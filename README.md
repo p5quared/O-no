@@ -1,93 +1,59 @@
 # Multiplayer Web Game (Name TBD)
 
-This is a real-time multiplayer game built with **SvelteKit**, **PocketBase**, and **Supabase**. It uses **custom WebSockets** for real-time interactions.
+A real-time multiplayer game built with **SvelteKit**, **PocketBase**, and **Supabase**, using **custom WebSockets** for real-time gameplay.
 
-> 🎮 The actual game is still being decided. Game details and mechanics will be added soon!
+> 🎮 The game concept is still being finalized. This README will be updated with gameplay details once chosen.
 
 ---
 
 ## 🧰 Tech Stack
 
 - **Frontend**: [SvelteKit](https://kit.svelte.dev)
-- **Real-time Multiplayer**: WebSockets (custom socket logic)
-- **Auth & Realtime DB**: [Supabase](https://supabase.io)
-- **Admin DB & File Store**: [PocketBase](https://pocketbase.io)
+- **Realtime**: Custom WebSockets
+- **Database/Auth**: [Supabase](https://supabase.com) & [PocketBase](https://pocketbase.io)
 - **Styling**: Tailwind CSS
 - **Testing**: Vitest & Playwright
-- **Tooling**: Docker + Docker Compose
+- **Dev Environment**: Docker + Docker Compose
 
 ---
 
-## 🚀 Getting Started (Dev)
+## 🚀 Getting Started (Development)
 
-> 🐳 Docker is required
-
-### Run all services:
+Use the provided script to start the dev environment:
 
 ```bash
 ./scripts/dev.sh
 ```
 
-This script launches:
-- `frontend-dev` (SvelteKit)
-- `pocketbase` (Dockerized)
-- Supabase assumed to be connected via env vars
+This starts:
+- The SvelteKit frontend
+- PocketBase (via Docker)
+- Supabase (via your configured environment)
 
-> Or use raw Docker:
-
-```bash
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+App will be available at: [http://localhost:5173](http://localhost:5173)
 
 ---
 
 ## 🌐 Environment Variables
 
-Make sure these are set up:
+Required environment variables:
 
-| Key                      | Description                         |
-|--------------------------|-------------------------------------|
-| `PUBLIC_POCKETBASE_URL`  | URL to PocketBase API (e.g. `http://localhost:8090`) |
-| `SUPABASE_URL`           | Your Supabase project URL           |
-| `SUPABASE_ANON_KEY`      | Public key for Supabase client auth |
-| `NODE_ENV`               | Usually `development`               |
-
-Use `.env` or inject them directly in your shell or Docker config.
+| Variable                | Purpose                               |
+|-------------------------|----------------------------------------|
+| `PUBLIC_POCKETBASE_URL` | PocketBase API URL (e.g. `http://localhost:8090`) |
+| `SUPABASE_URL`          | Your Supabase project URL              |
+| `SUPABASE_ANON_KEY`     | Supabase anon/public key               |
+| `NODE_ENV`              | Usually set to `development`           |
 
 ---
 
 ## 🧪 Testing
 
+Run unit and e2e tests:
+
 ```bash
-# Unit tests
 npm run test:unit
-
-# End-to-end tests
 npm run test:e2e
-```
-
----
-
-## 📦 Production
-
-To build:
-
-```bash
-npm run build
-```
-
-To preview the build locally:
-
-```bash
-npm run preview
-```
-
-Or build/run with Docker:
-
-```bash
-docker-compose -f docker-compose.yml up --build
 ```
 
 ---
@@ -96,28 +62,23 @@ docker-compose -f docker-compose.yml up --build
 
 ```
 .
-├── app/                # Frontend (SvelteKit)
-├── pocketbase/         # Backend (Dockerized PocketBase)
+├── app/                # SvelteKit frontend
+├── pocketbase/         # Dockerized backend
 ├── scripts/            # Dev scripts
-├── docker-compose.*    # Docker environments
-├── .env                # Environment variables (optional)
+├── docker-compose.*    # Dev configuration
 └── README.md
 ```
 
 ---
 
-## ✅ TODO
+## 📌 Project Planning
 
-- [ ] Choose the actual game to implement
-- [ ] Connect Supabase (auth / real-time / persistence)
-- [ ] Add socket multiplayer logic
-- [ ] Create UI/UX flow
-- [ ] Write integration & gameplay tests
+All tasks, bugs, and feature requests are tracked using [GitHub Issues](../../issues) and [GitHub Projects](../../projects). Please refer there for the current TODO list.
 
 ---
 
 ## 🧠 Credits
 
-Built with ❤️ using SvelteKit, Supabase, PocketBase, and sockets.
+Built with ❤️ using SvelteKit, Supabase, PocketBase, and WebSockets.
 
 
