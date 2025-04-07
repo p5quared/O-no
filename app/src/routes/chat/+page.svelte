@@ -30,102 +30,31 @@
 	<title>Chat Demo</title>
 </svelte:head>
 
-<div class="chat-container">
-	<h1>Chat Demo</h1>
+<div class="max-w-xl mx-auto p-4">
+	<h1 class="text-center text-2xl font-bold mb-6">Chat Demo</h1>
 	
-	<div class="messages">
+	<div class="h-[400px] overflow-y-auto border border-gray-300 rounded p-4 mb-4 bg-gray-50">
 		{#if messages.length === 0}
-			<p class="empty-state">No messages yet. Be the first to say hello!</p>
+			<p class="text-gray-500 text-center mt-[180px]">No messages yet. Be the first to say hello!</p>
 		{:else}
 			{#each messages as message}
-				<div class="message">
-					<p class="content">{message.content}</p>
-					<span class="time">{new Date(message.created).toLocaleTimeString()}</span>
+				<div class="bg-white rounded-lg p-3 mb-3 shadow-sm">
+					<p class="m-0 mb-2 break-words">{message.content}</p>
+					<span class="text-xs text-gray-500">{new Date(message.created).toLocaleTimeString()}</span>
 				</div>
 			{/each}
 		{/if}
 	</div>
 	
-	<form on:submit|preventDefault={handleSendMessage} class="message-form">
+	<form on:submit|preventDefault={handleSendMessage} class="flex gap-2">
 		<input 
 			type="text" 
 			bind:value={newMessage} 
 			placeholder="Type a message..." 
 			autocomplete="off"
+			class="flex-1 p-3 border border-gray-300 rounded"
 		/>
-		<button type="submit">Send</button>
+		<button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded">Send</button>
 	</form>
 </div>
 
-<style>
-	.chat-container {
-		max-width: 600px;
-		margin: 0 auto;
-		padding: 1rem;
-	}
-	
-	h1 {
-		text-align: center;
-		margin-bottom: 1.5rem;
-	}
-	
-	.messages {
-		height: 400px;
-		overflow-y: auto;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		padding: 1rem;
-		margin-bottom: 1rem;
-		background: #f9f9f9;
-	}
-	
-	.empty-state {
-		color: #666;
-		text-align: center;
-		margin-top: 180px;
-	}
-	
-	.message {
-		background: white;
-		border-radius: 8px;
-		padding: 0.75rem;
-		margin-bottom: 0.75rem;
-		box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-	}
-	
-	.content {
-		margin: 0 0 0.5rem 0;
-		word-break: break-word;
-	}
-	
-	.time {
-		font-size: 0.8rem;
-		color: #666;
-	}
-	
-	.message-form {
-		display: flex;
-		gap: 0.5rem;
-	}
-	
-	input {
-		flex: 1;
-		padding: 0.75rem;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-	}
-	
-	button {
-		padding: 0.75rem 1.5rem;
-		background: #4f46e5;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-weight: bold;
-	}
-	
-	button:hover {
-		background: #4338ca;
-	}
-</style>
