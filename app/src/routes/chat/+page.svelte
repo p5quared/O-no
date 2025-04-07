@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { pb } from '$lib/pb/pocketbase';
+	import { getChatMessages, subscribeToChatUpdates, sendChatMessage } from '$lib/pb/chat';
 	import type { ChatMessage } from './types';
 
 	let messages: ChatMessage[] = [];
@@ -8,37 +8,21 @@
 	let unsubscribe: () => void;
 
 	onMount(async () => {
-		try {
-			const records = await pb.collection('chat').getList(1, 50, {
-				sort: 'created'
-			});
-			messages = records.items as ChatMessage[];
+		const initialMessages = await getChatMessages();
+		messages = initialMessages;
 
-			unsubscribe = await pb.collection('chat').subscribe('*', async ({ action, record }) => {
-				if (action === 'create') {
-					messages = [...messages, record as ChatMessage];
-				}
-			});
-		} catch (error) {
-			console.error('Failed to connect to PocketBase:', error);
-		}
+		unsubscribe = await subscribeToChatUpdates((newMsg) => {
+			messages = [...messages, newMsg];
+		});
 	});
 
 	onDestroy(() => {
 		if (unsubscribe) unsubscribe();
 	});
 
-	async function sendMessage() {
-		if (!newMessage.trim()) return;
-		
-		try {
-			await pb.collection('chat').create({
-				content: newMessage
-			});
-			newMessage = '';
-		} catch (error) {
-			console.error('Failed to send message:', error);
-		}
+	async function handleSendMessage() {
+		await sendChatMessage(newMessage);
+		newMessage = '';
 	}
 </script>
 
@@ -62,7 +46,7 @@
 		{/if}
 	</div>
 	
-	<form on:submit|preventDefault={sendMessage} class="message-form">
+	<form on:submit|preventDefault={handleSendMessage} class="message-form">
 		<input 
 			type="text" 
 			bind:value={newMessage} 
