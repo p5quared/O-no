@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd app
+npm run format
+
+git add -u
