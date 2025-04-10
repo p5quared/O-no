@@ -56,6 +56,7 @@
 		<input
 			type="text"
 			bind:value={username}
+
 			placeholder="Username"
 			required
 			autocomplete="off"
