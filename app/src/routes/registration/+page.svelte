@@ -1,8 +1,43 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
+	import { createUser } from '$lib/pb/users';
+	import { goto } from '$app/navigation';
+	
+	let username = '';
+	let email = '';
+	let password = '';
+	let passwordConfirm = '';
+	let error = '';
+	let loading = false;
+	let successMessage = '';
 
-	export let form: ActionData;
+	async function handleSubmit() {
+		loading = true;
+		error = '';
+
+		if (password !== passwordConfirm) {
+			error = 'Passwords do not match!';
+			loading = false;
+			return false;
+		}
+
+		const result = await createUser({
+			username,
+			email,
+			password,
+			passwordConfirm
+		});
+
+		if (result.success) {
+		  
+		successMessage = 'Account created!';
+		setTimeout(() => goto('/login'), 1500);
+		} else {
+			error = result.error || 'Registration failed';
+		}
+		
+		loading = false;
+		return false;
+	}
 </script>
 
 <svelte:head>
@@ -11,14 +46,17 @@
 
 <div class="mx-auto max-w-md p-4">
 	<h1 class="mb-4 text-2xl font-bold">Registration</h1>
-	{#if form?.error}
-		<p class="text-red-600">{form.error}</p>
+	{#if error}
+		<p class="text-red-600">{error}</p>
 	{/if}
-	<form method="POST" use:enhance class="flex flex-col gap-4">
+  {#if successMessage}
+	<p class="text-green-600">{successMessage}</p>
+  {/if}
+	<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
 		<input
 			type="text"
-			name="username"
-			value={form?.username ?? ''}
+			bind:value={username}
+
 			placeholder="Username"
 			required
 			autocomplete="off"
@@ -26,8 +64,7 @@
 		/>
 		<input
 			type="email"
-			name="email"
-			value={form?.email ?? ''}
+			bind:value={email}
 			placeholder="Email"
 			required
 			autocomplete="off"
@@ -35,7 +72,7 @@
 		/>
 		<input
 			type="password"
-			name="password"
+			bind:value={password}
 			placeholder="Password"
 			required
 			autocomplete="off"
@@ -43,7 +80,7 @@
 		/>
 		<input
 			type="password"
-			name="passwordConfirm"
+			bind:value={passwordConfirm}
 			placeholder="Confirm Password"
 			required
 			autocomplete="off"
@@ -52,7 +89,10 @@
 		<button
 			type="submit"
 			class="rounded bg-indigo-600 px-6 py-3 font-bold text-white hover:bg-indigo-700"
-			style="cursor:pointer">Register</button
+			style="cursor:pointer"
+			disabled={loading}
 		>
+			{loading ? 'Registering...' : 'Register'}
+		</button>
 	</form>
 </div>
