@@ -4,10 +4,9 @@
 	import { onMount } from 'svelte';
 
 	const urlParams = page.url.searchParams;
-	const name = urlParams.get("name") ?? "xxx"
+	const name = urlParams.get('name') ?? 'xxx';
 
-
-  onMount(async () => {
-	  init(name);
+	onMount(async () => {
+		init(name);
 	});
 </script>
