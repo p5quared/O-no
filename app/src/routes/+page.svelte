@@ -2,6 +2,14 @@
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcomeFallback from '$lib/images/svelte-welcome.png';
+
+	import { pb } from '$lib/pb/pocketbase'; //hello I added this to test login
+	let username: string | null = null;
+
+	if (pb.authStore.isValid && pb.authStore.model) {
+		username = pb.authStore.model.username;
+	}
+
 </script>
 
 <svelte:head>
@@ -19,6 +27,13 @@
 		</span>
 
 		to your new<br />SvelteKit app
+		{#if username}
+			<p class="text-center text-lg font-semibold mt-4">Welcome, {username}!</p>
+		{:else}
+			<p class="text-center text-lg text-gray-500 mt-4">Welcome, Guest</p>
+		{/if}
+
+
 	</h1>
 
 	<h2>
