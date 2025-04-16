@@ -1,28 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { page } from '$app/stores';
 	import logo from '$lib/images/svelte-logo.svg';
-	import { isUserAuthenticated, logout, getCurrentUser } from '$lib/pb/users';
-	import { onMount } from 'svelte';
-
-	let isLoggedIn = false;
-	let currentUser = null;
+	import { currentUser, pb } from '$lib/pb/pocketbase';
 
 	function handleLogout() {
-		logout();
-		window.location.href = '/';
+		pb.authStore.clear();
 	}
-
-	// Add debug function to check auth state
-	function checkAuth() {
-		isLoggedIn = isUserAuthenticated();
-		currentUser = getCurrentUser();
-		return isLoggedIn;
-	}
-
-	// Check auth on mount
-	onMount(() => {
-		checkAuth();
-	});
 
 	$: navItems = [
 		{ name: 'Home', path: '/' },
@@ -30,6 +13,15 @@
 		{ name: 'Sverdle', path: '/sverdle' },
 		{ name: 'Chat Demo', path: '/chat' }
 	];
+
+	function getAvatarUrl(user) {
+		if (!user || !user.avatar) return '';
+		const pocketbaseUrl =
+			typeof window !== 'undefined'
+				? import.meta.env.PUBLIC_POCKETBASE_URL || 'http://localhost:8090'
+				: 'http://localhost:8090';
+		return `${pocketbaseUrl}/api/files/${user.collectionId || 'users_auth'}/${user.id}/${user.avatar}`;
+	}
 </script>
 
 <header>
@@ -45,17 +37,17 @@
 		</svg>
 		<ul>
 			{#each navItems as item}
-				<li aria-current={page.url.pathname === item.path ? 'page' : undefined}>
+				<li aria-current={$page.url.pathname === item.path ? 'page' : undefined}>
 					<a href={item.path}>{item.name}</a>
 				</li>
 			{/each}
 
-			{#if checkAuth()}
+			{#if $currentUser}
 				<li>
 					<button on:click={handleLogout} class="nav-button">Logout</button>
 				</li>
 			{:else}
-				<li aria-current={page.url.pathname === '/login' ? 'page' : undefined}>
+				<li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
 					<a href="/login">Login</a>
 				</li>
 			{/if}
@@ -66,13 +58,13 @@
 	</nav>
 
 	<div class="corner user-corner">
-		{#if checkAuth() && currentUser}
+		{#if $currentUser}
 			<div class="user-info">
-				{#if currentUser.avatar}
-					<img src={currentUser.avatar} alt="Avatar" class="avatar" />
+				{#if getAvatarUrl($currentUser)}
+					<img src={getAvatarUrl($currentUser)} alt="Avatar" class="avatar" />
 				{/if}
 				<span class="username"
-					>{currentUser.name || currentUser.username || currentUser.email || 'User'}</span
+					>{$currentUser.name || $currentUser.username || $currentUser.email || 'User'}</span
 				>
 			</div>
 		{/if}

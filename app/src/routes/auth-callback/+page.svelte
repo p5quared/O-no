@@ -4,171 +4,72 @@
 	import { pb } from '$lib/pb/pocketbase';
 
 	let status = 'Processing authentication...';
-	let debugInfo = '';
 	let errorDetails = '';
-	let callbackParams = {};
 	let success = false;
 	let userInfo = { name: '', email: '', picture: '' };
 
-	// Exchange code for tokens with Google
-	async function exchangeCodeForTokens(code, redirectUri) {
-		// Hardcoded credentials for testing
-		const clientId = 'PUBLIC_GOOGLE_CLIENT_ID';
-		const clientSecret = 'GOOGLE_CLIENT_SECRET';
-
-		console.log('Using client ID:', clientId);
-		console.log('Using redirect URI:', redirectUri);
-
-		const tokenUrl = 'https://oauth2.googleapis.com/token';
-
-		// Create the request payload
-		const payload = {
-			code,
-			client_id: clientId,
-			client_secret: clientSecret,
-			redirect_uri: redirectUri,
-			grant_type: 'authorization_code'
-		};
-
-		console.log('Token request payload:', payload);
-
-		const response = await fetch(tokenUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			body: new URLSearchParams(payload)
-		});
-
-		if (!response.ok) {
-			const errorResponse = await response.json();
-			console.error('Token exchange error:', errorResponse);
-			throw new Error(
-				errorResponse.error_description ||
-					`Failed to exchange code for tokens: ${errorResponse.error || 'Unknown error'}`
-			);
-		}
-
-		return response.json();
-	}
-
-	// Get user info from Google
-	async function getUserInfo(accessToken) {
-		const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
-			headers: {
-				Authorization: `Bearer ${accessToken}`
-			}
-		});
-
-		if (!response.ok) {
-			throw new Error('Failed to get user info');
-		}
-
-		return response.json();
-	}
-
 	onMount(async () => {
+		const urlParams = new URLSearchParams(window.location.search);
+		const code = urlParams.get('code');
+		const state = urlParams.get('state');
+		const errorParam = urlParams.get('error');
+
+		if (errorParam) {
+			status = 'OAuth Error from Google';
+			errorDetails = `Google returned an error: ${errorParam}`;
+			console.error('OAuth error from provider:', errorParam);
+			return;
+		}
+
+		if (!code || !state) {
+			status = 'Invalid callback parameters';
+			errorDetails = 'Missing authorization code or state from Google.';
+			console.error('Missing code or state in callback URL');
+			return;
+		}
+
+		status = 'Authenticating with PocketBase...';
+
 		try {
-			// Get all URL parameters for debugging
-			const urlParams = new URLSearchParams(window.location.search);
-			const paramObject = {};
-			urlParams.forEach((value, key) => {
-				paramObject[key] = value;
-			});
+			const redirectUrl = `${window.location.origin}/auth-callback`;
 
-			callbackParams = paramObject;
+			const authData = await pb
+				.collection('users')
+				.authWithOAuth2Code('google', code, state, redirectUrl);
 
-			const code = urlParams.get('code');
-			const stateParam = urlParams.get('state');
-			const error = urlParams.get('error');
+			console.log('PocketBase auth successful:', authData);
 
-			if (error) {
-				status = `OAuth Error: ${error}`;
-				errorDetails = error;
-				console.error('OAuth error:', error);
-				return;
+			success = true;
+			status = 'Authentication successful!';
+
+			if (pb.authStore.model) {
+				const model = pb.authStore.model;
+				const avatarUrl = model.avatar
+					? `${pb.baseUrl}/api/files/${model.collectionId || model.collectionName}/${model.id}/${model.avatar}`
+					: '';
+
+				userInfo = {
+					name: model.name || model.username || 'User',
+					email: model.email || '',
+					picture: avatarUrl
+				};
 			}
 
-			if (code) {
-				status = 'OAuth code received, processing...';
-				debugInfo = `Code: ${code.substring(0, 10)}...`;
-
-				try {
-					// Get the redirect URI that was used
-					const redirectUri = `${window.location.origin}/auth-callback`;
-
-					// Exchange code for tokens
-					const tokens = await exchangeCodeForTokens(code, redirectUri);
-
-					// Get user info from Google
-					const googleUserInfo = await getUserInfo(tokens.access_token);
-
-					// Set up the authentication in PocketBase
-					try {
-						// Clear any existing auth data
-						pb.authStore.clear();
-
-						// Create a valid-looking auth token (using the Google token)
-						const authToken = tokens.access_token;
-
-						// Create a valid-looking user model
-						const userModel = {
-							id: 'google_' + googleUserInfo.id,
-							email: googleUserInfo.email,
-							username: googleUserInfo.email.split('@')[0],
-							name: googleUserInfo.name,
-							avatar: googleUserInfo.picture
-						};
-
-						// Save to PocketBase's auth store
-						pb.authStore.save(authToken, userModel);
-
-						// Also manually save to localStorage as a backup
-						if (typeof window !== 'undefined') {
-							localStorage.setItem(
-								'pocketbase_auth',
-								JSON.stringify({
-									token: authToken,
-									model: userModel
-								})
-							);
-						}
-
-						// Show success UI
-						success = true;
-						status = 'Authentication successful!';
-
-						// Set user info for display
-						userInfo = {
-							name: googleUserInfo.name || 'User',
-							email: googleUserInfo.email || '',
-							picture: googleUserInfo.picture || ''
-						};
-
-						// Give time to see the success message
-						setTimeout(() => {
-							// Force full page reload with a special parameter to prevent auto-validation
-							window.location.href = '/?auth=manual';
-						}, 2000);
-					} catch (authSetupError) {
-						console.error('Error setting up auth:', authSetupError);
-						status = 'Auth setup failed';
-						errorDetails = 'Could not set up authentication properly.';
-					}
-				} catch (authError) {
-					console.error('Authentication error:', authError);
-					status = 'Authentication failed';
-					errorDetails = authError instanceof Error ? authError.message : 'Authentication failed';
-				}
-			} else {
-				status = 'No authentication code found in URL';
-				debugInfo = 'Could not find the OAuth code parameter in the callback URL.';
-				console.error('No code parameter found in callback URL');
+			// Use SvelteKit's goto for client-side navigation
+			console.log('Navigating to home page using goto...');
+			setTimeout(() => {
+				goto('/', { replaceState: true });
+			}, 1000); // Keep a small delay for user feedback
+		} catch (err) {
+			console.error('PocketBase OAuth Error:', err);
+			status = 'Authentication failed';
+			errorDetails =
+				err?.message ||
+				'Failed to authenticate with PocketBase. Check PocketBase server logs and configuration.';
+			if (err?.data) {
+				console.error('PocketBase Error Data:', err.data);
+				errorDetails += ` Details: ${JSON.stringify(err.data)}`;
 			}
-		} catch (error) {
-			console.error('Auth callback error:', error);
-			status = 'Authentication error, please try again.';
-			errorDetails = error instanceof Error ? error.message : 'Unknown error';
 		}
 	});
 </script>
@@ -240,13 +141,6 @@
 				<div
 					class="mx-auto mt-6 h-12 w-12 animate-spin rounded-full border-4 border-t-blue-500"
 				></div>
-			{/if}
-
-			{#if debugInfo && !errorDetails}
-				<div class="mt-4 rounded bg-gray-100 p-3 text-left text-sm">
-					<p class="font-bold">Debug Info:</p>
-					<p class="overflow-auto">{debugInfo}</p>
-				</div>
 			{/if}
 		{/if}
 	</div>

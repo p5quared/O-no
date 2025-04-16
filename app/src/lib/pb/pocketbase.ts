@@ -1,4 +1,5 @@
-import PocketBase from 'pocketbase';
+import PocketBase, { type AuthModel } from 'pocketbase';
+import { writable } from 'svelte/store';
 
 // Get the PocketBase URL from environment variables or use the default localhost
 const pocketbaseUrl =
@@ -15,6 +16,12 @@ export const pb = new PocketBase(pocketbaseUrl);
 
 // Disable auto-cancellation
 pb.autoCancellation(false);
+
+/**
+ * Svelte store to hold the current authenticated user model.
+ * Initialize with the current state from pb.authStore.
+ */
+export const currentUser = writable<AuthModel | null>(pb.authStore.model);
 
 // Important: Prevent PocketBase from auto-validating the token
 // This will keep our manually set token valid regardless of server validation
@@ -34,9 +41,10 @@ if (typeof window !== 'undefined') {
 	});
 }
 
-// Simple auth state change listener
-pb.authStore.onChange(() => {
-	// Auth state changed - no need for verbose logging
+// Update the currentUser store whenever the auth state changes
+pb.authStore.onChange((token, model) => {
+	console.log('Auth state changed, updating store. New model:', model);
+	currentUser.set(model);
 });
 
 // Debug log current auth state on load
