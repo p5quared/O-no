@@ -56,3 +56,64 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 		};
 	}
 }
+
+/**
+ * Authenticate with Google OAuth
+ */
+export async function authenticateWithGoogle() {
+	try {
+		// This will redirect the user to the OAuth provider's sign-in page
+		const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+		return {
+			success: true,
+			data: authData
+		};
+	} catch (error: any) {
+		console.error('Google authentication failed:', error);
+		return {
+			success: false,
+			error: error?.message || 'Google authentication failed'
+		};
+	}
+}
+
+/**
+ * Authenticate with GitHub OAuth
+ */
+export async function authenticateWithGitHub() {
+	try {
+		// This will redirect the user to the OAuth provider's sign-in page
+		const authData = await pb.collection('users').authWithOAuth2({ provider: 'github' });
+		return {
+			success: true,
+			data: authData
+		};
+	} catch (error: any) {
+		console.error('GitHub authentication failed:', error);
+		return {
+			success: false,
+			error: error?.message || 'GitHub authentication failed'
+		};
+	}
+}
+
+/**
+ * Check if the user is authenticated
+ */
+export function isUserAuthenticated() {
+	return pb.authStore.isValid;
+}
+
+/**
+ * Get the current authenticated user
+ */
+export function getCurrentUser() {
+	return pb.authStore.model;
+}
+
+/**
+ * Logout the current user
+ */
+export function logout() {
+	pb.authStore.clear();
+}

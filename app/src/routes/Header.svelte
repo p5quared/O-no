@@ -2,6 +2,12 @@
 	import { page } from '$app/state';
 	import logo from '$lib/images/svelte-logo.svg';
 	import github from '$lib/images/github.svg';
+	import { isUserAuthenticated, logout } from '$lib/pb/users';
+
+	function handleLogout() {
+		logout();
+		window.location.href = '/';
+	}
 </script>
 
 <header>
@@ -28,6 +34,15 @@
 			<li aria-current={page.url.pathname === '/chat' ? 'page' : undefined}>
 				<a href="/chat">Chat Demo</a>
 			</li>
+			{#if isUserAuthenticated()}
+				<li>
+					<button on:click={handleLogout} class="nav-button">Logout</button>
+				</li>
+			{:else}
+				<li aria-current={page.url.pathname === '/login' ? 'page' : undefined}>
+					<a href="/login">Login</a>
+				</li>
+			{/if}
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
@@ -112,7 +127,8 @@
 		border-top: var(--size) solid var(--color-theme-1);
 	}
 
-	nav a {
+	nav a,
+	.nav-button {
 		display: flex;
 		height: 100%;
 		align-items: center;
@@ -124,9 +140,13 @@
 		letter-spacing: 0.1em;
 		text-decoration: none;
 		transition: color 0.2s linear;
+		background: none;
+		border: none;
+		cursor: pointer;
 	}
 
-	a:hover {
+	a:hover,
+	.nav-button:hover {
 		color: var(--color-theme-1);
 	}
 </style>
