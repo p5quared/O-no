@@ -27,4 +27,11 @@ export async function loginUser(email: string, password: string): Promise<LoginR
 			error: errorMessage
 		};
 	}
+
+}
+
+
+
+export function logoutUser(){
+	pb.authStore.clear();
 }
