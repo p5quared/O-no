@@ -23,36 +23,13 @@
 		loading = false;
 	}
 	async function handleGoogleLogin() {
-		console.log('Google login button clicked');
-		loading = true;
-		error = '';
-
 		try {
-			// Use PocketBase SDK to initiate OAuth2 flow.
-			// This handles URL construction, PKCE, and state management.
 			await pb.collection('users').authWithOAuth2({
-				provider: 'google' // Ensure this matches the provider name in PocketBase Admin UI
+				provider: 'google'
 			});
-			// If successful, browser navigates away.
-			loading = false; // Reset in case of immediate error before redirect
-		} catch (err: any) {
-			console.error('PocketBase Google OAuth initiation error:', err);
-			error = err.message || 'Failed to initiate Google authentication with PocketBase.';
-			loading = false;
-		}
-	}
-
-	function handleGitHubLogin() {
-		loading = true;
-		error = '';
-
-		try {
-			// We'll implement GitHub later if Google works
-			error = 'GitHub login not implemented yet';
-			loading = false;
-		} catch (err: any) {
-			error = err.message || 'GitHub authentication failed';
-			loading = false;
+			// PocketBase handles the redirect and callback automatically
+		} catch (error) {
+			console.error('Login failed:', error);
 		}
 	}
 </script>
