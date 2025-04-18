@@ -1,6 +1,19 @@
 #!/bin/bash
 
-cd app
-npm run format
+# Get list of staged JavaScript, TypeScript, and Svelte files in the app directory
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^app/.*\.(js|jsx|ts|tsx|svelte)$' || true)
 
-git add -u
+if [ -n "$FILES" ]; then
+  # Change to the app directory
+  cd app
+  
+  # Format only the staged files
+  echo "$FILES" | xargs npx prettier --write
+  
+  # Add the formatted files back to staging
+  echo "$FILES" | xargs git add
+fi
+
+# Exit successfully
+exit 0
+
