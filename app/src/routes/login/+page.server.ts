@@ -30,16 +30,16 @@ function handleGoogleLogin() {
 	}
 }
 
-function handleGitHubLogin() {
-	loading = true;
-	error = '';
+// function handleGitHubLogin() {
+// 	loading = true;
+// 	error = '';
 
-	try {
-		// We'll implement GitHub later if Google works
-		error = 'GitHub login not implemented yet';
-		loading = false;
-	} catch (err: any) {
-		error = err.message || 'GitHub authentication failed';
-		loading = false;
-	}
-}
+// 	try {
+// 		// We'll implement GitHub later if Google works
+// 		error = 'GitHub login not implemented yet';
+// 		loading = false;
+// 	} catch (err: any) {
+// 		error = err.message || 'GitHub authentication failed';
+// 		loading = false;
+// 	}
+// }

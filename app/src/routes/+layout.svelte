@@ -9,7 +9,7 @@
 	<Header />
 
 	<main>
-		{@render children()}
+		<slot />
 	</main>
 
 	<footer>
