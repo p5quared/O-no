@@ -3,9 +3,6 @@
 	import logo from '$lib/images/svelte-logo.svg';
 	import { pb } from '$lib/pb/pocketbase';
 
-	function getAvatarUrl(user: any) {
-		return `${pb.baseUrl}/api/files/${user.collectionId || 'users_auth'}/${user.id}/${user.avatar}`;
-	}
 
 </script>
 
@@ -52,15 +49,15 @@
 	<div class="user-corner">
 		{#if pb.authStore.model}
 			<div class="user-info">
-				{#if getAvatarUrl(pb.authStore.model)}
-					<img src={getAvatarUrl(pb.authStore.model)} alt="Avatar" class="avatar" />
+				{#if pb.authStore.model?.avatar}
+					<img src={`${pb.baseUrl}/api/files/${pb.authStore.model.collectionId}/${pb.authStore.model.id}/${pb.authStore.model.avatar}`} alt="Avatar" class="avatar" />
 				{/if}
 				<span class="username">
-					{pb.authStore.model.name || pb.authStore.model.username || pb.authStore.model.email || 'User'}
+					{pb.authStore.model.name || 'User'}
 				</span>
 			</div>
 		{/if}
-		</div>
+	</div>
 
 </header>
 
