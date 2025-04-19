@@ -13,7 +13,7 @@
 
 		try {
 			await pb.collection('users').authWithPassword(email, password);
-			goto('/');
+			window.location.href = '/';
 		} catch (err: any) {
 			error = err.message || 'Login failed';
 		}

@@ -34,7 +34,7 @@
 				<a href="/chat">Chat Demo</a>
 			</li>
 
-			{#if pb.authStore.model}
+			{#if pb.authStore.model }
 				<li>
 					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button">Logout</button></a>
 				</li>
