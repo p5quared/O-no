@@ -9,9 +9,7 @@
 	let chatContainer: HTMLDivElement;
 
 	$: if (chatContainer && messages.length > 0) {
-		setTimeout(() => {
-			chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
-		}, 0);
+		setTimeout(() => {chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' })}, 0);
 	}
 
 	onMount(async () => {
@@ -48,9 +46,7 @@
 		{:else}
 			{#each messages as message}
 				<div class="mb-3 rounded-lg bg-white p-3 shadow-sm">
-					<span class="font-semibold text-sm text-gray-700">
-						{pb.authStore.model?.username || 'Guest'}
-					</span>
+					<span class="font-semibold text-sm text-gray-700">{pb.authStore.model?.username || 'Guest'}</span>
 					<p class="m-0 mb-2 break-words">{message.content}</p>
 					<span class="text-xs text-gray-500">{new Date(message.created).toLocaleTimeString()}</span
 					>
