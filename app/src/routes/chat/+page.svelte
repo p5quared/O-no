@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { getChatMessages, subscribeToChatUpdates, sendChatMessage } from '$lib/pb/chat';
 	import type { ChatMessage } from './types';
-
+	import { pb } from '$lib/pb/pocketbase';
 	let messages: ChatMessage[] = [];
 	let newMessage = '';
 	let unsubscribe: () => void;
@@ -12,7 +12,7 @@
 		messages = initialMessages;
 
 		unsubscribe = await subscribeToChatUpdates((newMsg) => {
-			messages = [...messages, newMsg];
+			messages = [newMsg, ...messages];
 		});
 	});
 
@@ -41,6 +41,9 @@
 		{:else}
 			{#each messages as message}
 				<div class="mb-3 rounded-lg bg-white p-3 shadow-sm">
+					<span class="font-semibold text-sm text-gray-700">
+						{pb.authStore.model?.username || 'Guest'}
+					</span>
 					<p class="m-0 mb-2 break-words">{message.content}</p>
 					<span class="text-xs text-gray-500">{new Date(message.created).toLocaleTimeString()}</span
 					>
