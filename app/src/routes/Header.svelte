@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import logo from '$lib/images/svelte-logo.svg';
 	import { pb } from '$lib/pb/pocketbase';
-	import ProfilePicture from '$lib/components/ProfilePicture.svelte';
+	import ProfilePicture from './ProfilePicture.svelte';
 
 </script>
 
