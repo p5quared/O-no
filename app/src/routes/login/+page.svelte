@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	import { goto } from '$app/navigation';
 	import { pb } from '$lib/pb/pocketbase';
 	import google from '$lib/images/google.svg';
@@ -38,6 +39,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-md p-4">
+
 	<h1 class="mb-6 text-2xl font-bold">Login</h1>
 
 	{#if error}
@@ -62,6 +64,7 @@
 
 		<button
 			type="submit"
+
 			class="mb-4 flex items-center justify-center gap-2 rounded bg-indigo-600 px-6 py-3 font-bold text-white hover:bg-indigo-700"
 			disabled={loading}
 		>
