@@ -36,7 +36,7 @@ class PlayerBuilder extends EntityBuilder {
 		this.isLocalPlayer = true;
 		return this
 	}
-	public build(): GameObj<SpriteComp | PosComp | AreaComp | BodyComp> {
+	public build(): KaplayPlayerType {
 		const k = kaplay();
 
 		let p = k.add([
@@ -63,7 +63,7 @@ class PlayerBuilder extends EntityBuilder {
   }
 
   private setupNetworkHooks(p: KaplayPlayerType): KaplayPlayerType {
-	// TODO: Connect the incomming events pipeline from Conduit
+	// TODO: Connect the events pipeline from Conduit
 	// and define the effects
 	//@ts-ignore
 	return
