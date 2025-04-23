@@ -3,7 +3,6 @@
 	import logo from '$lib/images/svelte-logo.svg';
 	import { pb } from '$lib/pb/pocketbase';
 	import ProfilePicture from './ProfilePicture.svelte';
-
 </script>
 
 <header>
@@ -31,9 +30,17 @@
 				<a href="/chat">Chat Demo</a>
 			</li>
 
-			{#if pb.authStore.model }
+			{#if pb.authStore.model}
 				<li>
-					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button">Logout</button></a>
+					<a
+						><button
+							on:click={() => {
+								pb.authStore.clear();
+								window.location.href = '/';
+							}}
+							class="nav-button">Logout</button
+						></a
+					>
 				</li>
 			{:else}
 				<li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
@@ -44,7 +51,6 @@
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
-		
 	</nav>
 	<div class="user-corner">
 		{#if pb.authStore.model}
@@ -56,7 +62,6 @@
 			</div>
 		{/if}
 	</div>
-
 </header>
 
 <style>
@@ -130,7 +135,8 @@
 		border-top: var(--size) solid var(--color-theme-1);
 	}
 
-	nav a, .nav-button {
+	nav a,
+	.nav-button {
 		display: flex;
 		height: 100%;
 		align-items: center;
@@ -182,5 +188,4 @@
 		object-fit: cover;
 		border: 2px solid white;
 	}
-
 </style>
