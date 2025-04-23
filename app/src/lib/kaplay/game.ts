@@ -3,7 +3,7 @@ import {
 	updatePosition,
 	type PositionRecord
 } from '$lib/pb/game';
-import kaplay, { type GameObj } from 'kaplay';
+import kaplay, { type GameObj, type Vec2 } from 'kaplay';
 
 function mulberry32(seed: number) {
 	return function () {
@@ -15,7 +15,7 @@ function mulberry32(seed: number) {
 }
 
 
-const _id = Math.random().toString(36).substring(2, 9);
+// const _id = Math.random().toString(36).substring(2, 9);
 
 const debounce = (func: Function, delay: number) => {
 	let timeout: ReturnType<typeof setTimeout>;
@@ -32,15 +32,15 @@ const updatePositionDebounced = debounce(updatePosition, 10);
 // Shared constants
 const GROUND_HEIGHT = 48;
 const PLATFORM_WIDTH = 100;
-const MIN_GAP = 40;
+const MIN_GAP = 70;
 
 // World generation function
-function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed = 1337) {
+function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogGodHeight: number, seed = 1337) {
+
 	const {
-		add, rect, pos, width, area, body, color, outline, circle, destroy
+		add, rect, pos, width, area, body, color, outline, destroy, offscreen
 	} = k;
 
-	const PLATFORM_WIDTH = 100;
 	const PLATFORM_HEIGHT = 8;
 
 	const rng = mulberry32(seed);
@@ -49,15 +49,18 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed 
 	// Ground
 	add([
 		rect(width(), GROUND_HEIGHT),
-		pos(0, WORLD_HEIGHT - GROUND_HEIGHT),
+		pos(0, (WORLD_HEIGHT - frogGodHeight) - GROUND_HEIGHT),
 		area(),
 		body({ isStatic: true }),
 		color(139, 69, 19),
 		outline(2)
 	]);
 
-	for (let y = WORLD_HEIGHT - 150; y > 100; y -= 120) {
-		const roll = rng();
+	const platformGenStart = (WORLD_HEIGHT - frogGodHeight) - 150;
+	const platformGenEnd = frogGodHeight / 3 - 64; // Same as FINAL_PLATFORM_Y
+
+	for (let y = platformGenStart; y > platformGenEnd; y -= 120) {
+		 const roll = rng();
 		let numPlatforms = 2;
 
 		if (roll < 1 / 6) {
@@ -107,7 +110,7 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed 
 						} else {
 							createTogglePlatform();
 						}
-					}, 3000);
+					}, 2000);
 				}
 			} else if (r < 0.10) {
 				// 🔥 Boost platform (5%)
@@ -118,6 +121,7 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed 
 					body({ isStatic: true, isPlatform: true }),
 					color(255, 140, 0),
 					outline(2),
+					offscreen({ distance: 600 }),
 					"boostpad"
 				]);
 			} else if (r < 0.15) {
@@ -168,7 +172,8 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed 
 					area(),
 					body({ isStatic: true, isPlatform: true }),
 					color(34, 139, 34),
-					outline(2)
+					outline(2),
+					offscreen({ distance: 600 })
 				]);
 			}
 
@@ -186,55 +191,82 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, seed 
 const init = (name: string) => {
 	const k = kaplay();
 	const {
-		add, rect, circle, pos, width, height, outline,
-		area, body, color, loadSprite, sprite, onKeyPress,
-		setGravity, onKeyPressRepeat, isKeyDown, vec2, camPos, layer, scale, z
+		add, pos, width, height, rect, color, opacity,
+		area, body, loadSprite, sprite, anchor, offscreen,
+		setGravity, onKeyPressRepeat, isKeyDown, vec2, scale, z, text
 	} = k;
 
 	loadSprite("hell", "/backgrounds/hell2.png");
 	loadSprite("swamp", "/backgrounds/swamp.png");
 	loadSprite("heaven", "/backgrounds/heaven.png");
+	loadSprite("froggod", "/backgrounds/froggod.png");
 
 	const bgOriginalWidth = 1024;
 	const bgOriginalHeight = 1536;
+	const frogGodOriginalHeight = 806;
 
 	const bgTargetWidth = width() * 1.7;
 	const bgScale = bgTargetWidth / bgOriginalWidth;
+
 	const bgTargetHeight = bgOriginalHeight * bgScale;
+	const frogGodHeight = frogGodOriginalHeight * bgScale;
+
 	const bgX = (width() / 2) - (bgTargetWidth / 2);
 
-// 🗺️ Stack 3 background levels vertically
-	const WORLD_HEIGHT = bgTargetHeight * 3;
+// 🗺️ Final world height includes 3 regular backgrounds + frogGod image
+	const WORLD_HEIGHT = bgTargetHeight * 3 + frogGodHeight;
+	const platformMaxY = frogGodHeight / 3;
 
-// Add hell background (bottom)
+	const bgLayers = ["hell", "swamp", "heaven"];
+
+	bgLayers.forEach((name, index) => {
+		add([
+			sprite(name),
+			scale(bgScale),
+			pos(bgX, WORLD_HEIGHT - bgTargetHeight * (index + 1)),
+			z(-10),
+			offscreen({ distance: 600 })
+		]);
+	});
+
 	add([
-		sprite("hell"),
+		sprite("froggod"),
 		scale(bgScale),
-		pos(bgX, WORLD_HEIGHT - bgTargetHeight),
-		z(-10)
+		pos(bgX, 0), // <-- Show it at the very top of the world
+		z(-10),
+		offscreen({ distance: 600 })
 	]);
 
-// Add swamp background (middle)
-	add([
-		sprite("swamp"),
-		scale(bgScale),
-		pos(bgX, WORLD_HEIGHT - bgTargetHeight * 2),
-		z(-10)
-	]);
+	// Can add/exclude 3rd param to put multiple players on same map
+	generateWorld(k, WORLD_HEIGHT, frogGodHeight);
 
-// Add heaven background (top)
-	add([
-		sprite("heaven"),
-		scale(bgScale),
-		pos(bgX, WORLD_HEIGHT - bgTargetHeight * 3),
-		z(-10)
-	]);
+	// 🌟 Final golden platforms at the top (in front of the Frog God)
+	const FINAL_PLATFORM_Y = frogGodHeight / 3 - 64;
+	const numFinalPlatforms = 5;
+	const spacing = width() / (numFinalPlatforms + 1);
+
+	for (let i = 1; i <= numFinalPlatforms; i++) {
+		add([
+			rect(PLATFORM_WIDTH, 8),
+			pos(spacing * i - PLATFORM_WIDTH / 2, FINAL_PLATFORM_Y),
+			area(),
+			body({ isStatic: true, isPlatform: true }),
+			color(255, 215, 0),
+			z(5)
+		]);
+
+		add([
+			rect(PLATFORM_WIDTH + 30, 30),
+			pos(spacing * i - PLATFORM_WIDTH / 2 - 15, FINAL_PLATFORM_Y - 11),
+			color(255, 215, 0),
+			opacity(0.3),
+			z(4)
+		]);
+	}
 
 
-	// Can change 3rd param to put multiple players on same map
-	generateWorld(k, WORLD_HEIGHT, Date.now());
 
-	const spawnPos = vec2(80, WORLD_HEIGHT - GROUND_HEIGHT - 32);
+	const spawnPos = vec2(80, (WORLD_HEIGHT - frogGodHeight) - GROUND_HEIGHT - 32);
 
 	loadSprite('bean', 'https://play.kaplayjs.com/sprites/bean.png');
 	// loadSprite("player", "/sprites/frogneutral.png");
@@ -246,6 +278,18 @@ const init = (name: string) => {
 		area(),
 		body()
 	]);
+
+	// Local name tag
+	const nameLabel = add([
+		text(name, { size: 12, align: "center", width: 100 }),
+		pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
+		anchor("center"),
+		z(10)
+	]);
+	localPlayer.onUpdate(() => {
+		nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
+	});
+
 
 	localPlayer.onCollide("boostpad", () => {
 		localPlayer.jump(2.5 * 400); // 2.5x jump height
@@ -289,24 +333,45 @@ const init = (name: string) => {
 	});
 
 	// Multiplayer player syncing
-	const remotePlayers: Record<string, GameObj> = {};
+	type RemotePlayerData = {
+		player: GameObj<{ pos: Vec2 }>;
+		nameTag: GameObj;
+	};
+
+	const remotePlayers: Record<string, RemotePlayerData> = {};
 
 	const onPlayerUpdates = (p: PositionRecord) => {
 		if (p.entity_name === name) return;
 
 		if (!remotePlayers[p.entity_name]) {
-			remotePlayers[p.entity_name] = add([
+			const player = add([
 				sprite('bean'),
 				pos(p.pos_x, p.pos_y),
-				area(),
-				body()
+				area(), // for overlap detection or interactivity
+				scale(1.0) // match local
 			]);
+
+			const nameTag = add([
+				text(p.entity_name, {
+					size: 12,
+					align: "center",
+					width: 100
+				}),
+				pos(p.pos_x + 28, p.pos_y + 64),
+				anchor("center"),
+				z(10)
+			]);
+			player.onUpdate(() => {
+				nameTag.pos = vec2(player.pos.x + 28, player.pos.y + 64);
+			});
+
+			remotePlayers[p.entity_name] = { player, nameTag };
 		}
 
-		const remote = remotePlayers[p.entity_name] as any;
-		remote.pos.x = p.pos_x;
-		remote.pos.y = p.pos_y;
+		const remote = remotePlayers[p.entity_name];
+		remote.player.pos = remote.player.pos.lerp(vec2(p.pos_x, p.pos_y), 0.08); // 0.2 = smoothing factor
 	};
+
 
 	subscribeToPositions(onPlayerUpdates);
 };
