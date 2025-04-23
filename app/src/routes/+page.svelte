@@ -6,20 +6,20 @@
 </script>
 
 <div class="container">
-	<section>
-		<h1>
-			<span class="welcome">
-				<picture>
-					<source srcset={welcome} type="image/webp" />
-					<img src={welcomeFallback} alt="Welcome" />
-				</picture>
-			</span>
-			to your new<br />SvelteKit app
-		</h1>
+<section>
+	<h1>
+		<span class="welcome">
+			<picture>
+				<source srcset={welcome} type="image/webp" />
+				<img src={welcomeFallback} alt="Welcome" />
+			</picture>
+		</span>
+		to your new<br />SvelteKit app
+	</h1>
 
 		<h2>try editing <strong>src/routes/+page.svelte</strong></h2>
-		<Counter />
-	</section>
+	<Counter />
+</section>
 	<Leaderboard />
 </div>
 
