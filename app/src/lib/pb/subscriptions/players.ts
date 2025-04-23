@@ -6,6 +6,7 @@ import type { PlayerPositionsRecord, PlayerPositionsResponse } from "../types/po
 
 type PositionHandler = (pr: PlayerPositionsRecord) => void;
 export const subscribeToPlayerPositions = (id: GameID, f: PositionHandler): EventSubscriptionInstance => {
+  // TODO: Filter by game id when we add lobby support
   pb.collection(TABLES.PLAYER_POSITIONS).subscribe<PlayerPositionsResponse>('update', (e) => {
 	f(e.record);
   })

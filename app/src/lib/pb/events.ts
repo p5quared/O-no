@@ -4,14 +4,13 @@ import type { GameEvents } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { TABLES } from "./constants";
-import { subscribeToPositions } from "./game";
 import { pb } from "./pocketbase";
 import { subscribeToPlayerPositions } from "./subscriptions/players";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
 
 /**
  * This class connects our EventBus to the outside world,
- * allowing us to send and receive events.
+ * allowing us to send and receive events over the network.
  */
 export class PBEventManager {
 	private gameID: GameID;
@@ -28,7 +27,7 @@ export class PBEventManager {
 	}
 
 	private setupIncomingEvents() {
-	  this.subscriptions.add(this.receivePlayerLocations())
+		this.subscriptions.add(this.receivePlayerLocations())
 	}
 
 	private setupOutGoingEvents() {
@@ -37,27 +36,26 @@ export class PBEventManager {
 		)
 	}
 
-
 	private broadcastLocation(e: GameEvents[GameEventTypes.PLAYER_MOVED]) {
 		if (this.positionTableID !== undefined && e.id === this.playerID) {
 			pb.collection(TABLES.PLAYER_POSITIONS).update(this.positionTableID, e.position)
 		}
 	}
 
-  private receivePlayerLocations() {
-	return subscribeToPlayerPositions(this.gameID, (e) => {
-		if (e.user !== this.playerID) {
+	private receivePlayerLocations() {
+		return subscribeToPlayerPositions(this.gameID, (e) => {
+			if (e.user !== this.playerID) {
 				Conduit.emit(GameEventTypes.PLAYER_MOVED, {
-				id: e.user,
-				position: {
-				position_x: e.position_x ?? 0, // NOTE: Casting away as these MUST be set
-				position_y: e.position_y ?? 0, // i.e. broadcast MUST have these
-				velocity_x: e.velocity_x ?? 0,
-				velocity_y: e.velocity_y ?? 0
-				}
-			  })
-		}
+					id: e.user,
+					position: {
+						position_x: e.position_x ?? -1, // WARN: Casting away as these MUST be set
+						position_y: e.position_y ?? -1, // i.e. broadcast MUST have these
+						velocity_x: e.velocity_x ?? -1,
+						velocity_y: e.velocity_y ?? -1
+					}
+				})
+			}
 
-	  })
-  }
+		})
+	}
 }
