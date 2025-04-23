@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { pb } from '$lib/pb/pocketbase';
 	import google from '$lib/images/google.svg';
+	import heavenBackground from '$lib/images/heaven.png';
+
 	// No environment variables needed here for the recommended flow
 	let error = '';
 	let loading = false;
@@ -38,51 +40,79 @@
 	<title>Login</title>
 </svelte:head>
 
-<div class="mx-auto max-w-md p-4">
-	<h1 class="mb-6 text-2xl font-bold">Login</h1>
 
-	{#if error}
-		<p class="mb-4 text-red-600">{error}</p>
-	{/if}
 
-	<form on:submit|preventDefault={handleLogin} class="flex flex-col gap-4">
-		<input
-			type="email"
-			bind:value={email}
-			placeholder="Email"
-			required
-			class="flex-1 rounded border border-gray-300 p-3"
-		/>
-		<input
-			type="password"
-			bind:value={password}
-			placeholder="Password"
-			required
-			class="flex-1 rounded border border-gray-300 p-3"
-		/>
+<div class="register-bg" style="background-image: url({heavenBackground});">
 
-		<button
-			type="submit"
-			class="mb-4 flex items-center justify-center gap-2 rounded bg-indigo-600 px-6 py-3 font-bold text-white hover:bg-indigo-700"
-			disabled={loading}
-		>
-			{#if loading}Logging in…{:else}Login{/if}
-		</button>
-	</form>
-	<div class="flex flex-col gap-4">
-		<button
-			on:click={handleGoogleLogin}
-			class="flex items-center justify-center gap-2 rounded bg-white px-6 py-3 font-medium text-gray-800 shadow hover:bg-gray-50"
-			style="cursor:pointer"
-			disabled={loading}
-		>
-			<img src={google} alt="Google" width="24" height="24" />
-			Continue with Google
-		</button>
-	</div>
+	<div class="mx-auto max-w-md p-4 form-box">
 
-	<div class="mt-6 text-center text-sm">
-		Don't have an account yet?
-		<a href="/registration" class="text-indigo-600 hover:underline">Register here</a>
+		<div class="mx-auto max-w-md p-4">
+			<h1 class="mb-6 text-2xl font-bold" style="color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">Hop On In!</h1>
+
+			{#if error}
+				<p class="mb-4 text-red-600">{error}</p>
+			{/if}
+
+			<form on:submit|preventDefault={handleLogin} class="flex flex-col gap-4">
+				<input
+					type="email"
+					bind:value={email}
+					placeholder="Email"
+					required
+					class="flex-1 rounded border border-gray-300 p-3"
+				/>
+				<input
+					type="password"
+					bind:value={password}
+					placeholder="Password"
+					required
+					class="flex-1 rounded border border-gray-300 p-3"
+				/>
+
+				<button
+					type="submit"
+					class="mb-4 flex items-center justify-center gap-2 rounded bg-indigo-600 px-6 py-3 font-bold text-white hover:bg-indigo-700"
+					style="cursor:pointer; background-color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;"
+					disabled={loading}
+				>
+					{#if loading}Logging in…{:else}Login{/if}
+				</button>
+			</form>
+			<div class="flex flex-col gap-4">
+				<button
+					on:click={handleGoogleLogin}
+					class="flex items-center justify-center gap-2 rounded bg-white px-6 py-3 font-medium text-gray-800 shadow hover:bg-gray-50"
+					style="cursor:pointer"
+					disabled={loading}
+				>
+					<img src={google} alt="Google" width="24" height="24" />
+					Continue with Google
+				</button>
+			</div>
+
+			<div class="mt-6 text-center text-sm">
+				Don't have an account yet?
+				<a href="/registration" class=" hover:underline" style="color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">Register here</a>
+			</div>
+		</div>
 	</div>
 </div>
+
+
+<style>
+	.register-bg {
+		min-height: 100vh;
+		background-size: cover;
+		background-position: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.form-box {
+		background: rgb(54, 145, 114);
+		border-radius: 12px;
+		padding: 2rem;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	}
+</style>
