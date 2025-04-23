@@ -8,9 +8,7 @@
 
 <header>
 	<div class="corner">
-		<a href="https://svelte.dev/docs/kit">
-			<img src={logo} alt="SvelteKit" />
-		</a>
+		<img src={logo} alt="SvelteKit" />
 	</div>
 
 	<nav>
@@ -65,6 +63,7 @@
 	header {
 		display: flex;
 		justify-content: space-between;
+		background: #212e1d;
 	}
 
 	.corner {
@@ -81,15 +80,15 @@
 	}
 
 	.corner img {
-		width: 2em;
-		height: 2em;
+		width: 3em;
+		height: 3em;
 		object-fit: contain;
 	}
 
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: #4e6042;
 	}
 
 	svg {
