@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import logo from '$lib/images/svelte-logo.svg';
 	import { pb } from '$lib/pb/pocketbase';
-
+	import ProfilePicture from './ProfilePicture.svelte';
 
 </script>
 
@@ -49,9 +49,7 @@
 	<div class="user-corner">
 		{#if pb.authStore.model}
 			<div class="user-info">
-				{#if pb.authStore.model?.avatar}
-					<img src={`${pb.baseUrl}/api/files/${pb.authStore.model.collectionId}/${pb.authStore.model.id}/${pb.authStore.model.avatar}`} alt="Avatar" class="avatar" />
-				{/if}
+				<ProfilePicture />
 				<span class="username">
 					{pb.authStore.model.name || 'User'}
 				</span>
