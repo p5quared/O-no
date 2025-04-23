@@ -2,8 +2,7 @@
 	import { page } from '$app/stores';
 	import logo from '$lib/images/frogdeath.png';
 	import { pb } from '$lib/pb/pocketbase';
-
-
+	import ProfilePicture from './ProfilePicture.svelte';
 </script>
 
 <header>
@@ -29,7 +28,7 @@
 				<a href="/chat" style="font-family: 'FrogFont', sans-serif;">Chat</a>
 			</li>
 
-			{#if pb.authStore.model }
+			{#if pb.authStore.model}
 				<li>
 					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button" style="font-family: 'FrogFont', sans-serif;">Logout</button></a>
 				</li>
@@ -42,21 +41,17 @@
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
-		
 	</nav>
 	<div class="user-corner">
 		{#if pb.authStore.model}
 			<div class="user-info">
-				{#if pb.authStore.model?.avatar}
-					<img src={`${pb.baseUrl}/api/files/${pb.authStore.model.collectionId}/${pb.authStore.model.id}/${pb.authStore.model.avatar}`} alt="Avatar" class="avatar" />
-				{/if}
+				<ProfilePicture />
 				<span class="username">
 					{pb.authStore.model.name || 'User'}
 				</span>
 			</div>
 		{/if}
 	</div>
-
 </header>
 
 <style>
@@ -131,7 +126,8 @@
 		border-top: var(--size) solid var(--color-theme-1);
 	}
 
-	nav a, .nav-button {
+	nav a,
+	.nav-button {
 		display: flex;
 		height: 100%;
 		align-items: center;
@@ -183,5 +179,4 @@
 		object-fit: cover;
 		border: 2px solid white;
 	}
-
 </style>
