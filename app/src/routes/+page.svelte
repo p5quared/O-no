@@ -2,6 +2,17 @@
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcomeFallback from '$lib/images/svelte-welcome.png';
+	import {logoutUser} from '$lib/pb/auth'
+	
+
+
+	import { pb } from '$lib/pb/pocketbase'; //hello I added this to test login
+	let username: string | null = null;
+
+	if (pb.authStore.isValid && pb.authStore.record) {
+		username = pb.authStore.record.username;
+	}
+
 </script>
 
 <svelte:head>
@@ -19,6 +30,16 @@
 		</span>
 
 		to your new<br />SvelteKit app
+		{#if username}
+			<p class="text-center text-lg font-semibold mt-4">Welcome {username}!</p>
+			<button on:click={logoutUser} class="rounded bg-indigo-600 px-6 py-3 font-bold text-white hover:bg-indigo-700" style="cursor: pointer;">
+		Logout
+	</button>
+		{:else}
+			<p class="text-center text-lg text-gray-500 mt-4">User not Logged in!</p>
+		{/if}
+
+
 	</h1>
 
 	<h2>
