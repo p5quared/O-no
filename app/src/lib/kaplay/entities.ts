@@ -1,4 +1,6 @@
-import type { GameID } from "$lib/constants";
+import type { GameID, PlayerID } from "$lib/constants";
+import { Conduit } from "$lib/events";
+import { GameEventTypes } from "$lib/events/EventTypes";
 import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
 import kaplay from "kaplay";
 class EntityBuilder {
@@ -26,18 +28,21 @@ class EntityBuilder {
 		this.posY = y;
 		return this
 	}
-
 }
 
 type KaplayPlayerType = GameObj<SpriteComp | PosComp | AreaComp | BodyComp>
 class PlayerBuilder extends EntityBuilder {
-  private isLocalPlayer: boolean = false;
+	private isLocalPlayer: boolean = false;
+	private PLAYER_SPEED = 200;
+	private playerID: PlayerID = "player";
+
 	public asLocalPlayer(): this {
 		this.isLocalPlayer = true;
 		return this
 	}
+
 	public build(): KaplayPlayerType {
-		const k = kaplay();
+		const k = kaplay({ global: false });
 
 		let p = k.add([
 			this.sprite,
@@ -46,27 +51,42 @@ class PlayerBuilder extends EntityBuilder {
 			k.body(),
 		])
 
-		if (this.isLocalPlayer) {
-			  p = this.setupNetworkBroadcast(p);
-		}
-		
-		p = this.setupNetworkHooks(p)
+		this.attachMovement(p);
+
+		p = this.setupEventBroadcast(p);
+		p = this.setupEventHooks(p)
 
 		return p;
 	}
 
-  private setupNetworkBroadcast(p: KaplayPlayerType): KaplayPlayerType {
-	// TODO: broadcast location and actions
-	// don't forget to debounce actions
-	//@ts-ignore
-	return
-  }
+	private attachMovement(p: KaplayPlayerType): KaplayPlayerType {
+		p.onKeyDown("left", () => {
+			p.move(-this.PLAYER_SPEED, 0);
+		});
 
-  private setupNetworkHooks(p: KaplayPlayerType): KaplayPlayerType {
-	// TODO: Connect the events pipeline from Conduit
-	// and define the effects
-	//@ts-ignore
-	return
-  }
+		p.onKeyDown("right", () => {
+			p.move(this.PLAYER_SPEED, 0);
+		});
+
+		return p
+	}
+
+	private setupEventBroadcast(p: KaplayPlayerType): KaplayPlayerType {
+		p.onUpdate(() => Conduit.emit(GameEventTypes.PLAYER_MOVED,
+			{ player_id: this.playerID, position: p.pos }
+		));
+		return p
+	}
+
+	private setupEventHooks(p: KaplayPlayerType): KaplayPlayerType {
+		if (!this.isLocalPlayer) {
+			Conduit.on(GameEventTypes.PLAYER_MOVED, (e) => {
+				if (e.player_id === this.playerID) {
+					p.moveTo(e.position);
+				}
+			});
+		}
+		return p
+	}
 }
 

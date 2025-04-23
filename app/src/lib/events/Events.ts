@@ -1,12 +1,8 @@
 import type { PlayerID } from "$lib/constants";
+import type { Vec2 } from "kaplay";
 
 // NOTE: In reality these are all non-null
-interface PlayerPosition  {
-	position_x: number;
-	position_y: number;
-	velocity_x: number;
-	velocity_y: number;
-}
+type PlayerPosition = Vec2;
 
 interface HealthState {
 	current: number;
@@ -26,7 +22,7 @@ export interface GameEvents {
 
 	// Player actions
 	player_moved: {
-		id: PlayerID; // player id
+		player_id: PlayerID; // player id
 		position: PlayerPosition;
 	};
 	player_damaged: {
@@ -57,7 +53,7 @@ export interface GameEvents {
 	};
 	powerup_expired: {
 		id: string;
-		playerId: string;
+		player_id: string;
 		type: string;
 	};
 
