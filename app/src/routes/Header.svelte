@@ -146,7 +146,7 @@
 	}
 	a:hover,
 	.nav-button:hover {
-		color: var(--color-theme-1);
+		color: #ffffff;
 	}
 	.user-corner {
 		width: 3em;

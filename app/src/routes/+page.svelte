@@ -2,40 +2,33 @@
 	import { pb } from '$lib/pb/pocketbase';
 	import { goto } from '$app/navigation';
 	import homepageBackground from '$lib/images/swamp.png';
-
-	if (!pb.authStore.isValid) {
-		//goto('/login'); //temporarily disabling this for now so that I can work on the page as a whole
-	}
-	
-
+	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
-	import { fetchLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+
+	onMount(async () => {
+		await new Promise(resolve => setTimeout(resolve, 50));
+		if (!pb.authStore.isValid) {
+			goto('/login');
+		}
+	});
+
+	let newLobbyName = '';
 	let lobbies: any[] = [];
-
-	async function handleJoinLobby(lobbyId: string) {
-    try {
-        await joinLobby(lobbyId);
-        goto(`/lobby/${lobbyId}`); 
-    } catch (error) {
-        console.error("Error joining lobby:", error);
-    }
-}
-
-
 	async function handleCreateLobby() {
-        const name = prompt("Enter lobby name:");
-        if (name) {
-            try {
-                await createLobby(name);
-                lobbies = await fetchLobbies();
-            } catch (error) {
-                console.error("Error creating lobby:", error);
-            }
-        }
-    }
+		if (newLobbyName.trim()) {
+			try {
+				await createLobby(newLobbyName.trim());
+				lobbies = await fetchAllLobbies();
+				newLobbyName = ''; 
+			} catch (error) {
+				console.error("Error creating lobby:", error);
+			}
+		}
+	}
+
 	onMount(async () => {
         try {
-            lobbies = await fetchLobbies();
+            lobbies = await fetchAllLobbies();
             subscribeToLobbies((e:any) => {
                 if (e.action === 'create') {
                     lobbies = [...lobbies, e.record];
@@ -49,10 +42,14 @@
                 }
             });
         } catch (error) {
-            console.error("Error fetching lobbies:", error);
+            console.error("Error Fetching All the Lobbies:", error);
         }
     });
+	
 
+	async function handleJoinLobby(lobbyId: string) {
+		goto(`/lobby?id=${lobbyId}`);
+	}
 
 </script>
 
@@ -83,6 +80,13 @@
         </div>
 
 		<button class="create-btn" style="font-family: 'FrogFont', sans-serif;" on:click={handleCreateLobby}>New Lobby</button>
+		<input
+			type="text"
+			bind:value={newLobbyName}
+			placeholder="New Lobby Name"
+			class="rounded"
+			style="color:black;"
+		/>
 
 	
 	</div>
@@ -107,7 +111,7 @@
 		overflow: hidden; 
 	}
 	.form-box {
-		background: rgba(128, 116, 41, .8);
+		background: rgba(120, 114, 47, .8);
 		border-radius: 12px;
 		padding: 2rem;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -125,7 +129,7 @@
 		overflow-y: auto;
 	}
 	.lobby-card {
-		background: rgba(55, 32, 4, .95);
+		background: rgba(33, 46, 29, .95);
 		border-radius: 8px;
 		padding: 1rem;
 		display: flex;
@@ -134,7 +138,7 @@
 		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 	}
 	.join-btn {
-		background-color: #de7a04;
+		background-color: #f4c03f;
 		color: white;
 		border: none;
 		padding: 0.5rem 1rem;
