@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createUser } from '$lib/pb/users';
 	import { goto } from '$app/navigation';
-	
+
 	let username = '';
 	let email = '';
 	let password = '';
@@ -28,13 +28,12 @@
 		});
 
 		if (result.success) {
-		  
-		successMessage = 'Account created!';
-		setTimeout(() => goto('/login'), 1500);
+			successMessage = 'Account created!';
+			setTimeout(() => goto('/login'), 1500);
 		} else {
 			error = result.error || 'Registration failed';
 		}
-		
+
 		loading = false;
 		return false;
 	}
@@ -49,14 +48,13 @@
 	{#if error}
 		<p class="text-red-600">{error}</p>
 	{/if}
-  {#if successMessage}
-	<p class="text-green-600">{successMessage}</p>
-  {/if}
+	{#if successMessage}
+		<p class="text-green-600">{successMessage}</p>
+	{/if}
 	<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
 		<input
 			type="text"
 			bind:value={username}
-
 			placeholder="Username"
 			required
 			autocomplete="off"

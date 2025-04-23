@@ -21,7 +21,8 @@ if [ -d "/pb_migrations" ] && [ "$(ls -A /pb_migrations)" ]; then
 else
     echo "No migrations found in /pb_migrations"
 fi
-
+echo "Creating/Updating superuser..."
+/pocketbase superuser upsert admin@email.com Password
 # Start PocketBase server
 echo "Starting PocketBase server..."
 exec /pocketbase serve --http=0.0.0.0:8090 --dir=/pb_data --publicDir=/pb_public --migrationsDir=/pb_migrations --origins=*
