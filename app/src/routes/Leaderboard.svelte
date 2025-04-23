@@ -11,8 +11,9 @@
 
     async function loadUsers() {
         const records = await pb.collection('users').getFullList();
+        console.log(records);
         users = records.map(user => ({
-            username: user.email,  // use email as username
+        username: user.username,  // use email as username
             score: user.score
         }));
     }
