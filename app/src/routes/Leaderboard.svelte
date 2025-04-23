@@ -1,13 +1,23 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { pb } from '$lib/pb/pocketbase';
 
-    let users = [
-        { username: 'user1', score: 0 },
-        { username: 'user2', score: 0 },
-        { username: 'user3', score: 0 },
-        { username: 'user4', score: 0 },
-        { username: 'user5', score: 0 }
-    ];
+    interface User {
+        username: string;
+        score: number;
+    }
+
+    let users: User[] = [];
+
+    async function loadUsers() {
+        const records = await pb.collection('users').getFullList();
+        users = records.map(user => ({
+            username: user.email,  // use email as username
+            score: user.score
+        }));
+    }
+
+    onMount(loadUsers);
 
     $: sortedUsers = users.sort((a, b) => b.score - a.score);
 </script>
