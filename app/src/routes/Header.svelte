@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import logo from '$lib/images/svelte-logo.svg';
+	import logo from '$lib/images/frogdeath.png';
 	import { pb } from '$lib/pb/pocketbase';
 
 
