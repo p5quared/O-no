@@ -50,13 +50,13 @@
 	<div class="mx-auto max-w-md p-4 form-box">
 
 		<div class="mx-auto max-w-md p-4">
-			<h1 class="mb-4 text-2xl font-bold" style="color: #e55e15; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">Join the Colony!</h1>
+			<h1 class="mb-4 text-2xl font-bold" style="color: #e55e15; font-family: 'FrogFont', sans-serif;">Join the Colony!</h1>
 
 			{#if error}
-				<p class="text-red-600">{error}</p>
+				<p style="color: #e55e15">{error}</p>
 			{/if}
 			{#if successMessage}
-				<p class="text-green-600">{successMessage}</p>
+				<p style="color: #9cc362;">{successMessage}</p>
 			{/if}
 			<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
 				<input

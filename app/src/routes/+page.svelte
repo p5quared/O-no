@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { pb } from '$lib/pb/pocketbase';
 	import { goto } from '$app/navigation';
-	import homepageBackground from '$lib/images/title1.png';
+	import homepageBackground from '$lib/images/swamp.png';
 
 	if (!pb.authStore.isValid) {
 		//goto('/login'); //temporarily disabling this for now so that I can work on the page as a whole
@@ -9,8 +9,18 @@
 	
 
 	import { onMount } from 'svelte';
-    import { fetchLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
-	let lobbies = [];
+	import { fetchLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+	let lobbies: any[] = [];
+
+	async function handleJoinLobby(lobbyId: string) {
+    try {
+        await joinLobby(lobbyId);
+        goto(`/lobby/${lobbyId}`); 
+    } catch (error) {
+        console.error("Error joining lobby:", error);
+    }
+}
+
 
 	async function handleCreateLobby() {
         const name = prompt("Enter lobby name:");
@@ -26,7 +36,7 @@
 	onMount(async () => {
         try {
             lobbies = await fetchLobbies();
-            subscribeToLobbies((e) => {
+            subscribeToLobbies((e:any) => {
                 if (e.action === 'create') {
                     lobbies = [...lobbies, e.record];
                 } else if (e.action === 'update') {
@@ -57,22 +67,23 @@
 
 
     
-        <h1>
-            Join a Lobby! 
-            <button class="create-btn" on:click={handleCreateLobby}>New Lobby</button>
-        </h1>
+        <h1 style="font-family: 'FrogFont', sans-serif;">Join a Lobby! </h1>
 
         <div class="lobby-list">
             {#each lobbies as lobby}
-                <div class="lobby-card">
-                    <p style="font-weight: bold;">{lobby.name}</p>
-
-
-
-                    <button class="join-btn">Join</button>
-                </div>
+				<div class="lobby-card">
+					<div>
+						<p style="font-weight: bold;">{lobby.name}</p>
+						<p>Players {lobby.players?.length || 0}/10</p>
+					</div>
+					<button class="join-btn" on:click={() => handleJoinLobby(lobby.id)}>Join</button>
+				</div>
+				
             {/each}
         </div>
+
+		<button class="create-btn" style="font-family: 'FrogFont', sans-serif;" on:click={handleCreateLobby}>New Lobby</button>
+
 	
 	</div>
   
@@ -100,6 +111,7 @@
 		border-radius: 12px;
 		padding: 2rem;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		width: 600px;
 	}
 	.lobby-list {
 		display: flex;
