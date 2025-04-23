@@ -1,8 +1,11 @@
-interface PlayerPosition {
-	x: number;
-	y: number;
-	velocityX: number;
-	velocityY: number;
+import type { PlayerID } from "$lib/constants";
+
+// NOTE: In reality these are all non-null
+interface PlayerPosition  {
+	position_x: number;
+	position_y: number;
+	velocity_x: number;
+	velocity_y: number;
 }
 
 interface HealthState {
@@ -23,21 +26,21 @@ export interface GameEvents {
 
 	// Player actions
 	player_moved: {
-		id: string;
+		id: PlayerID; // player id
 		position: PlayerPosition;
 	};
 	player_damaged: {
-		id: string;
+		id: PlayerID;
 		damage: number;
 		source: string;
 		health: HealthState;
 	};
 	player_died: {
-		id: string;
+		id: PlayerID;
 		killerId?: string;
 	};
 	player_respawned: {
-		id: string;
+		id: PlayerID;
 		position: PlayerPosition;
 	};
 
