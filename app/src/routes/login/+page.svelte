@@ -47,10 +47,10 @@
 	<div class="mx-auto max-w-md p-4 form-box">
 
 		<div class="mx-auto max-w-md p-4">
-			<h1 class="mb-6 text-2xl font-bold" style="color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">Hop On In!</h1>
+			<h1 class="mb-6 text-2xl font-bold" style="color: #9cc362; font-family: 'FrogFont', sans-serif;">Hop On In!</h1>
 
 			{#if error}
-				<p class="mb-4 text-red-600">{error}</p>
+				<p style="color: #e55e15">{error}</p>
 			{/if}
 
 			<form on:submit|preventDefault={handleLogin} class="flex flex-col gap-4">

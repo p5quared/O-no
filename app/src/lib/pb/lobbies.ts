@@ -1,10 +1,5 @@
 import { pb } from './pocketbase'; 
 
-
-
-
-
-
 export async function fetchLobbies() {
     try {
         const lobbies = await pb.collection('lobbies').getFullList();
@@ -21,7 +16,7 @@ export async function createLobby(name: string) {
         const newLobby = await pb.collection('lobbies').create({
             name: name,
             host: pb.authStore.model.id,
-            players: [pb.authStore.model.id],
+            players: [],
         });
         return newLobby;
     } catch (error) {
@@ -30,17 +25,35 @@ export async function createLobby(name: string) {
     }
 }
 
-
 export function subscribeToLobbies(callback: Function) {
-    // This subscribes to changes in the lobbies collection and calls the callback when there's an update
     pb.collection('lobbies').subscribe('*', (e) => {
-        callback(e); // Pass the event (could be created, updated, or deleted)
+        callback(e); 
     });
 }
 
 
 
 
+export async function joinLobby(lobbyId: string) {
+    try {
+        const lobby = await pb.collection('lobbies').getOne(lobbyId);
+        const players = lobby.players || [];
+
+        // Prevent duplicate joins
+        if (!players.includes(pb.authStore.model.id)) {
+            players.push(pb.authStore.model.id);
+
+            await pb.collection('lobbies').update(lobbyId, {
+                players: players
+            });
+        }
+
+        return lobby;
+    } catch (error) {
+        console.error('Error joining lobby:', error);
+        throw error;
+    }
+}
 
 
 
