@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import logo from '$lib/images/svelte-logo.svg';
+	import logo from '$lib/images/frogdeath.png';
 	import { pb } from '$lib/pb/pocketbase';
 	import ProfilePicture from './ProfilePicture.svelte';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="https://svelte.dev/docs/kit">
-			<img src={logo} alt="SvelteKit" />
-		</a>
+		<img src={logo} alt="SvelteKit" />
 	</div>
 
 	<nav>
@@ -18,33 +16,25 @@
 		</svg>
 		<ul>
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">Home</a>
+				<a href="/" style="font-family: 'FrogFont', sans-serif;">Home</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
-				<a href="/about">About</a>
+				<a href="/about" style="font-family: 'FrogFont', sans-serif;">About</a>
 			</li>
 			<li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
-				<a href="/sverdle">Sverdle</a>
+				<a href="/sverdle" style="font-family: 'FrogFont', sans-serif;">Sverdle</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/chat' ? 'page' : undefined}>
-				<a href="/chat">Chat Demo</a>
+				<a href="/chat" style="font-family: 'FrogFont', sans-serif;">Chat</a>
 			</li>
 
 			{#if pb.authStore.model}
 				<li>
-					<a
-						><button
-							on:click={() => {
-								pb.authStore.clear();
-								window.location.href = '/';
-							}}
-							class="nav-button">Logout</button
-						></a
-					>
+					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button" style="font-family: 'FrogFont', sans-serif;">Logout</button></a>
 				</li>
 			{:else}
 				<li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
-					<a href="/login">Login</a>
+					<a href="/login" style="font-family: 'FrogFont', sans-serif;">Login</a>
 				</li>
 			{/if}
 		</ul>
@@ -68,6 +58,7 @@
 	header {
 		display: flex;
 		justify-content: space-between;
+		background: #212e1d;
 	}
 
 	.corner {
@@ -84,15 +75,15 @@
 	}
 
 	.corner img {
-		width: 2em;
-		height: 2em;
+		width: 3em;
+		height: 3em;
 		object-fit: contain;
 	}
 
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: #4e6042;
 	}
 
 	svg {
@@ -151,7 +142,7 @@
 	}
 	a:hover,
 	.nav-button:hover {
-		color: var(--color-theme-1);
+		color: #ffffff;
 	}
 	.user-corner {
 		width: 3em;

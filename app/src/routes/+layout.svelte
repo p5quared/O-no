@@ -1,22 +1,26 @@
 <script lang="ts">
 	import Header from './Header.svelte';
 	import '../app.css';
+	import {page} from '$app/stores';
 
 	let { children } = $props();
 </script>
 
 <div class="app">
+	{#if !['/login', '/registration'].includes($page.url.pathname)}
 	<Header />
+
+	{/if}
 
 	<main>
 		{@render children()}
 	</main>
 
-	<footer>
-		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
-		</p>
-	</footer>
+	<!-- <footer>Footer is here in case we want to use it later. For now, removing it for Front-End Cleanup.</footer>  -->
+
+
+
+
 </div>
 
 <style>
@@ -24,16 +28,16 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
+		width: 100%;
 	}
 
 	main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
+		padding: 0; /* remove padding that restricts spacing */
+		margin: 0;
+		width: 100%; /* allow full-width content */
 		box-sizing: border-box;
 	}
 
