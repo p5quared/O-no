@@ -1,61 +1,108 @@
-import type { GameID, PlayerID } from "$lib/constants";
+import type { PlayerID } from "$lib/constants";
 import { Conduit } from "$lib/events";
 import type { GameEvents } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { TABLES } from "./constants";
 import { pb } from "./pocketbase";
-import { subscribeToPlayerPositions } from "./subscriptions/players";
+import { subscribetoPlayerPositionTable } from "./subscriptions/players";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
+import { deleteUserPositionRecordByUserId, listUserPositions } from "./users";
 
 /**
  * This class connects our EventBus to the outside world,
  * allowing us to send and receive events over the network.
  */
 export class PBEventManager {
-	private gameID: GameID;
-	private playerID: PlayerID;
-	private positionTableID: PlayerPositionsRecord['id'] | undefined;
+	public playerID: PlayerID;
+	private positionTableID: PlayerPositionsRecord['id'];
 	private subscriptions = new SubscriptionManager();
 
-	constructor(gameID: GameID, playerID: PlayerID) {
-		this.gameID = gameID;
+	constructor(playerID: PlayerID, positionTableID: string) {
 		this.playerID = playerID;
-
-		this.setupOutGoingEvents();
-		this.setupIncomingEvents();
+		this.positionTableID = positionTableID;
 	}
 
-	private setupIncomingEvents() {
-		this.subscriptions.add(this.receivePlayerLocations())
+	public async setup() {
+		this.setupOutGoingEventSubscriptions();
+		await this.setupIncomingEventSubscriptions();
+		this.emitExistingPositions()
+
 	}
 
-	private setupOutGoingEvents() {
+	public async shutdown() {
+		this.subscriptions.cancelAll();
+		await deleteUserPositionRecordByUserId(this.positionTableID);
+		console.log("Cleaned up PB EventManager");
+	}
+
+	private async setupIncomingEventSubscriptions() {
+		this.subscriptions.add(await this.subToPlayerPositionsTable())
+	}
+
+	private setupOutGoingEventSubscriptions() {
 		this.subscriptions.add(
-			Conduit.on(GameEventTypes.PLAYER_MOVED, this.broadcastLocation)
+			Conduit.on(GameEventTypes.PLAYER_MOVED, e => this.broadcastMovement(e))
 		)
 	}
 
-	private broadcastLocation(e: GameEvents[GameEventTypes.PLAYER_MOVED]) {
-		if (this.positionTableID !== undefined && e.id === this.playerID) {
-			pb.collection(TABLES.PLAYER_POSITIONS).update(this.positionTableID, e.position)
+	private async broadcastMovement(e: GameEvents[GameEventTypes.PLAYER_MOVED]) {
+		if (e.player_id === this.playerID) {
+			try {
+				await pb.collection(TABLES.PLAYER_POSITIONS).update(this.positionTableID, e.position)
+			} catch (error) {
+				//console.debug('Failed to update position, this may be because of auto-cancellation.')
+			}
 		}
 	}
 
-	private receivePlayerLocations() {
-		return subscribeToPlayerPositions(this.gameID, (e) => {
-			if (e.user !== this.playerID) {
-				Conduit.emit(GameEventTypes.PLAYER_MOVED, {
-					id: e.user,
-					position: {
-						position_x: e.position_x ?? -1, // WARN: Casting away as these MUST be set
-						position_y: e.position_y ?? -1, // i.e. broadcast MUST have these
-						velocity_x: e.velocity_x ?? -1,
-						velocity_y: e.velocity_y ?? -1
-					}
-				})
-			}
+	private async subToPlayerPositionsTable() {
+		console.log("Subscribing to player locations");
+		return await subscribetoPlayerPositionTable((action, record) => {
+			switch (action) {
+				case 'create':
+					Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {
+						id: record.user,
+						position: {
+							'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+							'y': record.y ?? -1, // i.e. broadcast MUST set these
+						}
 
+					})
+					break;
+				case "update":
+					Conduit.emit(GameEventTypes.PLAYER_MOVED, {
+						player_id: record.user,
+						position: {
+							'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+							'y': record.y ?? -1, // i.e. broadcast MUST set these
+						}
+					})
+					break;
+				case "delete":
+					console.log("Player left", record.user)
+					Conduit.emit(GameEventTypes.PLAYER_QUIT, {
+						id: record.user,
+					})
+					break;
+			}
 		})
+	}
+
+	// Emit the positions of all players already in the game
+	// This is done at startup to ensure that we load all players
+	// This could cause some double spawns?
+	private async emitExistingPositions() {
+		const existingPositions = await listUserPositions();
+		for (const positionRecord of existingPositions) {
+			Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {
+				id: positionRecord.user,
+				position: {
+					'x': positionRecord.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+					'y': positionRecord.y ?? -1, // i.e. broadcast MUST set these
+				}
+
+			})
+		}
 	}
 }
