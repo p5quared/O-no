@@ -1,7 +1,7 @@
 import type { PlayerID } from "$lib/constants";
 
 // NOTE: In reality these are all non-null
-type PlayerPosition = {x: number, y: number};
+export type PlayerPosition = {x: number, y: number};
 
 interface HealthState {
 	current: number;
