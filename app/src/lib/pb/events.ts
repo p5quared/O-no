@@ -1,13 +1,14 @@
 import type { PlayerID } from "$lib/constants";
 import { Conduit } from "$lib/events";
-import type { GameEvents } from "$lib/events/Events";
+import type { GameEvents, PlayerPosition } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
+import { throttle } from "$lib/utils";
 import { TABLES } from "./constants";
 import { pb } from "./pocketbase";
 import { subscribetoPlayerPositionTable } from "./subscriptions/players";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
-import { deleteUserPositionRecordByUserId, listUserPositions } from "./users";
+import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./users";
 
 /**
  * This class connects our EventBus to the outside world,
@@ -48,13 +49,13 @@ export class PBEventManager {
 
 	private async broadcastMovement(e: GameEvents[GameEventTypes.PLAYER_MOVED]) {
 		if (e.player_id === this.playerID) {
-			try {
-				await pb.collection(TABLES.PLAYER_POSITIONS).update(this.positionTableID, e.position)
-			} catch (error) {
-				//console.debug('Failed to update position, this may be because of auto-cancellation.')
-			}
+			this.throttledUpdatePositoin(this.positionTableID, e.position);
 		}
 	}
+
+	private throttledUpdatePositoin = throttle(async (id: string, p: PlayerPosition) => {
+		await updateUserPositionRecord(id, p)
+	}, 50);
 
 	private async subToPlayerPositionsTable() {
 		console.log("Subscribing to player locations");
