@@ -1,8 +1,7 @@
 import type { PlayerID } from "$lib/constants";
-import type { Vec2 } from "kaplay";
 
 // NOTE: In reality these are all non-null
-type PlayerPosition = Vec2;
+type PlayerPosition = {x: number, y: number};
 
 interface HealthState {
 	current: number;
@@ -35,7 +34,7 @@ export interface GameEvents {
 		id: PlayerID;
 		killerId?: string;
 	};
-	player_respawned: {
+	player_spawned: {
 		id: PlayerID;
 		position: PlayerPosition;
 	};
