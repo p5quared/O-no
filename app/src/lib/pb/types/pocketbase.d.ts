@@ -104,14 +104,11 @@ export type GamesRecord = {
 
 export type PlayerPositionsRecord = {
 	created?: IsoDateString
-	game?: RecordIdString
 	id: string
-	position_x?: number
-	position_y?: number
 	updated?: IsoDateString
 	user: RecordIdString
-	velocity_x?: number
-	velocity_y?: number
+	x?: number
+	y?: number
 }
 
 export type PositionsRecord = {
@@ -129,10 +126,10 @@ export type UsersRecord = {
 	email: string
 	emailVisibility?: boolean
 	id: string
-	name?: string
 	password: string
 	tokenKey: string
 	updated?: IsoDateString
+	username?: string
 	verified?: boolean
 }
 
