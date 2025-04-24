@@ -1,3 +1,4 @@
+import type { PlayerPosition } from '$lib/events/Events';
 import { TABLES } from './constants';
 import { pb } from './pocketbase';
 import type { PlayerPositionsRecord } from './types/pocketbase';
@@ -84,6 +85,10 @@ export async function createOrRecreateUserPositionRecord(userID: string, x: numb
 	})
 
 	return id;
+}
+
+export async function updateUserPositionRecord(id: string, p: PlayerPosition) {
+   await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e=> {})
 }
 
 export async function deleteUserPositionRecordByUserId(userID: string) {
