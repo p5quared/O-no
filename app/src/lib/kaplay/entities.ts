@@ -85,7 +85,6 @@ export class PlayerBuilder extends EntityBuilder {
 
 	private setupEventBroadcast(p: KaplayPlayerType): KaplayPlayerType {
 		p.onUpdate(() => {
-			console.log("Broadcasting player movement", p.pos);
 			Conduit.emit(GameEventTypes.PLAYER_MOVED,
 				{ player_id: this.playerID, position: p.pos }
 			)
@@ -98,7 +97,7 @@ export class PlayerBuilder extends EntityBuilder {
 		if (!this.isLocalPlayer) {
 			Conduit.on(GameEventTypes.PLAYER_MOVED, (e) => {
 				if (e.player_id === this.playerID) {
-					p.moveTo(k.vec2(e.position.x, e.position.y));
+					p.moveTo(k.vec2(e.position.x, e.position.y), this.PLAYER_SPEED * 3);
 				}
 			});
 		}
