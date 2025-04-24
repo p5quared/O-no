@@ -5,6 +5,7 @@ import {
 } from '$lib/pb/game';
 import kaplay, { type GameObj, type Vec2 } from 'kaplay';
 
+// Randomizing seed, probably unnecessary
 function mulberry32(seed: number) {
 	return function () {
 		let t = seed += 0x6D2B79F5;
@@ -24,24 +25,25 @@ const debounce = (func: Function, delay: number) => {
 	};
 };
 
-const updatePositionDebounced = debounce(updatePosition, 10);
+const updatePositionDebounced = debounce(updatePosition, 5);
 
 const GROUND_HEIGHT = 48;
 const PLATFORM_WIDTH = 100;
 const MIN_GAP = 70;
 
+// Create a world with auto-generated platforms, based on a seed (optional)
 function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogGodHeight: number, seed = 625) {
 	const {
 		add, rect, pos, width, area, body, color, outline, destroy, offscreen, opacity, z
 	} = k;
 
 	const PLATFORM_HEIGHT = 8;
-
+	const WORLD_WIDTH = 1024;
 	const rng = mulberry32(seed);
 	const placed: { x: number, y: number }[] = [];
 
 	add([
-		rect(width(), GROUND_HEIGHT),
+		rect(WORLD_WIDTH, GROUND_HEIGHT),
 		pos(0, WORLD_HEIGHT - GROUND_HEIGHT),
 		area(),
 		body({ isStatic: true }),
@@ -49,7 +51,7 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogG
 		outline(2)
 	]);
 	add([
-		rect(width(), GROUND_HEIGHT + 10),
+		rect(WORLD_WIDTH, GROUND_HEIGHT + 10),
 		pos(0, WORLD_HEIGHT - GROUND_HEIGHT),
 		color(255, 60, 0),
 		opacity(0.1),
@@ -58,16 +60,18 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogG
 
 
 	const platformGenStart = WORLD_HEIGHT - GROUND_HEIGHT - 100;
-	const platformGenEnd = frogGodHeight / 3;
+	const ROW_HEIGHT_GAP = 120
+	const platformGenEnd = frogGodHeight / 3 + 2 * ROW_HEIGHT_GAP;
 
-	for (let y = platformGenStart; y > platformGenEnd; y -= 120) {
+	for (let y = platformGenStart; y > platformGenEnd; y -= ROW_HEIGHT_GAP) {
 		const roll = rng();
 		let numPlatforms = roll < 1 / 6 ? 2 : roll < 3 / 6 ? 3 : 4;
 		let attempts = 0;
 		const placedX: number[] = [];
 
 		while (placedX.length < numPlatforms && attempts < 50) {
-			const x = rng() * (width() - PLATFORM_WIDTH);
+			// console.count("loop")
+			const x = rng() * (WORLD_WIDTH - PLATFORM_WIDTH);
 			const overlaps = placed.some(p =>
 				p.y === y && Math.abs(p.x - x) < PLATFORM_WIDTH + MIN_GAP
 			);
@@ -164,6 +168,7 @@ function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogG
 	}
 }
 
+// Load world and spawn players.
 const init = (name: string) => {
 	const k = kaplay();
 	const {
@@ -176,15 +181,16 @@ const init = (name: string) => {
 	loadSprite("heaven", "/backgrounds/heaven.png");
 	loadSprite("froggod", "/backgrounds/froggod.png");
 
+	const WORLD_WIDTH = 1024;
 	const bgOriginalWidth = 1024;
 	const bgOriginalHeight = 1536;
 	const frogGodOriginalHeight = 806;
 
-	const bgTargetWidth = width() * 1.7;
+	const bgTargetWidth = WORLD_WIDTH * 2.5;
 	const bgScale = bgTargetWidth / bgOriginalWidth;
 	const bgTargetHeight = bgOriginalHeight * bgScale;
 	const frogGodHeight = frogGodOriginalHeight * bgScale;
-	const bgX = (width() / 2) - (bgTargetWidth / 2);
+	const bgX = (WORLD_WIDTH / 2) - (bgTargetWidth / 2);
 
 	const WORLD_HEIGHT = bgTargetHeight * 3 + frogGodHeight;
 
@@ -208,34 +214,47 @@ const init = (name: string) => {
 
 	generateWorld(k, WORLD_HEIGHT, frogGodHeight);
 
-	const FINAL_PLATFORM_Y = frogGodHeight / 3 - 64;
-	const numFinalPlatforms = 5;
-	const spacing = width() / (numFinalPlatforms + 1);
+	const FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
+	const GOLD_WIDTH = PLATFORM_WIDTH * 1.8;
+	const GOLD_HEIGHT = 8 * 1.8;
+	const GLOW_WIDTH = GOLD_WIDTH + 30;
+	const GLOW_HEIGHT = 30 * 1.8;
+	const GLOW_Y_OFFSET = 11 * 1.8;
 
-	for (let i = 1; i <= numFinalPlatforms; i++) {
+	const spacing = 440;
+	const numFinalPlatforms = 3;
+	const totalGoldWidth = spacing * (numFinalPlatforms - 1);
+	const goldStartX = (WORLD_WIDTH - totalGoldWidth) / 2;
+
+	for (let i = 0; i < numFinalPlatforms; i++) {
+		const x = goldStartX + spacing * i;
+
 		add([
-			rect(PLATFORM_WIDTH, 8),
-			pos(spacing * i - PLATFORM_WIDTH / 2, FINAL_PLATFORM_Y),
+			rect(GOLD_WIDTH, GOLD_HEIGHT),
+			pos(x - GOLD_WIDTH / 2, FINAL_PLATFORM_Y),
 			area(),
 			body({ isStatic: true, isPlatform: true }),
 			color(255, 215, 0),
 			z(5),
-			"goldPlatform" // ✅ Tag for collision
+			"goldPlatform"
 		]);
+
 		add([
-			rect(PLATFORM_WIDTH + 30, 30),
-			pos(spacing * i - PLATFORM_WIDTH / 2 - 15, FINAL_PLATFORM_Y - 11),
+			rect(GLOW_WIDTH, GLOW_HEIGHT),
+			pos(x - GOLD_WIDTH / 2 - 15, FINAL_PLATFORM_Y - GLOW_Y_OFFSET),
 			color(255, 215, 0),
 			opacity(0.3),
 			z(4)
 		]);
 	}
 
+
 	const spawnPos = vec2(80, WORLD_HEIGHT - GROUND_HEIGHT - 32);
 	const maxHeights: Record<string, number> = { [name]: 0 };
 	let leaderboardText: GameObj<{ pos: Vec2 }> | null = null;
 	let leaderboardBg: GameObj<{ pos: Vec2 }> | null = null;
 
+	// Updates the leaderboard based on player height, every 5 seconds
 	const updateLeaderboard = () => {
 		const sorted = Object.entries(maxHeights)
 			.sort(([, aY], [, bY]) => bY - aY) // Higher height = higher rank
@@ -252,7 +271,7 @@ const init = (name: string) => {
 
 		leaderboardBg = add([
 			rect(200, 170),
-			pos(0, 0),
+			pos(0, -400),
 			color(10, 10, 10),
 			z(100),
 			layer("game"),
@@ -260,19 +279,13 @@ const init = (name: string) => {
 		]);
 		add([
 			rect(204, 174),
-			pos(-2, -2),
+			pos(-2, -400),
 			color(80, 80, 80),
 			z(99),
 			layer("game"),
 			opacity(0.4)
 		]);
 
-		add([
-			text("Leaderboard", { size: 14, font: "monospace" }),
-			pos(10, 5),
-			z(101),
-			layer("game")
-		]);
 		leaderboardText = add([
 			text(lines, { size: 12, lineSpacing: 4, font: "monospace" }),
 			pos(10, 25), // shift down for title spacing
@@ -281,11 +294,10 @@ const init = (name: string) => {
 		]);
 	};
 
-
 	setInterval(updateLeaderboard, 5000);
 
+	// Load local player sprite and spawn point
 	loadSprite('bean', 'https://play.kaplayjs.com/sprites/bean.png');
-
 	const localPlayer = add([
 		sprite('bean'),
 		scale(1.0),
@@ -293,7 +305,7 @@ const init = (name: string) => {
 		area(),
 		body()
 	]);
-
+	// Player username under sprite
 	const nameLabel = add([
 		text(name, { size: 12, align: "center", width: 100 }),
 		pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
@@ -305,15 +317,17 @@ const init = (name: string) => {
 		nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
 		maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
 	});
-
 	localPlayer.onCollide("boostpad", () => {
 		localPlayer.jump(2.5 * 400);
 	});
+
+	// Gravity of map -- don't change.
 	setGravity(1000);
 
+	// Update local player and camera based on keyboard inputs
 	k.onUpdate(() => {
-		const groundCenterX = width() / 2;
-		const clampMargin = width() / 4;
+		const groundCenterX = WORLD_WIDTH / 2;
+		const clampMargin = WORLD_WIDTH / 4;
 		const minCamX = groundCenterX - clampMargin;
 		const maxCamX = groundCenterX + clampMargin;
 
@@ -331,7 +345,7 @@ const init = (name: string) => {
 
 		if (leaderboardText && leaderboardBg) {
 			const camTopLeft = vec2(
-				k.camPos().x - width() / 2,
+				k.camPos().x - width() / 2, // use actual screen width
 				k.camPos().y - height() / 2
 			);
 			const offset = vec2(20, 20);
@@ -345,7 +359,6 @@ const init = (name: string) => {
 			pos_y: localPlayer.pos.y,
 		});
 	});
-
 	onKeyPressRepeat(['space', 'w', 'up'], () => {
 		if (localPlayer.isGrounded()) {
 			localPlayer.jump();
@@ -360,6 +373,7 @@ const init = (name: string) => {
 
 	const remotePlayers: Record<string, RemotePlayerData> = {};
 
+	// Track remote player movements live
 	const onPlayerUpdates = (p: PositionRecord) => {
 		if (p.entity_name === name) return;
 
@@ -388,7 +402,13 @@ const init = (name: string) => {
 			remotePlayers[p.entity_name] = { player, nameTag };
 		}
 		const remote = remotePlayers[p.entity_name];
-		remote.player.pos = remote.player.pos.lerp(vec2(p.pos_x, p.pos_y), 0.05);
+		const target = vec2(p.pos_x, p.pos_y);
+		if (remote.player.pos.dist(target) > 300) {
+			remote.player.pos = target;
+		} else {
+			remote.player.pos = remote.player.pos.lerp(target, 0.2);
+		}
+
 	};
 
 	subscribeToPositions(onPlayerUpdates);
