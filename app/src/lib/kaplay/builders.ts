@@ -63,31 +63,12 @@ export class PlayerBuilder extends EntityBuilder {
 		//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
 		//});
 
+
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
-		k.onUpdate(() => {
-			const groundCenterX = WORLD_WIDTH / 2;
-			const clampMargin = WORLD_WIDTH / 4;
-			const minCamX = groundCenterX - clampMargin;
-			const maxCamX = groundCenterX + clampMargin;
-
-			const x = Math.max(minCamX, Math.min(p.pos.x, maxCamX))
-			const y = Math.min(p.pos.y, WORLD_HEIGHT - k.height() / 2)
-			k.setCamPos(k.vec2(x, y));
-
-
-			//if (leaderboardText && leaderboardBg) {
-			//	const camTopLeft = vec2(
-			//		k.camPos().x - width() / 2, // use actual screen width
-			//		k.camPos().y - height() / 2
-			//	);
-			//	const offset = vec2(20, 20);
-			//	leaderboardText.pos = camTopLeft.add(offset);
-			//	leaderboardBg.pos = camTopLeft.add(offset);
-			//}
-		});
 
 		p = this.setupEventHooks(p)
+		p = this.setupCameraTracking(p)
 
 		if (this.isLocalPlayer) {
 			this.attachMovementBindings(p);
@@ -101,6 +82,35 @@ export class PlayerBuilder extends EntityBuilder {
 	public withID(id: PlayerID): this {
 		this.playerID = id;
 		return this
+	}
+
+	private setupCameraTracking(p: KaplayPlayerType): KaplayPlayerType {
+		const k = getKaplay();
+		const groundCenterX = WORLD_WIDTH / 2;
+		const clampMargin = WORLD_WIDTH / 4;
+		const minCamX = groundCenterX - clampMargin;
+		const maxCamX = groundCenterX + clampMargin;
+
+
+		p.onUpdate(() => {
+			const x = Math.max(minCamX, Math.min(p.pos.x, maxCamX))
+			const y = Math.min(p.pos.y, WORLD_HEIGHT - k.height() / 2)
+			k.setCamPos(k.vec2(x, y));
+		});
+
+		// TODO: what is this?
+		//
+		//if (leaderboardText && leaderboardBg) {
+		//	const camTopLeft = vec2(
+		//		k.camPos().x - width() / 2, // use actual screen width
+		//		k.camPos().y - height() / 2
+		//	);
+		//	const offset = vec2(20, 20);
+		//	leaderboardText.pos = camTopLeft.add(offset);
+		//	leaderboardBg.pos = camTopLeft.add(offset);
+		//}
+
+		return p;
 	}
 
 
