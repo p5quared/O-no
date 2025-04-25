@@ -1,8 +1,9 @@
-
 export const WORLD_WIDTH = 1024;
 export const bgOriginalWidth = 1024;
 export const bgOriginalHeight = 1536;
 export const frogGodOriginalHeight = 806;
+
+export const GRAVITY = 1000;
 
 export const bgTargetWidth = WORLD_WIDTH * 2.5;
 export const bgScale = bgTargetWidth / bgOriginalWidth;
