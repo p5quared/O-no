@@ -1,9 +1,10 @@
-import { PlayerFactory, WorldFactory } from './entities';
 import { getKaplay } from '.';
 import { frogGodHeight, WORLD_HEIGHT } from './constants';
 import { getLoggedInUserID } from '$lib/pb/users';
 import { Conduit } from '$lib/events';
 import { GameEventTypes } from '$lib/events/EventTypes';
+import { WorldFactory } from './factory_world';
+import { PlayerFactory } from './factory_player';
 
 const init = async (name: string) => {
 	const k = getKaplay();
