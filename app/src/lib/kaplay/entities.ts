@@ -5,7 +5,7 @@ import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
 import { getLoggedInUserID, createOrRecreateUserPositionRecord } from "$lib/pb/users";
 import { PBEventManager } from "$lib/pb/events";
 import { getKaplay } from ".";
-import { frogGodHeight, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
+import { frogGodHeight, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -49,22 +49,52 @@ export class PlayerBuilder extends EntityBuilder {
 			k.body(),
 		])
 
-	// TODO: Player username under sprite
-	// This can be attached: https://kaplayjs.com/guides/game_objects/ 
-	// (see section on "Parents, childs, and roots")
-	//
-	//const nameLabel = add([
-	//	text(name, { size: 12, align: "center", width: 100 }),
-	//	pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
-	//	anchor("center"),
-	//	z(10)
-	//]);
-	//
-	//localPlayer.onUpdate(() => {
-	//	nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
-	//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
-	//});
+		// TODO: Player username under sprite
+		// This can be attached: https://kaplayjs.com/guides/game_objects/ 
+		// (see section on "Parents, childs, and roots")
+		//
+		//const nameLabel = add([
+		//	text(name, { size: 12, align: "center", width: 100 }),
+		//	pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
+		//	anchor("center"),
+		//	z(10)
+		//]);
+		//
+		//localPlayer.onUpdate(() => {
+		//	nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
+		//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
+		//});
 
+		// TODO: Player camera updates
+		// Update local player and camera based on keyboard inputs
+		//k.onUpdate(() => {
+		//	const groundCenterX = WORLD_WIDTH / 2;
+		//	const clampMargin = WORLD_WIDTH / 4;
+		//	const minCamX = groundCenterX - clampMargin;
+		//	const maxCamX = groundCenterX + clampMargin;
+		//
+		//	k.camPos(vec2(
+		//		Math.max(minCamX, Math.min(localPlayer.pos.x, maxCamX)),
+		//		Math.min(localPlayer.pos.y, WORLD_HEIGHT - height() / 2)
+		//	));
+		//
+		//
+		//	if (leaderboardText && leaderboardBg) {
+		//		const camTopLeft = vec2(
+		//			k.camPos().x - width() / 2, // use actual screen width
+		//			k.camPos().y - height() / 2
+		//		);
+		//		const offset = vec2(20, 20);
+		//		leaderboardText.pos = camTopLeft.add(offset);
+		//		leaderboardBg.pos = camTopLeft.add(offset);
+		//	}
+		//
+		//	updatePositionDebounced({
+		//		entity_name: name,
+		//		pos_x: localPlayer.pos.x,
+		//		pos_y: localPlayer.pos.y,
+		//	});
+		//});
 
 		p = this.setupEventHooks(p)
 
@@ -169,8 +199,8 @@ const GOLD_HEIGHT = 8 * 1.8;
 const GLOW_WIDTH = GOLD_WIDTH + 30;
 const GLOW_HEIGHT = 30 * 1.8;
 const GLOW_Y_OFFSET = 11 * 1.8;
+const PLATFORM_HEIGHT = 8;
 export class PlatformFactory {
-
 	static async createGoldPlatform(x: number): Promise<GameObj<PosComp | SpriteComp>> {
 		const k = getKaplay();
 		k.add([
@@ -194,5 +224,218 @@ export class PlatformFactory {
 		//@ts-ignore
 		return Promise.resolve();
 	}
+	static createTogglePlatform(x: number, y: number) {
+		const k = getKaplay();
+		let p = k.add([
+			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.pos(x, y),
+			k.area(),
+			k.body({ isStatic: true, }),
+			k.color(48, 0, 80),
+			k.outline(2)
+		]);
 
+		setInterval(() => {
+			if (p) {
+				k.destroy(p);
+			} else {
+				p = PlatformFactory.createTogglePlatform(x, y);
+			}
+		}, 2000);
+
+		return p
+	};
+
+	static createBoostPad(x: number, y: number) {
+		const k = getKaplay();
+		const p = k.add([
+			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.pos(x, y),
+			k.area(),
+			k.body({ isStatic: true }),
+			k.color(255, 140, 0),
+			k.outline(2),
+			k.offscreen({ distance: 600 }),
+			"boostpad"
+		]);
+		return p
+	}
+
+	static createSidewaysMover(x: number, y: number) {
+		const k = getKaplay();
+		const mover = k.add([
+			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.pos(x, y),
+			k.area(),
+			k.body({ isStatic: true }),
+			k.color(173, 216, 230),
+			k.outline(2)
+		]);
+		const baseX = x;
+		let t = 0;
+		mover.onUpdate(() => {
+			t += k.dt();
+			mover.pos.x = baseX + Math.sin(t * 2) * 100;
+		});
+		return mover;
+
+	}
+
+	static createUpDownMover(x: number, y: number) {
+		const k = getKaplay();
+		const mover = k.add([
+			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.pos(x, y),
+			k.area(),
+			k.body({ isStatic: true }),
+			k.color(173, 216, 230),
+			k.outline(2)
+		]);
+		const baseY = y;
+		let t = 0;
+		mover.onUpdate(() => {
+			t += k.dt();
+			mover.pos.y = baseY + Math.sin(t * 2) * 100;
+		});
+		return mover;
+	}
+
+	static createBasicPlatform(x: number, y: number) {
+		const k = getKaplay();
+		return k.add([
+			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.pos(x, y),
+			k.area(),
+			k.body({ isStatic: true }),
+			k.color(34, 139, 34),
+			k.outline(2),
+			k.offscreen({ distance: 600 })
+		]);
+	}
+
+}
+// Updates the leaderboard based on player height, every 5 seconds
+//const updateLeaderboard = () => {
+//	const sorted = Object.entries(maxHeights)
+//		.sort(([, aY], [, bY]) => bY - aY) // Higher height = higher rank
+//		.slice(0, 10);
+//
+//
+//	const lines = sorted.map(([playerName, y], i) => {
+//		const heightDisplay = y < 100 ? "(0)" : `(${Math.round(y)}m)`;
+//		return `${i + 1}. ${playerName} ${heightDisplay}`;
+//	}).join("\n");
+//
+//	if (leaderboardText) leaderboardText.destroy();
+//	if (leaderboardBg) leaderboardBg.destroy();
+//
+//	leaderboardBg = add([
+//		rect(200, 170),
+//		pos(0, -400),
+//		color(10, 10, 10),
+//		z(100),
+//		layer("game"),
+//		opacity(0.8)
+//	]);
+//	add([
+//		rect(204, 174),
+//		pos(-2, -400),
+//		color(80, 80, 80),
+//		z(99),
+//		layer("game"),
+//		opacity(0.4)
+//	]);
+//
+//	leaderboardText = add([
+//		text(lines, { size: 12, lineSpacing: 4, font: "monospace" }),
+//		pos(10, 25), // shift down for title spacing
+//		z(101),
+//		layer("game")
+//	]);
+//};
+//
+//setInterval(updateLeaderboard, 5000);
+//
+
+class WorldFactory {
+	// Randomizing seed, probably unnecessary
+	static mulberry32(seed: number) {
+		return function() {
+			let t = seed += 0x6D2B79F5;
+			t = Math.imul(t ^ t >>> 15, t | 1);
+			t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+			return ((t ^ t >>> 14) >>> 0) / 4294967296;
+		};
+	}
+
+	// Create a world with auto-generated platforms, based on a seed (optional)
+	static generateWorld(WORLD_HEIGHT: number, frogGodHeight: number, seed = 625) {
+		const k = getKaplay();
+		const {
+			add, rect, pos, width, area, body, color, outline, destroy, offscreen, opacity, z
+		} = k;
+
+		const WORLD_WIDTH = 1024;
+		const rng = WorldFactory.mulberry32(seed);
+		const placed: { x: number, y: number }[] = [];
+
+		add([
+			rect(WORLD_WIDTH, GROUND_HEIGHT),
+			pos(0, WORLD_HEIGHT - GROUND_HEIGHT),
+			area(),
+			body({ isStatic: true }),
+			color(70, 20, 0), // very dark burnt orange
+			outline(2)
+		]);
+		add([
+			rect(WORLD_WIDTH, GROUND_HEIGHT + 10),
+			pos(0, WORLD_HEIGHT - GROUND_HEIGHT),
+			color(255, 60, 0),
+			opacity(0.1),
+			z(-9)
+		]);
+
+
+		const platformGenStart = WORLD_HEIGHT - GROUND_HEIGHT - 100;
+		const ROW_HEIGHT_GAP = 120
+		const platformGenEnd = frogGodHeight / 3 + 2 * ROW_HEIGHT_GAP;
+
+		for (let y = platformGenStart; y > platformGenEnd; y -= ROW_HEIGHT_GAP) {
+			const roll = rng();
+			let numPlatforms = roll < 1 / 6 ? 2 : roll < 3 / 6 ? 3 : 4;
+			let attempts = 0;
+			const placedX: number[] = [];
+
+			while (placedX.length < numPlatforms && attempts < 50) {
+				const x = rng() * (WORLD_WIDTH - PLATFORM_WIDTH);
+				const overlaps = placed.some(p =>
+					p.y === y && Math.abs(p.x - x) < PLATFORM_WIDTH + MIN_GAP
+				);
+				if (overlaps) {
+					attempts++;
+					continue;
+				}
+
+				const r = rng();
+				let p: GameObj | null = null;
+
+				if (r < 0.05) {
+					p = PlatformFactory.createTogglePlatform(x, y);
+				} else if (r < 0.10) {
+					p = PlatformFactory.createBoostPad(x, y);
+				} else if (r < 0.15) {
+					p = PlatformFactory.createSidewaysMover(x, y);
+				} else if (r < 0.20) {
+					p = PlatformFactory.createUpDownMover(x, y);
+				} else {
+					p = PlatformFactory.createBasicPlatform(x, y);
+
+				}
+				if (p) {
+					placedX.push(x);
+					placed.push({ x, y });
+				}
+			}
+		}
+	}
 }
