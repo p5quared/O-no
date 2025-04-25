@@ -46,7 +46,7 @@
 		{#if pb.authStore.model}
 			<div class="user-info">
 				<ProfilePicture />
-				<span class="username">
+				<span class="name">
 					{pb.authStore.model.name || 'User'}
 				</span>
 			</div>
@@ -163,7 +163,7 @@
 		right: 0;
 		min-width: 12em;
 	}
-	.username {
+	.name {
 		font-size: 0.9rem;
 		font-weight: bold;
 		color: var(--color-text);
