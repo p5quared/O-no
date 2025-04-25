@@ -52,7 +52,7 @@
 			{#each messages as message}
 				<div class="mb-3 rounded-lg bg-white p-3 shadow-sm">
 					<span class="text-sm font-semibold text-gray-700"
-						>{pb.authStore.model?.username || 'Guest'}</span
+						>{pb.authStore.model?.name || 'Guest'}</span
 					>
 					<p class="m-0 mb-2 break-words">{message.content}</p>
 					<span class="text-xs text-gray-500">{new Date(message.created).toLocaleTimeString()}</span
