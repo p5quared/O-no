@@ -7,10 +7,12 @@
 	import Leaderboard from './Leaderboard.svelte';
 
 	onMount(async () => {
-		await new Promise(resolve => setTimeout(resolve, 50));
-		if (!pb.authStore.isValid) {
-			goto('/login');
-		}
+		// More reliable auth check with timeout
+		setTimeout(() => {
+			if (!pb.authStore.isValid) {
+				goto('/login');
+			}
+		}, 100);
 	})
 
 	let newLobbyName = '';
