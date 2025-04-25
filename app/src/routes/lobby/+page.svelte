@@ -4,6 +4,7 @@
 	import { fetchSingleLobby, joinLobby} from '$lib/pb/lobbies';
   import { goto } from '$app/navigation';
   import lobbyBackground from '$lib/images/title4.png';
+  import { pb } from '$lib/pb/pocketbase';
 
 
 	let lobbyId:string | null = null;
@@ -12,6 +13,11 @@
 	lobbyId = page.url.searchParams.get('id');
 
   onMount(async () => {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    if (!pb.authStore.isValid) {
+      goto('/login');
+    }
+
     if (lobbyId) {
       try {
         await joinLobby(lobbyId);
