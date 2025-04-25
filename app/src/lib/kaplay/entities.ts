@@ -193,19 +193,19 @@ export class PlayerFactory {
 	}
 }
 
-const FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
-const GOLD_WIDTH = PLATFORM_WIDTH * 1.8;
-const GOLD_HEIGHT = 8 * 1.8;
-const GLOW_WIDTH = GOLD_WIDTH + 30;
-const GLOW_HEIGHT = 30 * 1.8;
-const GLOW_Y_OFFSET = 11 * 1.8;
-const PLATFORM_HEIGHT = 8;
 export class PlatformFactory {
+	static FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
+	static GOLD_WIDTH = PLATFORM_WIDTH * 1.8;
+	static GOLD_HEIGHT = 8 * 1.8;
+	static GLOW_WIDTH = this.GOLD_WIDTH + 30;
+	static GLOW_HEIGHT = 30 * 1.8;
+	static GLOW_Y_OFFSET = 11 * 1.8;
+	static PLATFORM_HEIGHT = 8;
 	static async createGoldPlatform(x: number): Promise<GameObj<PosComp | SpriteComp>> {
 		const k = getKaplay();
 		k.add([
-			k.rect(GOLD_WIDTH, GOLD_HEIGHT),
-			k.pos(x - GOLD_WIDTH / 2, FINAL_PLATFORM_Y),
+			k.rect(PlatformFactory.GOLD_WIDTH, PlatformFactory.GOLD_HEIGHT),
+			k.pos(x - PlatformFactory.GOLD_WIDTH / 2, PlatformFactory.FINAL_PLATFORM_Y),
 			k.area(),
 			k.body({ isStatic: true }),
 			k.color(255, 215, 0),
@@ -214,8 +214,8 @@ export class PlatformFactory {
 		]);
 
 		k.add([
-			k.rect(GLOW_WIDTH, GLOW_HEIGHT),
-			k.pos(x - GOLD_WIDTH / 2 - 15, FINAL_PLATFORM_Y - GLOW_Y_OFFSET),
+			k.rect(PlatformFactory.GLOW_WIDTH, PlatformFactory.GLOW_HEIGHT),
+			k.pos(x - PlatformFactory.GOLD_WIDTH / 2 - 15, PlatformFactory.FINAL_PLATFORM_Y - PlatformFactory.GLOW_Y_OFFSET),
 			k.color(255, 215, 0),
 			k.opacity(0.3),
 			k.z(4)
@@ -227,7 +227,7 @@ export class PlatformFactory {
 	static createTogglePlatform(x: number, y: number) {
 		const k = getKaplay();
 		let p = k.add([
-			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
 			k.pos(x, y),
 			k.area(),
 			k.body({ isStatic: true, }),
@@ -249,7 +249,7 @@ export class PlatformFactory {
 	static createBoostPad(x: number, y: number) {
 		const k = getKaplay();
 		const p = k.add([
-			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
 			k.pos(x, y),
 			k.area(),
 			k.body({ isStatic: true }),
@@ -264,7 +264,7 @@ export class PlatformFactory {
 	static createSidewaysMover(x: number, y: number) {
 		const k = getKaplay();
 		const mover = k.add([
-			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
 			k.pos(x, y),
 			k.area(),
 			k.body({ isStatic: true }),
@@ -284,7 +284,7 @@ export class PlatformFactory {
 	static createUpDownMover(x: number, y: number) {
 		const k = getKaplay();
 		const mover = k.add([
-			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
 			k.pos(x, y),
 			k.area(),
 			k.body({ isStatic: true }),
@@ -303,7 +303,7 @@ export class PlatformFactory {
 	static createBasicPlatform(x: number, y: number) {
 		const k = getKaplay();
 		return k.add([
-			k.rect(PLATFORM_WIDTH, PLATFORM_HEIGHT),
+			k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
 			k.pos(x, y),
 			k.area(),
 			k.body({ isStatic: true }),
