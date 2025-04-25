@@ -2,10 +2,10 @@ import type { PlayerID } from "$lib/constants";
 import { Conduit } from "$lib/events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
-import { getLoggedInUserID, createOrRecreateUserPositionRecord } from "$lib/pb/users";
+import { createOrRecreateUserPositionRecord } from "$lib/pb/users";
 import { PBEventManager } from "$lib/pb/events";
 import { getKaplay } from ".";
-import { frogGodHeight, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
+import { bgScale, bgTargetHeight, bgX, frogGodHeight, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -357,7 +357,7 @@ export class PlatformFactory {
 //setInterval(updateLeaderboard, 5000);
 //
 
-class WorldFactory {
+export class WorldFactory {
 	// Randomizing seed, probably unnecessary
 	static mulberry32(seed: number) {
 		return function() {
@@ -372,10 +372,32 @@ class WorldFactory {
 	static generateWorld(WORLD_HEIGHT: number, frogGodHeight: number, seed = 625) {
 		const k = getKaplay();
 		const {
-			add, rect, pos, width, area, body, color, outline, destroy, offscreen, opacity, z
+			add, rect, pos, area, body, color, outline, offscreen, opacity, z
 		} = k;
 
-		const WORLD_WIDTH = 1024;
+		k.loadSprite("hell", "/backgrounds/hell2.png");
+		k.loadSprite("swamp", "/backgrounds/swamp.png");
+		k.loadSprite("heaven", "/backgrounds/heaven.png");
+		k.loadSprite("froggod", "/backgrounds/froggod.png");
+
+		["hell", "swamp", "heaven"].forEach((name, index) => {
+			add([
+				k.sprite(name),
+				k.scale(bgScale),
+				pos(bgX, WORLD_HEIGHT - bgTargetHeight * (index + 1)),
+				z(-10),
+				offscreen({ distance: 600 })
+			]);
+		});
+
+		add([
+			k.sprite("froggod"),
+			k.scale(bgScale),
+			pos(bgX, 0),
+			z(-10),
+			offscreen({ distance: 600 })
+		])
+
 		const rng = WorldFactory.mulberry32(seed);
 		const placed: { x: number, y: number }[] = [];
 
