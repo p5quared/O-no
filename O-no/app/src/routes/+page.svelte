@@ -1,0 +1,158 @@
+<script lang="ts">
+	import { pb } from '$lib/pb/pocketbase';
+	import { goto } from '$app/navigation';
+	import homepageBackground from '$lib/images/swamp.png';
+	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+	import { onMount } from 'svelte';
+
+	onMount(async () => {
+		await new Promise(resolve => setTimeout(resolve, 50));
+		if (!pb.authStore.isValid) {
+			goto('/login');
+		}
+	});
+
+	let newLobbyName = '';
+	let lobbies: any[] = [];
+	async function handleCreateLobby() {
+		if (newLobbyName.trim()) {
+			try {
+				await createLobby(newLobbyName.trim());
+				lobbies = await fetchAllLobbies();
+				newLobbyName = ''; 
+			} catch (error) {
+				console.error("Error creating lobby:", error);
+			}
+		}
+	}
+
+	onMount(async () => {
+        try {
+            lobbies = await fetchAllLobbies();
+            subscribeToLobbies((e:any) => {
+                if (e.action === 'create') {
+                    lobbies = [...lobbies, e.record];
+                } else if (e.action === 'update') {
+                    const index = lobbies.findIndex((lobby) => lobby.id === e.record.id);
+                    if (index !== -1) {
+                        lobbies[index] = e.record;
+                    }
+                } else if (e.action === 'delete') {
+                    lobbies = lobbies.filter((lobby) => lobby.id !== e.record.id);
+                }
+            });
+        } catch (error) {
+            console.error("Error Fetching All the Lobbies:", error);
+        }
+    });
+	
+
+	async function handleJoinLobby(lobbyId: string) {
+		goto(`/lobby?id=${lobbyId}`);
+	}
+
+</script>
+
+
+
+<svelte:head>
+	<title>Home</title>
+</svelte:head>
+
+<section class="lobby-page" style="background-image: url({homepageBackground});">
+	<div class="mx-auto max-w-md p-4 form-box">
+
+
+    
+        <h1 style="font-family: 'FrogFont', sans-serif;">Join a Lobby! </h1>
+
+        <div class="lobby-list">
+            {#each lobbies as lobby}
+				<div class="lobby-card">
+					<div>
+						<p style="font-weight: bold;">{lobby.name}</p>
+						<p>Players {lobby.players?.length || 0}/10</p>
+					</div>
+					<button class="join-btn" on:click={() => handleJoinLobby(lobby.id)}>Join</button>
+				</div>
+				
+            {/each}
+        </div>
+
+		<button class="create-btn" style="font-family: 'FrogFont', sans-serif;" on:click={handleCreateLobby}>New Lobby</button>
+		<input
+			type="text"
+			bind:value={newLobbyName}
+			placeholder="New Lobby Name"
+			class="rounded"
+			style="color:black;"
+		/>
+
+	
+	</div>
+  
+</section>
+
+
+
+
+
+
+<style>
+	.lobby-page {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+		color: white;
+		background-position: center;
+		background-size: cover;
+		overflow: hidden; 
+	}
+	.form-box {
+		background: rgba(120, 114, 47, .8);
+		border-radius: 12px;
+		padding: 2rem;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		width: 600px;
+	}
+	.lobby-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		width: 100%;
+		max-width: 650px;
+		margin-bottom: 2rem;
+		margin-top: 2rem;
+		height: 400px;
+		overflow-y: auto;
+	}
+	.lobby-card {
+		background: rgba(33, 46, 29, .95);
+		border-radius: 8px;
+		padding: 1rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+	}
+	.join-btn {
+		background-color: #f4c03f;
+		color: white;
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 6px;
+		cursor: pointer;
+	}
+	.create-btn {
+		background-color: #f4c03f;
+		color: white;
+		padding: 0.75rem 1.25rem;
+		font-size: 1rem;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		margin-bottom: 10px;
+	}
+</style>
