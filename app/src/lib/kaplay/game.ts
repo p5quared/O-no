@@ -4,10 +4,12 @@ import {
 	type PositionRecord
 } from '$lib/pb/game';
 import kaplay, { type GameObj, type Vec2 } from 'kaplay';
+import { bgScale, bgTargetHeight, bgX, frogGodHeight, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_HEIGHT, WORLD_WIDTH } from './constants';
+import { PlatformFactory } from './entities';
 
 // Randomizing seed, probably unnecessary
 function mulberry32(seed: number) {
-	return function () {
+	return function() {
 		let t = seed += 0x6D2B79F5;
 		t = Math.imul(t ^ t >>> 15, t | 1);
 		t ^= t + Math.imul(t ^ t >>> 7, t | 61);
@@ -17,7 +19,7 @@ function mulberry32(seed: number) {
 
 const debounce = (func: Function, delay: number) => {
 	let timeout: ReturnType<typeof setTimeout>;
-	return function (this: any, ...args: any[]) {
+	return function(this: any, ...args: any[]) {
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			func.apply(this, args);
@@ -27,9 +29,6 @@ const debounce = (func: Function, delay: number) => {
 
 const updatePositionDebounced = debounce(updatePosition, 5);
 
-const GROUND_HEIGHT = 48;
-const PLATFORM_WIDTH = 100;
-const MIN_GAP = 70;
 
 // Create a world with auto-generated platforms, based on a seed (optional)
 function generateWorld(k: ReturnType<typeof kaplay>, WORLD_HEIGHT: number, frogGodHeight: number, seed = 625) {
@@ -181,19 +180,6 @@ const init = (name: string) => {
 	loadSprite("heaven", "/backgrounds/heaven.png");
 	loadSprite("froggod", "/backgrounds/froggod.png");
 
-	const WORLD_WIDTH = 1024;
-	const bgOriginalWidth = 1024;
-	const bgOriginalHeight = 1536;
-	const frogGodOriginalHeight = 806;
-
-	const bgTargetWidth = WORLD_WIDTH * 2.5;
-	const bgScale = bgTargetWidth / bgOriginalWidth;
-	const bgTargetHeight = bgOriginalHeight * bgScale;
-	const frogGodHeight = frogGodOriginalHeight * bgScale;
-	const bgX = (WORLD_WIDTH / 2) - (bgTargetWidth / 2);
-
-	const WORLD_HEIGHT = bgTargetHeight * 3 + frogGodHeight;
-
 	["hell", "swamp", "heaven"].forEach((name, index) => {
 		add([
 			sprite(name),
@@ -214,13 +200,6 @@ const init = (name: string) => {
 
 	generateWorld(k, WORLD_HEIGHT, frogGodHeight);
 
-	const FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
-	const GOLD_WIDTH = PLATFORM_WIDTH * 1.8;
-	const GOLD_HEIGHT = 8 * 1.8;
-	const GLOW_WIDTH = GOLD_WIDTH + 30;
-	const GLOW_HEIGHT = 30 * 1.8;
-	const GLOW_Y_OFFSET = 11 * 1.8;
-
 	const spacing = 440;
 	const numFinalPlatforms = 3;
 	const totalGoldWidth = spacing * (numFinalPlatforms - 1);
@@ -228,24 +207,7 @@ const init = (name: string) => {
 
 	for (let i = 0; i < numFinalPlatforms; i++) {
 		const x = goldStartX + spacing * i;
-
-		add([
-			rect(GOLD_WIDTH, GOLD_HEIGHT),
-			pos(x - GOLD_WIDTH / 2, FINAL_PLATFORM_Y),
-			area(),
-			body({ isStatic: true, isPlatform: true }),
-			color(255, 215, 0),
-			z(5),
-			"goldPlatform"
-		]);
-
-		add([
-			rect(GLOW_WIDTH, GLOW_HEIGHT),
-			pos(x - GOLD_WIDTH / 2 - 15, FINAL_PLATFORM_Y - GLOW_Y_OFFSET),
-			color(255, 215, 0),
-			opacity(0.3),
-			z(4)
-		]);
+		PlatformFactory.createGoldPlatform(x);
 	}
 
 
@@ -317,9 +279,6 @@ const init = (name: string) => {
 		nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
 		maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
 	});
-	localPlayer.onCollide("boostpad", () => {
-		localPlayer.jump(2.5 * 400);
-	});
 
 	// Gravity of map -- don't change.
 	setGravity(1000);
@@ -331,10 +290,10 @@ const init = (name: string) => {
 		const minCamX = groundCenterX - clampMargin;
 		const maxCamX = groundCenterX + clampMargin;
 
-		k.camPos(
+		k.camPos(vec2(
 			Math.max(minCamX, Math.min(localPlayer.pos.x, maxCamX)),
 			Math.min(localPlayer.pos.y, WORLD_HEIGHT - height() / 2)
-		);
+		));
 
 		if (isKeyDown('left') || isKeyDown('a')) localPlayer.move(-400, 0);
 		if (isKeyDown('right') || isKeyDown('d')) localPlayer.move(400, 0);
