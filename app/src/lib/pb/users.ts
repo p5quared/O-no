@@ -35,9 +35,7 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 		if (error?.response?.data) {
 			const errors = error.response.data;
 
-			if (errors?.username) {
-				errorMessage += 'Username: ' + errors.username.message + ' ';
-			}
+			
 
 			if (errors?.password) {
 				errorMessage += 'Password: ' + errors.password.message + ' ';
@@ -45,6 +43,10 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 
 			if (errors?.email) {
 				errorMessage += 'Email: ' + errors.email.message + ' ';
+			}
+
+			if (errors?.name) {
+				errorMessage += 'Name: ' + errors.name.message + ' ';
 			}
 		} else {
 			errorMessage = 'Something went wrong, account not created!';
