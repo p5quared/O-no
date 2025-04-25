@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import hellBackground from '$lib/images/froghell.png';
 
-	let username = '';
+	let name = '';
 	let email = '';
 	let password = '';
 	let passwordConfirm = '';
@@ -22,7 +22,7 @@
 		}
 
 		const result = await createUser({
-			username,
+			name,
 			email,
 			password,
 			passwordConfirm
@@ -61,8 +61,8 @@
 			<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
 				<input
 					type="text"
-					bind:value={username}
-					placeholder="Username"
+					bind:value={name}
+					placeholder="Name"
 					required
 					autocomplete="off"
 					class="flex-1 rounded border border-gray-300 p-3"
