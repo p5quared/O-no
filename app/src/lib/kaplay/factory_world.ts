@@ -1,6 +1,6 @@
 import type { GameObj } from "kaplay";
 import { getKaplay } from ".";
-import { bgScale, bgTargetHeight, bgX, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
+import { bgScale, bgTargetHeight, bgX, GRAVITY, GROUND_HEIGHT, MIN_GAP, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
 import { PlatformFactory } from "./factory_platform";
 
 export class WorldFactory {
@@ -43,6 +43,8 @@ export class WorldFactory {
 			z(-10),
 			offscreen({ distance: 600 })
 		])
+
+		k.setGravity(GRAVITY);
 
 		const rng = WorldFactory.mulberry32(seed);
 		const placed: { x: number, y: number }[] = [];
