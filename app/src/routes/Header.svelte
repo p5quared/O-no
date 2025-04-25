@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import logo from '$lib/images/svelte-logo.svg';
+	import logo from '$lib/images/frogdeath.png';
 	import { pb } from '$lib/pb/pocketbase';
-
-
+	import ProfilePicture from './ProfilePicture.svelte';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="https://svelte.dev/docs/kit">
-			<img src={logo} alt="SvelteKit" />
-		</a>
+		<img src={logo} alt="SvelteKit" />
 	</div>
 
 	<nav>
@@ -19,52 +16,49 @@
 		</svg>
 		<ul>
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">Home</a>
+				<a href="/" style="font-family: 'FrogFont', sans-serif;">Home</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
-				<a href="/about">About</a>
+				<a href="/about" style="font-family: 'FrogFont', sans-serif;">About</a>
 			</li>
 			<li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
-				<a href="/sverdle">Sverdle</a>
+				<a href="/sverdle" style="font-family: 'FrogFont', sans-serif;">Sverdle</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/chat' ? 'page' : undefined}>
-				<a href="/chat">Chat Demo</a>
+				<a href="/chat" style="font-family: 'FrogFont', sans-serif;">Chat</a>
 			</li>
 
-			{#if pb.authStore.model }
+			{#if pb.authStore.model}
 				<li>
-					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button">Logout</button></a>
+					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button" style="font-family: 'FrogFont', sans-serif;">Logout</button></a>
 				</li>
 			{:else}
 				<li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
-					<a href="/login">Login</a>
+					<a href="/login" style="font-family: 'FrogFont', sans-serif;">Login</a>
 				</li>
 			{/if}
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
-		
 	</nav>
 	<div class="user-corner">
 		{#if pb.authStore.model}
 			<div class="user-info">
-				{#if pb.authStore.model?.avatar}
-					<img src={`${pb.baseUrl}/api/files/${pb.authStore.model.collectionId}/${pb.authStore.model.id}/${pb.authStore.model.avatar}`} alt="Avatar" class="avatar" />
-				{/if}
-				<span class="username">
+				<ProfilePicture />
+				<span class="name">
 					{pb.authStore.model.name || 'User'}
 				</span>
 			</div>
 		{/if}
 	</div>
-
 </header>
 
 <style>
 	header {
 		display: flex;
 		justify-content: space-between;
+		background: #212e1d;
 	}
 
 	.corner {
@@ -81,15 +75,15 @@
 	}
 
 	.corner img {
-		width: 2em;
-		height: 2em;
+		width: 3em;
+		height: 3em;
 		object-fit: contain;
 	}
 
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: #4e6042;
 	}
 
 	svg {
@@ -132,7 +126,8 @@
 		border-top: var(--size) solid var(--color-theme-1);
 	}
 
-	nav a, .nav-button {
+	nav a,
+	.nav-button {
 		display: flex;
 		height: 100%;
 		align-items: center;
@@ -147,7 +142,7 @@
 	}
 	a:hover,
 	.nav-button:hover {
-		color: var(--color-theme-1);
+		color: #ffffff;
 	}
 	.user-corner {
 		width: 3em;
@@ -168,7 +163,7 @@
 		right: 0;
 		min-width: 12em;
 	}
-	.username {
+	.name {
 		font-size: 0.9rem;
 		font-weight: bold;
 		color: var(--color-text);
@@ -184,5 +179,4 @@
 		object-fit: cover;
 		border: 2px solid white;
 	}
-
 </style>
