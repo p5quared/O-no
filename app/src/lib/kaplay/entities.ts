@@ -5,6 +5,7 @@ import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
 import { getLoggedInUserID, createOrRecreateUserPositionRecord } from "$lib/pb/users";
 import { PBEventManager } from "$lib/pb/events";
 import { getKaplay } from ".";
+import { frogGodHeight, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -48,6 +49,23 @@ export class PlayerBuilder extends EntityBuilder {
 			k.body(),
 		])
 
+	// TODO: Player username under sprite
+	// This can be attached: https://kaplayjs.com/guides/game_objects/ 
+	// (see section on "Parents, childs, and roots")
+	//
+	//const nameLabel = add([
+	//	text(name, { size: 12, align: "center", width: 100 }),
+	//	pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
+	//	anchor("center"),
+	//	z(10)
+	//]);
+	//
+	//localPlayer.onUpdate(() => {
+	//	nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
+	//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
+	//});
+
+
 		p = this.setupEventHooks(p)
 
 		if (this.isLocalPlayer) {
@@ -78,6 +96,10 @@ export class PlayerBuilder extends EntityBuilder {
 			if (p.isGrounded()) {
 				p.jump()
 			}
+		});
+
+		p.onCollide("boostpad", () => {
+			p.jump(2.5 * 400);
 		});
 
 		return p
@@ -139,4 +161,38 @@ export class PlayerFactory {
 
 		return { entity };
 	}
+}
+
+const FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
+const GOLD_WIDTH = PLATFORM_WIDTH * 1.8;
+const GOLD_HEIGHT = 8 * 1.8;
+const GLOW_WIDTH = GOLD_WIDTH + 30;
+const GLOW_HEIGHT = 30 * 1.8;
+const GLOW_Y_OFFSET = 11 * 1.8;
+export class PlatformFactory {
+
+	static async createGoldPlatform(x: number): Promise<GameObj<PosComp | SpriteComp>> {
+		const k = getKaplay();
+		k.add([
+			k.rect(GOLD_WIDTH, GOLD_HEIGHT),
+			k.pos(x - GOLD_WIDTH / 2, FINAL_PLATFORM_Y),
+			k.area(),
+			k.body({ isStatic: true }),
+			k.color(255, 215, 0),
+			k.z(5),
+			"goldPlatform"
+		]);
+
+		k.add([
+			k.rect(GLOW_WIDTH, GLOW_HEIGHT),
+			k.pos(x - GOLD_WIDTH / 2 - 15, FINAL_PLATFORM_Y - GLOW_Y_OFFSET),
+			k.color(255, 215, 0),
+			k.opacity(0.3),
+			k.z(4)
+		]);
+
+		//@ts-ignore
+		return Promise.resolve();
+	}
+
 }
