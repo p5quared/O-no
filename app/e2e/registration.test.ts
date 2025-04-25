@@ -2,19 +2,19 @@ import { expect, test } from '@playwright/test';
 import { pb } from '../src/lib/pb/pocketbase';
 
 const timestamp = Date.now();
-const testUsername = `testuser${timestamp}`;
+const testName = `testuser${timestamp}`;
 const testEmail = `test${timestamp}@example.com`;
 const testPassword = 'Password123!';
 
 test.afterAll(async () => {
 	try {
 		const users = await pb.collection('users').getList(1, 10, {
-			filter: `username = "${testUsername}"`
+			filter: `name = "${testName}"`
 		});
 
 		if (users.items.length > 0) {
 			await pb.collection('users').delete(users.items[0].id);
-			console.log(`Test user ${testUsername} deleted successfully`);
+			console.log(`Test user ${testName} deleted successfully`);
 		}
 	} catch (error) {
 		console.error('Error cleaning up test user:', error);
@@ -24,7 +24,7 @@ test.afterAll(async () => {
 test('registration page shows error message when passwords do not match', async ({ page }) => {
 	await page.goto('/registration');
 
-	await page.fill('input[placeholder="Username"]', testUsername);
+	await page.fill('input[placeholder="Name"]', testName);
 	await page.fill('input[placeholder="Email"]', testEmail);
 	await page.fill('input[placeholder="Password"]', testPassword);
 	await page.fill('input[placeholder="Confirm Password"]', 'DifferentPassword123!');
@@ -37,7 +37,7 @@ test('registration page shows error message when passwords do not match', async 
 test('registration page shows success message on successful registration', async ({ page }) => {
 	await page.goto('/registration');
 
-	await page.fill('input[placeholder="Username"]', testUsername);
+	await page.fill('input[placeholder="Name"]', testName);
 	await page.fill('input[placeholder="Email"]', testEmail);
 	await page.fill('input[placeholder="Password"]', testPassword);
 	await page.fill('input[placeholder="Confirm Password"]', testPassword);
