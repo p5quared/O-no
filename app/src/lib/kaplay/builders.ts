@@ -3,6 +3,7 @@ import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
 import { getKaplay } from ".";
 import { Conduit } from "$lib/events";
 import { GameEventTypes } from "$lib/events/EventTypes";
+import { WORLD_HEIGHT, WORLD_WIDTH } from "./constants";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -64,34 +65,27 @@ export class PlayerBuilder extends EntityBuilder {
 
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
-		//k.onUpdate(() => {
-		//	const groundCenterX = WORLD_WIDTH / 2;
-		//	const clampMargin = WORLD_WIDTH / 4;
-		//	const minCamX = groundCenterX - clampMargin;
-		//	const maxCamX = groundCenterX + clampMargin;
-		//
-		//	k.camPos(vec2(
-		//		Math.max(minCamX, Math.min(localPlayer.pos.x, maxCamX)),
-		//		Math.min(localPlayer.pos.y, WORLD_HEIGHT - height() / 2)
-		//	));
-		//
-		//
-		//	if (leaderboardText && leaderboardBg) {
-		//		const camTopLeft = vec2(
-		//			k.camPos().x - width() / 2, // use actual screen width
-		//			k.camPos().y - height() / 2
-		//		);
-		//		const offset = vec2(20, 20);
-		//		leaderboardText.pos = camTopLeft.add(offset);
-		//		leaderboardBg.pos = camTopLeft.add(offset);
-		//	}
-		//
-		//	updatePositionDebounced({
-		//		entity_name: name,
-		//		pos_x: localPlayer.pos.x,
-		//		pos_y: localPlayer.pos.y,
-		//	});
-		//});
+		k.onUpdate(() => {
+			const groundCenterX = WORLD_WIDTH / 2;
+			const clampMargin = WORLD_WIDTH / 4;
+			const minCamX = groundCenterX - clampMargin;
+			const maxCamX = groundCenterX + clampMargin;
+
+			const x = Math.max(minCamX, Math.min(p.pos.x, maxCamX))
+			const y = Math.min(p.pos.y, WORLD_HEIGHT - k.height() / 2)
+			k.setCamPos(k.vec2(x, y));
+
+
+			//if (leaderboardText && leaderboardBg) {
+			//	const camTopLeft = vec2(
+			//		k.camPos().x - width() / 2, // use actual screen width
+			//		k.camPos().y - height() / 2
+			//	);
+			//	const offset = vec2(20, 20);
+			//	leaderboardText.pos = camTopLeft.add(offset);
+			//	leaderboardBg.pos = camTopLeft.add(offset);
+			//}
+		});
 
 		p = this.setupEventHooks(p)
 
