@@ -19,6 +19,8 @@ const init = async (name: string) => {
 		await PlayerFactory.createRemotePlayer(e.id, e.position.x, e.position.y);
 		spawnedPlayers.push(e.id);
 	})
+
+  return () => eventManager.shutdown();
 };
 
 export { init };
