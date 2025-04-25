@@ -14,7 +14,7 @@
 		loading = true;
 		try {
 			await pb.collection('users').authWithPassword(email, password);
-			window.location.href = '/';
+			goto('/');
 		} catch (err: any) {
 			error = err.message || 'Login failed';
 		}
@@ -27,7 +27,7 @@
 			await pb.collection('users').authWithOAuth2({
 				provider: 'google'
 			});
-			window.location.reload();
+			goto('/');
 		} catch (err: any) {
 			error = err.message || 'Google authentication failed';
 			loading = false;

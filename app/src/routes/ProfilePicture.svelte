@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { pb } from '$lib/pb/pocketbase';
-	const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${pb.authStore.model?.username || 'guest'}`;
+	const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${pb.authStore.model?.name || 'guest'}`;
 	let fileInput: HTMLInputElement;
 
 	async function handleImageChange(event: Event) {

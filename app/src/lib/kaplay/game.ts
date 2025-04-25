@@ -20,6 +20,7 @@ const init = async (name: string) => {
 		spawnedPlayers.push(e.id);
 	})
 
+
   return () => eventManager.shutdown();
 };
 
