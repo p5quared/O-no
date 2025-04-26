@@ -2,7 +2,7 @@
 
 A multiplayer hopping game where frogs race to reach heaven before it's too late.
 
-## The Story
+## 🐸 Hop or Hell: Race to Salvation
 
 It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. As a virtuous frog, you expected a peaceful ascent to frog-heaven, but there's a problem:
 
