@@ -6,14 +6,35 @@
 	import { onMount } from 'svelte';
 	import Leaderboard from './Leaderboard.svelte';
 
-	onMount(async () => {
-		// More reliable auth check with timeout
-		setTimeout(() => {
-			if (!pb.authStore.isValid) {
-				goto('/login');
-			}
-		}, 100);
-	})
+
+	let sounds: { [key: string]: HTMLAudioElement } = {};
+	let frogInterval: number;
+
+	onMount(() => {
+		if (!pb.authStore.isValid) {
+			goto('/login');
+			return;
+		}
+
+		// Setup sounds
+		sounds = {
+			forest: Object.assign(new Audio('/forest.wav'), { volume: 0.7, loop: true }),
+			frog: Object.assign(new Audio('/frog.mp3'), { volume: 0.05 })
+		};
+
+		// Start playback
+		sounds.forest.play().catch(console.error);
+		sounds.forest.addEventListener('ended', () => sounds.forest.play().catch(console.error));
+		const playFrog = () => sounds.frog.play().catch(console.error);
+		playFrog();
+		frogInterval = setInterval(playFrog, 25000);
+
+		return () => {
+			Object.values(sounds).forEach(sound => sound.pause());
+			clearInterval(frogInterval);
+		};
+	});
+
 
 	let newLobbyName = '';
 	let lobbies: any[] = [];
