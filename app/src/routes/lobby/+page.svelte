@@ -20,13 +20,13 @@
         try {
           await joinLobby(lobbyId);
           lobby = await fetchSingleLobby(lobbyId);
-          //console.log('Lobby data:', lobby);
+          console.log('Lobby data:', lobby);
           unsubscribe = await subscribeToLobby(lobbyId, (updatedLobby: any) => {
             lobby = updatedLobby;
             //console.log('updated data',updatedLobby)
             if(updatedLobby.gameStarted===true){
-              const username = pb.authStore.record?.username ?? 'anonymous';
-              const myUrl = `/about?name=${encodeURIComponent(username)}&lobby=${encodeURIComponent(lobbyId)}`;
+              const myName = pb.authStore.record?.name ?? 'anonymous';
+              const myUrl = `/about?name=${encodeURIComponent(myName)}&lobby=${encodeURIComponent(lobbyId)}`;
               goto(myUrl);
             }
 
@@ -99,7 +99,7 @@
         <h2 style="font-family: 'FrogFont', sans-serif; color:white;">Players in Lobby:</h2>
         <ul>
           {#each lobby.expand.players as player}
-            <li style="font-family: 'FrogFont', sans-serif; color:white;">{player.username}</li>
+            <li style="font-family: 'FrogFont', sans-serif; color:white;">{player.name}</li>
           {/each}
         </ul>
       {:else}
