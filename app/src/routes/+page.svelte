@@ -2,7 +2,7 @@
 	import { pb } from '$lib/pb/pocketbase';
 	import { goto } from '$app/navigation';
 	import homepageBackground from '$lib/images/swamp.png';
-	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+	import { fetchAllLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 
 	onMount(async () => {
