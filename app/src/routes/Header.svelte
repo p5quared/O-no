@@ -21,9 +21,6 @@
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href="/about" style="font-family: 'FrogFont', sans-serif;">About</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/chat' ? 'page' : undefined}>
-				<a href="/chat" style="font-family: 'FrogFont', sans-serif;">Chat</a>
-			</li>
 
 			{#if pb.authStore.model}
 				<li>
