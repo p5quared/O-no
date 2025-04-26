@@ -49,57 +49,57 @@
 
 	<div class="mx-auto max-w-md p-4 form-box">
 
-		<div class="mx-auto max-w-md p-4">
+<div class="mx-auto max-w-md p-4">
 			<h1 class="mb-4 text-2xl font-bold" style="color: #e55e15; font-family: 'FrogFont', sans-serif;">Join the Colony!</h1>
 
-			{#if error}
+	{#if error}
 				<p style="color: #e55e15">{error}</p>
-			{/if}
-			{#if successMessage}
+	{/if}
+	{#if successMessage}
 				<p style="color: #9cc362;">{successMessage}</p>
-			{/if}
-			<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
-				<input
-					type="text"
+	{/if}
+	<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4">
+		<input
+			type="text"
 					bind:value={name}
 					placeholder="Name"
-					required
-					autocomplete="off"
-					class="flex-1 rounded border border-gray-300 p-3"
-				/>
-				<input
-					type="email"
-					bind:value={email}
-					placeholder="Email"
-					required
-					autocomplete="off"
-					class="rounded border border-gray-300 p-3"
-				/>
-				<input
-					type="password"
-					bind:value={password}
-					placeholder="Password"
-					required
-					autocomplete="off"
-					class="rounded border border-gray-300 p-3"
-				/>
-				<input
-					type="password"
-					bind:value={passwordConfirm}
-					placeholder="Confirm Password"
-					required
-					autocomplete="off"
-					class="rounded border border-gray-300 p-3"
-				/>
-				<button
-					type="submit"
+			required
+			autocomplete="off"
+			class="flex-1 rounded border border-gray-300 p-3"
+		/>
+		<input
+			type="email"
+			bind:value={email}
+			placeholder="Email"
+			required
+			autocomplete="off"
+			class="rounded border border-gray-300 p-3"
+		/>
+		<input
+			type="password"
+			bind:value={password}
+			placeholder="Password"
+			required
+			autocomplete="off"
+			class="rounded border border-gray-300 p-3"
+		/>
+		<input
+			type="password"
+			bind:value={passwordConfirm}
+			placeholder="Confirm Password"
+			required
+			autocomplete="off"
+			class="rounded border border-gray-300 p-3"
+		/>
+		<button
+			type="submit"
 					class="rounded px-6 py-3 font-bold text-white "
 					style="cursor:pointer; background-color: #e55e15; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;"
-					disabled={loading}
-				>
-					{loading ? 'Registering...' : 'Register'}
-				</button>
-			</form>
+			disabled={loading}
+		>
+			{loading ? 'Registering...' : 'Register'}
+		</button>
+	</form>
 
 			<div class="mt-6 text-center text-sm text-white" style="font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">
 				Already Registered a Frog?
