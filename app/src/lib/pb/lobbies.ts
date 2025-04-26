@@ -6,6 +6,7 @@ export async function createLobby(name: string) {
             name: name,
             host: pb.authStore.record!.id,
             players: [],
+            gameStarted: false
         });
         return newLobby;
     } catch (error) {
@@ -30,15 +31,36 @@ export function subscribeToLobbies(callback: Function) {
     });
 }
 
+export async function subscribeToLobby(lobbyId: string, callback: Function) {
+    const unsubscribe = await pb.collection('lobbies').subscribe(lobbyId, async (e) => {
+      const updatedLobby = await pb.collection('lobbies').getOne(lobbyId, {
+        expand: 'host,players'
+      });
+      callback(updatedLobby);
+    });
+    return unsubscribe;
+  }
+  
+
+
+
 export async function joinLobby(lobbyId: string) {
     try {
-      const lobby = await pb.collection('lobbies').getOne(lobbyId);
-      const players = lobby.players || [];
-      if (!players.includes(pb.authStore.record!.id)) {
-        players.push(pb.authStore.record!.id);
-        await pb.collection('lobbies').update(lobbyId, { players });
-      }
-      return await pb.collection('lobbies').getOne(lobbyId, { expand: 'players' });
+        const lobby = await pb.collection('lobbies').getOne(lobbyId);
+        const players = lobby.players || [];
+        //console.log('Before join:', players); 
+        //console.log("players data:", players)
+        //console.log("lobby data:", lobby)
+        if (players.length >= 10) {
+			throw new Error("Lobby is full");
+		}
+
+        if (!players.includes(pb.authStore.record!.id)) {
+            players.push(pb.authStore.record!.id);
+            await pb.collection('lobbies').update(lobbyId, { players });
+            //console.log('After join:', players); 
+        }
+        
     } catch (error) {
       console.error('Error Joining the Lobby:', error);
       throw error;
@@ -49,7 +71,7 @@ export async function joinLobby(lobbyId: string) {
 export async function fetchSingleLobby(lobbyId: string) {
 	try {
 		const result = await pb.collection('lobbies').getOne(lobbyId, {
-			expand: 'players',
+			expand: 'host,players',
 		});
 		return result;
 	} catch (err) {
@@ -57,3 +79,22 @@ export async function fetchSingleLobby(lobbyId: string) {
 		throw err;
 	}
 }
+
+
+
+export async function leaveLobby(lobbyId: string) {
+    try {
+      const lobby = await pb.collection('lobbies').getOne(lobbyId);
+      const players = lobby.players || [];
+  
+      const userId = pb.authStore.record?.id;
+      if (!userId) return;
+  
+      const updatedPlayers = players.filter((id: string) => id !== userId);
+  
+      await pb.collection('lobbies').update(lobbyId, { players: updatedPlayers });
+    } catch (error) {
+      console.error('Error leaving the lobby:', error);
+    }
+}
+  
