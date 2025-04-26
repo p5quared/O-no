@@ -48,7 +48,8 @@ export async function sendChatMessage(content: string): Promise<ChatMessage | nu
 
 	try {
 		return (await pb.collection('chat').create({
-			content
+			content,
+			name: pb.authStore.model?.name || 'Guest'
 		})) as ChatMessage;
 	} catch (error) {
 		console.error('Failed to send message:', error);
