@@ -1,4 +1,7 @@
+import type { PlayerPosition } from '$lib/events/Events';
+import { TABLES } from './constants';
 import { pb } from './pocketbase';
+import type { PlayerPositionsRecord } from './types/pocketbase';
 
 export interface UserCreateData {
 	username: string;
@@ -35,9 +38,7 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 		if (error?.response?.data) {
 			const errors = error.response.data;
 
-			if (errors?.username) {
-				errorMessage += 'Username: ' + errors.username.message + ' ';
-			}
+			
 
 			if (errors?.password) {
 				errorMessage += 'Password: ' + errors.password.message + ' ';
@@ -45,6 +46,10 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 
 			if (errors?.email) {
 				errorMessage += 'Email: ' + errors.email.message + ' ';
+			}
+
+			if (errors?.name) {
+				errorMessage += 'Name: ' + errors.name.message + ' ';
 			}
 		} else {
 			errorMessage = 'Something went wrong, account not created!';
@@ -55,4 +60,54 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 			error: errorMessage
 		};
 	}
+}
+
+export function getLoggedInUserID(): string {
+	return pb.authStore.record?.id ?? '';
+}
+
+export async function listUserPositions() {
+	return await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
+}
+
+// Creates a new user position record,
+// and possible deletes the old one.
+export async function createOrRecreateUserPositionRecord(userID: string, x: number, y: number): Promise<string> {
+	try {
+		await deleteUserPositionRecordByUserId(userID);
+	} catch (error) {
+		console.error('Error creating or recreating user position record:', error);
+	}
+
+
+	const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).create({
+		user: userID,
+		x: x,
+		y: y
+	})
+
+	return id;
+}
+
+export async function updateUserPositionRecord(id: string, p: PlayerPosition) {
+   await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e=> {})
+}
+
+export async function deleteUserPositionRecordByUserId(userID: string) {
+  try {
+  		const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
+  		if (id) {
+  			await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
+  		}
+  	} catch (error) {
+  		console.error('Error deleting user position record:', error);
+  	}
+  }
+
+export async function deleteUserPositionRecord(id: string) {
+  try {
+  await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
+  } catch (error) {
+	console.error('Error deleting user position record:', error);
+  }
 }

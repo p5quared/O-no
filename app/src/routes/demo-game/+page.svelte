@@ -7,6 +7,7 @@
 	const name = urlParams.get('name') ?? 'xxx';
 
 	onMount(async () => {
-		init(name);
+		await init(name);
 	});
+
 </script>
