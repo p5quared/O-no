@@ -5,39 +5,31 @@
 	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 
-	let frogSound: HTMLAudioElement | undefined;
-	let soundInterval: number | undefined;
-
-	function playFrogSound() {
-		if (frogSound) {
-			frogSound.currentTime = 0;
-			frogSound.play().catch(err => console.log('Audio playback failed:', err));
-		}
-	}
+	let sounds: { [key: string]: HTMLAudioElement } = {};
+	let frogInterval: number;
 
 	onMount(() => {
 		if (!pb.authStore.isValid) {
 			goto('/login');
 			return;
 		}
-		// Initialize ambient frog sounds for home page only
-		frogSound = new Audio('/frog.mp3');
-		frogSound.volume = 0.2;
-		
-		// Play immediately once
-		playFrogSound();
-		
-		// Then play every 10 seconds
-		soundInterval = setInterval(playFrogSound, 10000);
+
+		// Setup sounds
+		sounds = {
+			forest: Object.assign(new Audio('/forest.wav'), { volume: 0.7, loop: true }),
+			frog: Object.assign(new Audio('/frog.mp3'), { volume: 0.05 })
+		};
+
+		// Start playback
+		sounds.forest.play().catch(console.error);
+		sounds.forest.addEventListener('ended', () => sounds.forest.play().catch(console.error));
+		const playFrog = () => sounds.frog.play().catch(console.error);
+		playFrog();
+		frogInterval = setInterval(playFrog, 25000);
 
 		return () => {
-			if (frogSound) {
-				frogSound.pause();
-				frogSound = undefined;
-			}
-			if (soundInterval) {
-				clearInterval(soundInterval);
-			}
+			Object.values(sounds).forEach(sound => sound.pause());
+			clearInterval(frogInterval);
 		};
 	});
 
