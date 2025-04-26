@@ -5,11 +5,40 @@
 	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 
-	onMount(async () => {
-		await new Promise(resolve => setTimeout(resolve, 50));
+	let frogSound: HTMLAudioElement | undefined;
+	let soundInterval: number | undefined;
+
+	function playFrogSound() {
+		if (frogSound) {
+			frogSound.currentTime = 0;
+			frogSound.play().catch(err => console.log('Audio playback failed:', err));
+		}
+	}
+
+	onMount(() => {
 		if (!pb.authStore.isValid) {
 			goto('/login');
+			return;
 		}
+		// Initialize ambient frog sounds for home page only
+		frogSound = new Audio('/frog.mp3');
+		frogSound.volume = 0.2;
+		
+		// Play immediately once
+		playFrogSound();
+		
+		// Then play every 10 seconds
+		soundInterval = setInterval(playFrogSound, 10000);
+
+		return () => {
+			if (frogSound) {
+				frogSound.pause();
+				frogSound = undefined;
+			}
+			if (soundInterval) {
+				clearInterval(soundInterval);
+			}
+		};
 	});
 
 	let newLobbyName = '';
