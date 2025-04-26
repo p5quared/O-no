@@ -1,8 +1,44 @@
-# Multiplayer Web Game (Name TBD)
+# HellHopper 🐸
 
-A real-time multiplayer game built with **SvelteKit**, **PocketBase**, and **Supabase**, using **custom WebSockets** for real-time gameplay.
+A multiplayer hopping game where frogs race to reach heaven before it's too late.
 
-> 🎮 The game concept is still being finalized. This README will be updated with gameplay details once chosen.
+## The Story
+
+It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. As a virtuous frog, you expected a peaceful ascent to frog-heaven, but there's a problem:
+
+Due to budget cuts:
+- Frog-heaven has limited capacity
+- The stairway to heaven is broken
+- Only the fastest hoppers will make it in
+
+Hop your way up before space runs out, or face eternal damnation in frog-hell!
+
+## Quick Start
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the server:
+```bash
+npm run dev
+```
+
+3. Start hopping at `http://localhost:5173`
+
+## Tech Stack
+
+- Frontend: SvelteKit
+- Backend: PocketBase
+- Authentication: Google OAuth
+
+## Game Features
+
+- Real-time multiplayer hopping
+- Global leaderboard
+- Live lobby system
+- Profile customization
 
 ---
 
