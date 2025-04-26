@@ -5,11 +5,32 @@
 	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 
-	onMount(async () => {
-		await new Promise(resolve => setTimeout(resolve, 50));
+	let sounds: { [key: string]: HTMLAudioElement } = {};
+	let frogInterval: number;
+
+	onMount(() => {
 		if (!pb.authStore.isValid) {
 			goto('/login');
+			return;
 		}
+
+		// Setup sounds
+		sounds = {
+			forest: Object.assign(new Audio('/forest.wav'), { volume: 0.7, loop: true }),
+			frog: Object.assign(new Audio('/frog.mp3'), { volume: 0.05 })
+		};
+
+		// Start playback
+		sounds.forest.play().catch(console.error);
+		sounds.forest.addEventListener('ended', () => sounds.forest.play().catch(console.error));
+		const playFrog = () => sounds.frog.play().catch(console.error);
+		playFrog();
+		frogInterval = setInterval(playFrog, 25000);
+
+		return () => {
+			Object.values(sounds).forEach(sound => sound.pause());
+			clearInterval(frogInterval);
+		};
 	});
 
 	let newLobbyName = '';
