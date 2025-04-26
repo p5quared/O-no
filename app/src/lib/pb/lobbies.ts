@@ -1,4 +1,6 @@
 import { pb } from './pocketbase'; 
+import { goto } from '$app/navigation'; 
+
 
 export async function createLobby(name: string) {
     try {
@@ -33,10 +35,13 @@ export function subscribeToLobbies(callback: Function) {
 
 export async function subscribeToLobby(lobbyId: string, callback: Function) {
     const unsubscribe = await pb.collection('lobbies').subscribe(lobbyId, async (e) => {
-      const updatedLobby = await pb.collection('lobbies').getOne(lobbyId, {
-        expand: 'host,players'
-      });
-      callback(updatedLobby);
+      try {
+        const updatedLobby = await pb.collection('lobbies').getOne(lobbyId, {expand: 'host,players'});
+        callback(updatedLobby);
+      } catch (err) {
+        console.error('Lobby deleted or not found:', err);
+        goto('/'); 
+      }
     });
     return unsubscribe;
   }

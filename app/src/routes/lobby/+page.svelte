@@ -25,9 +25,9 @@
             lobby = updatedLobby;
             //console.log('updated data',updatedLobby)
             if(updatedLobby.gameStarted===true){
-              const myName = pb.authStore.record?.name ?? 'anonymous';
-              const myUrl = `/about?name=${encodeURIComponent(myName)}&lobby=${encodeURIComponent(lobbyId)}`;
-              goto(myUrl);
+              //const myName = pb.authStore.record?.name ?? 'anonymous';
+              //const myUrl = `/about?name=${encodeURIComponent(myName)}&lobby=${encodeURIComponent(lobbyId)}`;
+              goto("/");
             }
 
 
@@ -69,7 +69,7 @@
         } catch (deleteErr) {
           console.error("Error deleting lobby:", deleteErr);
         }
-      }, 2000);
+      }, 500);
     } catch (err) {
       console.error("Failed to start game:", err);
     }
