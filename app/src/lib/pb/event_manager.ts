@@ -6,8 +6,8 @@ import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { throttle } from "$lib/utils";
 import { subscribeToGameEventsTable } from "./game/subscriptions/events";
 import { subscribetoPlayerPositionTable } from "./game/subscriptions/players";
+import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./game/subscriptions/users";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
-import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./users";
 
 /**
  * This class connects our EventBus to the outside world,
