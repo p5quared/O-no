@@ -1,0 +1,21 @@
+{
+    admin off
+}
+
+:80 {
+    encode gzip
+
+    handle /api/pb/* {
+        uri strip_prefix /api/pb
+        reverse_proxy pocketbase:8090
+    }
+
+    handle {
+        reverse_proxy sveltekit:5173
+    }
+
+    log {
+        output file /var/log/caddy/log.log
+        format console
+    }
+}
