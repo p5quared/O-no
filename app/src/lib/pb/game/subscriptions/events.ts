@@ -1,8 +1,8 @@
 import type { GameEvents } from "$lib/events/Events";
 import type { GameEventTypes } from "$lib/events/EventTypes";
-import { TABLES } from "../constants";
-import { pb } from "../pocketbase";
-import type { EventsGamesResponse } from "../types/pocketbase";
+import { TABLES } from "../../constants";
+import { pb } from "../../pocketbase";
+import type { EventsGamesResponse } from "../../types/pocketbase";
 
 
 type GameEventHandler = <T extends GameEventTypes>(

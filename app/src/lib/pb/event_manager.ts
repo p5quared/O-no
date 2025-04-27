@@ -4,8 +4,8 @@ import type { GameEvents, PlayerPosition } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { throttle } from "$lib/utils";
-import { subscribeToGameEventsTable } from "./subscriptions/events";
-import { subscribetoPlayerPositionTable } from "./subscriptions/players";
+import { subscribeToGameEventsTable } from "./game/subscriptions/events";
+import { subscribetoPlayerPositionTable } from "./game/subscriptions/players";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
 import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./users";
 
