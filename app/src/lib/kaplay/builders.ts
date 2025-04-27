@@ -68,11 +68,11 @@ export class PlayerBuilder extends EntityBuilder {
 		// Update local player and camera based on keyboard inputs
 
 		p = this.setupEventHooks(p)
-		p = this.setupCameraTracking(p)
 
 		if (this.isLocalPlayer) {
-			this.attachMovementBindings(p);
-			this.setupEventBroadcast(p);
+		p = this.setupCameraTracking(p)
+			p = this.attachMovementBindings(p);
+			p = this.setupEventBroadcast(p);
 		}
 
 
