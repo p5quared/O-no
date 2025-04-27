@@ -34,7 +34,7 @@ services:
       - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy/logs:/var/log/caddy
+      - ./:/var/log/caddy
     depends_on:
       - sveltekit
       - pocketbase
