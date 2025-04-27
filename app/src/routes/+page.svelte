@@ -78,12 +78,24 @@
 
 	async function resetGame() {
 		try {
-		const records = await pb.collection('positions').getFullList();
-		for (const record of records) {
-			await pb.collection('positions').delete(record.id);
-		}
-		//console.log('Game reset!');
-		goto('/demo-game');
+			const positions = await pb.collection('positions').getFullList();
+			for (const record of positions) {
+				await pb.collection('positions').delete(record.id);
+			}
+
+			const playerPositions = await pb.collection('player_positions').getFullList();
+			for (const record of playerPositions) {
+				await pb.collection('player_positions').delete(record.id);
+			}
+			
+			const eventsGames = await pb.collection('events_games').getFullList();
+			for (const record of eventsGames) {
+				await pb.collection('events_games').delete(record.id);
+			}
+
+			console.log('Game reset!');
+
+			goto('/demo-game');
 		} catch (error) {
 		console.error('Error resetting game:', error);
 		}
