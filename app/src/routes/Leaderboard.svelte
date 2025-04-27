@@ -13,7 +13,7 @@
     let users: User[] = [];
 
     async function loadUsers() {
-        const records = await pb.collection('Leaderboard').getFullList();
+        const records = await pb.collection('users_scores').getFullList();
         console.log(records);
         users = records.map(user => ({
             name: user.name,
