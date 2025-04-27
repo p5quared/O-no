@@ -1,12 +1,8 @@
-version: '3.8'
-
 services:
   pocketbase:
     build:
       context: ./pocketbase
       dockerfile: Dockerfile
-    ports:
-      - "8090:8090"
     volumes:
       - ./pocketbase/pb_data:/pb_data
       - ./pocketbase/pb_public:/pb_public
@@ -17,21 +13,33 @@ services:
     environment:
       - TZ=UTC
 
-  frontend-dev:
+  sveltekit:
     image: node:20-alpine
     working_dir: /app
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
-    ports:
-      - "5173:5173"
     volumes:
       - ./app:/app
-    depends_on:
-      - pocketbase
     networks:
       - app-network
     environment:
-      - PUBLIC_POCKETBASE_URL=http://localhost:8090
+      - VITE_PB_URL=http://localhost:8080/api/pb
       - NODE_ENV=development
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/logs:/var/log/caddy
+    depends_on:
+      - sveltekit
+      - pocketbase
+    networks:
+      - app-network
 
 networks:
   app-network:
