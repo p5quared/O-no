@@ -59,9 +59,6 @@
 			<li>Testing: Vitest & Playwright</li>
 			<li>Dev Environment: Docker + Docker Compose</li>
 		</ul>
-		<p> 
-			Development is tracked via <a href="#">GitHub Issues & Projects</a>. (Consider linking to your actual repo issues/projects here)
-		</p>
 	</div>
 </div>
 
