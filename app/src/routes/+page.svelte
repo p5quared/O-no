@@ -72,6 +72,36 @@
 		goto(`/lobby?id=${lobbyId}`);
 	}
 
+	function joinGame() {
+		goto('/demo-game');
+	}
+
+	async function resetGame() {
+		try {
+			const positions = await pb.collection('positions').getFullList();
+			for (const record of positions) {
+				await pb.collection('positions').delete(record.id);
+			}
+
+			const playerPositions = await pb.collection('player_positions').getFullList();
+			for (const record of playerPositions) {
+				await pb.collection('player_positions').delete(record.id);
+			}
+			
+			const eventsGames = await pb.collection('events_games').getFullList();
+			for (const record of eventsGames) {
+				await pb.collection('events_games').delete(record.id);
+			}
+
+			console.log('Game reset!');
+
+			goto('/demo-game');
+		} catch (error) {
+		console.error('Error resetting game:', error);
+		}
+	}
+
+
 </script>
 
 
@@ -82,9 +112,14 @@
 
 <section class="lobby-page" style="background-image: url({homepageBackground});">
 	<div class="mx-auto max-w-md p-4 form-box">
+		<h1 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Welcome, Frog!</h1>
+		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Click "Start" to Reset the Game!</h2>
+		<button class="create-btn" style="font-family: 'FrogFont', sans-serif; color: #212e1d;" on:click={resetGame}>Start</button>
+		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Click "Join" to Go to Existing Game!</h2>
+		<button class="create-btn" style="font-family: 'FrogFont', sans-serif; color: #212e1d;" on:click={joinGame}>Join</button>
 
 
-    
+<!-- REMOVED FOR TEMP LOBBY: 
         <h1 style="font-family: 'FrogFont', sans-serif;">Join a Lobby! </h1>
 
         <div class="lobby-list">
@@ -108,8 +143,8 @@
 			class="rounded"
 			style="color:black;"
 		/>
+-->		
 
-	
 	</div>
   
 </section>
