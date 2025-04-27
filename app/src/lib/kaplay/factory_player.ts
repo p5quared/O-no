@@ -1,6 +1,6 @@
 import type { PlayerID } from "$lib/constants";
-import { PBEventManager } from "$lib/pb/events";
-import { createOrRecreateUserPositionRecord } from "$lib/pb/users";
+import { PBEventManager } from "$lib/pb/event_manager";
+import { createOrRecreateUserPositionRecord } from "$lib/pb/game/subscriptions/users";
 import { getKaplay } from ".";
 import { PlayerBuilder, type KaplayPlayerType } from "./builders";
 
