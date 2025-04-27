@@ -12,7 +12,9 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Chat = "chat",
+	EventsGames = "events_games",
 	Games = "games",
+	Lobbies = "lobbies",
 	PlayerPositions = "player_positions",
 	Positions = "positions",
 	Users = "users",
@@ -96,9 +98,26 @@ export type ChatRecord = {
 	updated?: IsoDateString
 }
 
+export type EventsGamesRecord<Tdata = unknown> = {
+	created?: IsoDateString
+	data?: null | Tdata
+	event_type: string
+	id: string
+	updated?: IsoDateString
+}
+
 export type GamesRecord = {
 	created?: IsoDateString
 	id: string
+	updated?: IsoDateString
+}
+
+export type LobbiesRecord = {
+	created?: IsoDateString
+	host?: RecordIdString
+	id: string
+	name: string
+	players?: RecordIdString[]
 	updated?: IsoDateString
 }
 
@@ -140,7 +159,9 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ChatResponse<Texpand = unknown> = Required<ChatRecord> & BaseSystemFields<Texpand>
+export type EventsGamesResponse<Tdata = unknown, Texpand = unknown> = Required<EventsGamesRecord<Tdata>> & BaseSystemFields<Texpand>
 export type GamesResponse<Texpand = unknown> = Required<GamesRecord> & BaseSystemFields<Texpand>
+export type LobbiesResponse<Texpand = unknown> = Required<LobbiesRecord> & BaseSystemFields<Texpand>
 export type PlayerPositionsResponse<Texpand = unknown> = Required<PlayerPositionsRecord> & BaseSystemFields<Texpand>
 export type PositionsResponse<Texpand = unknown> = Required<PositionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -154,7 +175,9 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	chat: ChatRecord
+	events_games: EventsGamesRecord
 	games: GamesRecord
+	lobbies: LobbiesRecord
 	player_positions: PlayerPositionsRecord
 	positions: PositionsRecord
 	users: UsersRecord
@@ -167,7 +190,9 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	chat: ChatResponse
+	events_games: EventsGamesResponse
 	games: GamesResponse
+	lobbies: LobbiesResponse
 	player_positions: PlayerPositionsResponse
 	positions: PositionsResponse
 	users: UsersResponse
@@ -183,7 +208,9 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'chat'): RecordService<ChatResponse>
+	collection(idOrName: 'events_games'): RecordService<EventsGamesResponse>
 	collection(idOrName: 'games'): RecordService<GamesResponse>
+	collection(idOrName: 'lobbies'): RecordService<LobbiesResponse>
 	collection(idOrName: 'player_positions'): RecordService<PlayerPositionsResponse>
 	collection(idOrName: 'positions'): RecordService<PositionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>

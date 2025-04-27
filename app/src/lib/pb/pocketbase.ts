@@ -1,22 +1,9 @@
 import PocketBase from 'pocketbase';
-import type { TypedPocketBase } from './types';
+import type { TypedPocketBase } from './types/pocketbase';
 
-const DEV_URL = 'http://localhost:8090';
-const PROD_URL = 'https://ono.myintro.link';
-const isProd = import.meta.env.PROD;
-
-let url = isProd ? PROD_URL : DEV_URL;
-
-if (!isProd) {
-  try {
-    const res = await fetch(DEV_URL + '/api/health', { method: 'GET' });
-    if (!res.ok) {
-      url = PROD_URL;
-    }
-  } catch (err) {
-    url = PROD_URL;
-  }
-}
-
-export const pb = new PocketBase(url) as TypedPocketBase;
-
+/**
+ * Single PocketBase instance for the entire app
+ */
+const LOCAL_PB_URL = import.meta.env.VITE_PB_URL;
+const PROD_PB_URL = "PROD_URL";
+export const pb = new PocketBase(LOCAL_PB_URL ?? PROD_PB_URL) as TypedPocketBase;
