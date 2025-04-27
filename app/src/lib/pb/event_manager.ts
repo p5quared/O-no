@@ -4,8 +4,7 @@ import type { GameEvents, PlayerPosition } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { throttle } from "$lib/utils";
-import { TABLES } from "./constants";
-import { pb } from "./pocketbase";
+import { subscribeToGameEventsTable } from "./subscriptions/events";
 import { subscribetoPlayerPositionTable } from "./subscriptions/players";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
 import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./users";
@@ -39,6 +38,7 @@ export class PBEventManager {
 
 	private async setupIncomingEventSubscriptions() {
 		this.subscriptions.add(await this.subToPlayerPositionsTable())
+		this.subscriptions.add(await this.subToGameEventsTable())
 	}
 
 	private setupOutGoingEventSubscriptions() {
@@ -56,6 +56,16 @@ export class PBEventManager {
 	private throttledUpdatePositoin = throttle(async (id: string, p: PlayerPosition) => {
 		await updateUserPositionRecord(id, p)
 	}, 50);
+
+	private async subToGameEventsTable() {
+		console.log("Subscribing to game events");
+		return await subscribeToGameEventsTable((_, eventType, data) => {
+			switch (eventType) {
+				case GameEventTypes.GAME_OVER:
+					Conduit.emit(GameEventTypes.GAME_OVER, data as GameEvents[GameEventTypes.GAME_OVER]);
+			}
+		})
+	}
 
 	private async subToPlayerPositionsTable() {
 		console.log("Subscribing to player locations");

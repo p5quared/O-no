@@ -1,5 +1,5 @@
 import type { PlayerID } from "$lib/constants";
-import { PBEventManager } from "$lib/pb/events";
+import { PBEventManager } from "$lib/pb/event_manager";
 import { createOrRecreateUserPositionRecord } from "$lib/pb/users";
 import { getKaplay } from ".";
 import { PlayerBuilder, type KaplayPlayerType } from "./builders";
