@@ -4,6 +4,7 @@
 	import homepageBackground from '$lib/images/swamp.png';
 	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
+	import { TABLES } from '$lib/pb/constants';
 
 	let sounds: { [key: string]: HTMLAudioElement } = {};
 	let frogInterval: number;
@@ -83,12 +84,12 @@
 				await pb.collection('positions').delete(record.id);
 			}
 
-			const playerPositions = await pb.collection('player_positions').getFullList();
+			const playerPositions = await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
 			for (const record of playerPositions) {
 				await pb.collection('player_positions').delete(record.id);
 			}
 			
-			const eventsGames = await pb.collection('events_games').getFullList();
+			const eventsGames = await pb.collection(TABLES.GAME_EVENTS).getFullList();
 			for (const record of eventsGames) {
 				await pb.collection('events_games').delete(record.id);
 			}
