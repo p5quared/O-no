@@ -48,6 +48,7 @@
 	},
 	"dependencies": {
 		"kaplay": "^3001.0.12",
-		"pocketbase": "^0.25.2"
+		"pocketbase": "^0.25.2",
+		"ws": "^8.18.1"
 	}
 }

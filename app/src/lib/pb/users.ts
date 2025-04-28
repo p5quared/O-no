@@ -3,7 +3,7 @@ import { pb } from './pocketbase';
 import type { UsersRecord } from './types/pocketbase';
 
 export interface UserCreateData {
-	username: string;
+	name: string;
 	email: string;
 	password: string;
 	passwordConfirm: string;
@@ -62,8 +62,10 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 }
 
 export async function getUserById(id: string): Promise<UsersRecord> {
-  const record = await pb.collection(TABLES.USERS).getOne<UsersRecord>(id);
-  return record;
+  return await pb.collection(TABLES.USERS).getOne<UsersRecord>(id).then(record => record).catch((error) => {
+	console.error(`Error fetching user ${id}`, error)
+	return { } as UsersRecord
+  });
 }
 
 export const getLoggedInUserID = () => {

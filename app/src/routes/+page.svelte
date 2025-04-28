@@ -5,6 +5,8 @@
 	import { fetchAllLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 	import { TABLES } from '$lib/pb/constants';
+	import Header from './Header.svelte';
+	import { page } from '$app/state';
 
 	let sounds: { [key: string]: HTMLAudioElement } = {};
 	let frogInterval: number;
@@ -102,6 +104,11 @@
 <svelte:head>
 	<title>Home</title>
 </svelte:head>
+
+	{#if !['/login', '/registration'].includes(page.url.pathname)}
+	<Header />
+
+	{/if}
 
 <section class="lobby-page" style="background-image: url({homepageBackground});">
 	<div class="form-box mx-auto max-w-md p-4">
