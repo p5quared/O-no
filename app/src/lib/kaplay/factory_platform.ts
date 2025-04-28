@@ -1,5 +1,5 @@
 import type { GameObj, PosComp, SpriteComp } from "kaplay";
-import { frogGodHeight, PLATFORM_WIDTH } from "./constants";
+import { frogGodHeight, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
 import { getKaplay } from ".";
 
 export class PlatformFactory {
@@ -68,6 +68,19 @@ export class PlatformFactory {
 			"boostpad"
 		]);
 		return p
+	}
+
+	static createEndingPlatforms() {
+		// In a perfect world this would live in the world factory
+		const nFinalPlatforms = 5;
+		const spacing = 440;
+		const totalGoldWidth = spacing * (nFinalPlatforms - 1)
+		const goldStartX = (WORLD_WIDTH - totalGoldWidth) / 2;
+		for (let i = 0; i < nFinalPlatforms; i++) {
+			const x = goldStartX + spacing * i
+			PlatformFactory.createGoldPlatform(x);
+		}
+
 	}
 
 	static createSidewaysMover(x: number, y: number) {

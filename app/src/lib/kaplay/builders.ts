@@ -70,6 +70,7 @@ export class PlayerBuilder extends EntityBuilder {
 		p = this.setupCameraTracking(p)
 			p = this.attachMovementBindings(p);
 			p = this.setupEventBroadcast(p);
+			p.tag("localPlayer");
 		}
 
 
