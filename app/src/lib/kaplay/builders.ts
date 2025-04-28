@@ -4,6 +4,7 @@ import { getKaplay } from ".";
 import { Conduit } from "$lib/events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "./constants";
+import { getUsername } from "$lib/pb/users";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -50,29 +51,26 @@ export class PlayerBuilder extends EntityBuilder {
 		// TODO: Player username under sprite
 		// This can be attached: https://kaplayjs.com/guides/game_objects/ 
 		// (see section on "Parents, childs, and roots")
-		//
-		//const nameLabel = add([
-		//	text(name, { size: 12, align: "center", width: 100 }),
-		//	pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
-		//	anchor("center"),
-		//	z(10)
-		//]);
-		//
-		//localPlayer.onUpdate(() => {
-		//	nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
-		//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
-		//});
+
+		const username = await getUsername(this.playerID);
+		p.add([
+			k.text(username, { size: 12, align: "center", width: 100 }),
+			k.pos(p.pos.x + 28, p.pos.y + 64),
+			k.anchor("center"),
+			k.z(10)
+		]);
 
 
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
 
 		p = this.setupEventHooks(p)
-		p = this.setupCameraTracking(p)
 
 		if (this.isLocalPlayer) {
-			this.attachMovementBindings(p);
-			this.setupEventBroadcast(p);
+			p = this.setupCameraTracking(p)
+			p = this.attachMovementBindings(p);
+			p = this.setupEventBroadcast(p);
+			p.tag("localPlayer");
 		}
 
 
@@ -131,6 +129,13 @@ export class PlayerBuilder extends EntityBuilder {
 
 		p.onCollide("boostpad", () => {
 			p.jump(2.5 * 400);
+		});
+
+		p.onCollide("endPlatform", () => {
+			if (p.isGrounded()) {
+				console.log("Gold collected");
+				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
+			}
 		});
 
 		return p

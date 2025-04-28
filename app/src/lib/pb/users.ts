@@ -1,7 +1,6 @@
-import type { PlayerPosition } from '$lib/events/Events';
 import { TABLES } from './constants';
 import { pb } from './pocketbase';
-import type { PlayerPositionsRecord } from './types/pocketbase';
+import type { UsersRecord } from './types/pocketbase';
 
 export interface UserCreateData {
 	username: string;
@@ -62,6 +61,17 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 	}
 }
 
-export function getLoggedInUserID(): string {
-	return pb.authStore.record?.id ?? '';
+export async function getUserById(id: string): Promise<UsersRecord> {
+  const record = await pb.collection(TABLES.USERS).getOne<UsersRecord>(id);
+  return record;
+}
+
+export const getLoggedInUserID = () => {
+  return pb.authStore.record?.id || ''; // They better be logged in
+}
+
+
+export async function getUsername(id: string): Promise<string> {
+  const user =  await getUserById(id);
+  return user.name ?? "Unknown";
 }
