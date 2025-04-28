@@ -107,5 +107,7 @@ export class WorldFactory {
 				}
 			}
 		}
+
+		PlatformFactory.createEndingPlatforms();
 	}
 }

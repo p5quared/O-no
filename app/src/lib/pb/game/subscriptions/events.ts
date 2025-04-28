@@ -1,8 +1,8 @@
 import type { GameEvents } from "$lib/events/Events";
 import type { GameEventTypes } from "$lib/events/EventTypes";
-import { TABLES } from "../../constants";
-import { pb } from "../../pocketbase";
-import type { EventsGamesResponse } from "../../types/pocketbase";
+import type { EventsGamesRecord, EventsGamesResponse } from "$lib/pb/types/pocketbase";
+import { TABLES } from "$lib/pb/constants";
+import { pb } from "$lib/pb/pocketbase";
 
 
 type GameEventHandler = <T extends GameEventTypes>(
@@ -21,4 +21,11 @@ export const subscribeToGameEventsTable = async (f: GameEventHandler) => {
 	return {
 		cancel: () => pb.collection(TABLES.GAME_EVENTS).unsubscribe("*")
 	}
+}
+
+export const createGameEvent = async (eventType: GameEventTypes, data: GameEvents[GameEventTypes]) => {
+	await pb.collection(TABLES.GAME_EVENTS).create<EventsGamesRecord>({
+		event_type: eventType,
+		data
+	})
 }
