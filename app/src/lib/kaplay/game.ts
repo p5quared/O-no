@@ -1,11 +1,14 @@
 import { getKaplay } from '.';
-import { frogGodHeight, WORLD_HEIGHT } from './constants';
+import { frogGodHeight, GROUND_HEIGHT, WORLD_HEIGHT } from './constants';
 import { getLoggedInUserID } from '$lib/pb/users';
 import { Conduit } from '$lib/events';
 import { GameEventTypes } from '$lib/events/EventTypes';
 import { WorldFactory } from './factory_world';
 import { PlayerFactory } from './factory_player';
 import { goto } from '$app/navigation';
+
+// TODO: This should probably dynamically generate a random valid spawn
+const spawnPosition = () => { return {x: 80, y: WORLD_HEIGHT - GROUND_HEIGHT - 32} }
 
 const init = async (name: string) => {
 	const k = getKaplay();
@@ -14,8 +17,8 @@ const init = async (name: string) => {
 
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
-	const { eventManager } = await PlayerFactory.createLocalPlayer(getLoggedInUserID(), 0, 0)
-
+	const localSpawn = spawnPosition();
+	const { eventManager } = await PlayerFactory.createLocalPlayer(getLoggedInUserID(), localSpawn.x, localSpawn.y);
 	const spawnedPlayers: string[] = [];
 	Conduit.on(GameEventTypes.PLAYER_SPAWNED, async (e) => {
 		if (e.id === getLoggedInUserID() || spawnedPlayers.includes(e.id)) return;

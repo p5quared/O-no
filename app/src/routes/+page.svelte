@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { pb } from '$lib/pb/pocketbase';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import homepageBackground from '$lib/images/swamp.png';
-	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+	import { fetchAllLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 	import { TABLES } from '$lib/pb/constants';
 
@@ -29,7 +29,7 @@
 		frogInterval = setInterval(playFrog, 25000);
 
 		return () => {
-			Object.values(sounds).forEach(sound => sound.pause());
+			Object.values(sounds).forEach((sound) => sound.pause());
 			clearInterval(frogInterval);
 		};
 	});
@@ -41,33 +41,32 @@
 			try {
 				await createLobby(newLobbyName.trim());
 				lobbies = await fetchAllLobbies();
-				newLobbyName = ''; 
+				newLobbyName = '';
 			} catch (error) {
-				console.error("Error creating lobby:", error);
+				console.error('Error creating lobby:', error);
 			}
 		}
 	}
 
 	onMount(async () => {
-        try {
-            lobbies = await fetchAllLobbies();
-            subscribeToLobbies((e:any) => {
-                if (e.action === 'create') {
-                    lobbies = [...lobbies, e.record];
-                } else if (e.action === 'update') {
-                    const index = lobbies.findIndex((lobby) => lobby.id === e.record.id);
-                    if (index !== -1) {
-                        lobbies[index] = e.record;
-                    }
-                } else if (e.action === 'delete') {
-                    lobbies = lobbies.filter((lobby) => lobby.id !== e.record.id);
-                }
-            });
-        } catch (error) {
-            console.error("Error Fetching All the Lobbies:", error);
-        }
-    });
-	
+		try {
+			lobbies = await fetchAllLobbies();
+			subscribeToLobbies((e: any) => {
+				if (e.action === 'create') {
+					lobbies = [...lobbies, e.record];
+				} else if (e.action === 'update') {
+					const index = lobbies.findIndex((lobby) => lobby.id === e.record.id);
+					if (index !== -1) {
+						lobbies[index] = e.record;
+					}
+				} else if (e.action === 'delete') {
+					lobbies = lobbies.filter((lobby) => lobby.id !== e.record.id);
+				}
+			});
+		} catch (error) {
+			console.error('Error Fetching All the Lobbies:', error);
+		}
+	});
 
 	async function handleJoinLobby(lobbyId: string) {
 		goto(`/lobby?id=${lobbyId}`);
@@ -78,49 +77,53 @@
 	}
 
 	async function resetGame() {
-		try {
-			const positions = await pb.collection('positions').getFullList();
-			for (const record of positions) {
-				await pb.collection('positions').delete(record.id);
+		for (const table of [TABLES.PLAYER_POSITIONS, TABLES.GAME_EVENTS]) {
+			try {
+				const records = await pb.collection(table).getFullList();
+				if (records.length === 0) {
+									console.log(`No records found in ${table}`);
+									continue;
+								}
+				for (const record of records) {
+					console.log(`Deleting record ${record.id} from ${table}`);
+					await pb.collection(table).delete(record.id);
+				}
+			} catch (error) {
+				console.error(`Error deleting from ${table}:`, error);
 			}
-
-			const playerPositions = await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
-			for (const record of playerPositions) {
-				await pb.collection('player_positions').delete(record.id);
-			}
-			
-			const eventsGames = await pb.collection(TABLES.GAME_EVENTS).getFullList();
-			for (const record of eventsGames) {
-				await pb.collection('events_games').delete(record.id);
-			}
-
-			console.log('Game reset!');
-
-			goto('/demo-game');
-		} catch (error) {
-		console.error('Error resetting game:', error);
 		}
+		console.log('Game reset!');
+
+		// INFO: Need to force refresh
+		window.location.href = '/demo-game';
 	}
-
-
 </script>
-
-
 
 <svelte:head>
 	<title>Home</title>
 </svelte:head>
 
 <section class="lobby-page" style="background-image: url({homepageBackground});">
-	<div class="mx-auto max-w-md p-4 form-box">
+	<div class="form-box mx-auto max-w-md p-4">
 		<h1 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Welcome, Frog!</h1>
-		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Click "Start" to Reset the Game!</h2>
-		<button class="create-btn" style="font-family: 'FrogFont', sans-serif; color: #212e1d;" on:click={resetGame}>Start</button>
-		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">Click "Join" to Go to Existing Game!</h2>
-		<button class="create-btn" style="font-family: 'FrogFont', sans-serif; color: #212e1d;" on:click={joinGame}>Join</button>
+		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">
+			Click "Start" to Reset the Game!
+		</h2>
+		<button
+			class="create-btn"
+			style="font-family: 'FrogFont', sans-serif; color: #212e1d;"
+			on:click={resetGame}>Start</button
+		>
+		<h2 style="font-family: 'FrogFont', sans-serif; color: #212e1d;">
+			Click "Join" to Go to Existing Game!
+		</h2>
+		<button
+			class="create-btn"
+			style="font-family: 'FrogFont', sans-serif; color: #212e1d;"
+			on:click={joinGame}>Join</button
+		>
 
-
-<!-- REMOVED FOR TEMP LOBBY: 
+		<!-- REMOVED FOR TEMP LOBBY: 
         <h1 style="font-family: 'FrogFont', sans-serif;">Join a Lobby! </h1>
 
         <div class="lobby-list">
@@ -144,16 +147,9 @@
 			class="rounded"
 			style="color:black;"
 		/>
--->		
-
+-->
 	</div>
-  
 </section>
-
-
-
-
-
 
 <style>
 	.lobby-page {
@@ -165,10 +161,10 @@
 		color: white;
 		background-position: center;
 		background-size: cover;
-		overflow: hidden; 
+		overflow: hidden;
 	}
 	.form-box {
-		background: rgba(120, 114, 47, .8);
+		background: rgba(120, 114, 47, 0.8);
 		border-radius: 12px;
 		padding: 2rem;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -186,7 +182,7 @@
 		overflow-y: auto;
 	}
 	.lobby-card {
-		background: rgba(33, 46, 29, .95);
+		background: rgba(33, 46, 29, 0.95);
 		border-radius: 8px;
 		padding: 1rem;
 		display: flex;
