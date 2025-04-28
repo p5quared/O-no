@@ -19,7 +19,7 @@ export class PlatformFactory {
 			k.body({ isStatic: true }),
 			k.color(255, 215, 0),
 			k.z(5),
-			"goldPlatform"
+			"endPlatform"
 		]);
 
 		k.add([
