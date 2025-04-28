@@ -53,13 +53,15 @@ export class PlayerBuilder extends EntityBuilder {
 		// (see section on "Parents, childs, and roots")
 
 		const username = await getUsername(this.playerID);
-		p.add([
+		const usernameLabel = k.add([
 			k.text(username, { size: 12, align: "center", width: 100 }),
 			k.pos(p.pos.x + 28, p.pos.y + 64),
 			k.anchor("center"),
 			k.z(10)
 		]);
-
+		p.onUpdate(() => {
+			usernameLabel.pos = k.vec2(p.pos.x + 28, p.pos.y + 64);
+		});
 
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
