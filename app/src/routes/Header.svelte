@@ -44,7 +44,7 @@
 			<div class="user-info">
 				<ProfilePicture />
 				<span class="name">
-					Logged in as: {pb.authStore.model.username ?? 'User'}
+					Logged in as: {pb.authStore.model.name ?? 'User'}
 				</span>
 			</div>
 		{/if}
