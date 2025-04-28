@@ -11,8 +11,9 @@ interface WebSocketOptions {
   maxReconnectAttempts?: number;
 }
 
+const PROD_WS_URL = 'wss://ws-wispy-wave-3271.fly.dev/ws';
 const DEFAULT_OPTIONS: WebSocketOptions = {
-  url: 'ws://localhost:8080/ws',
+  url: import.meta.env.VITE_WS_URL ?? PROD_WS_URL,
   autoReconnect: true,
   reconnectInterval: 3000,
   maxReconnectAttempts: 5
