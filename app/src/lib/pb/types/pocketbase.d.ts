@@ -13,7 +13,6 @@ export enum Collections {
 	Superusers = "_superusers",
 	Chat = "chat",
 	EventsGames = "events_games",
-	Games = "games",
 	Lobbies = "lobbies",
 	PlayerPositions = "player_positions",
 	Positions = "positions",
@@ -106,12 +105,6 @@ export type EventsGamesRecord<Tdata = unknown> = {
 	updated?: IsoDateString
 }
 
-export type GamesRecord = {
-	created?: IsoDateString
-	id: string
-	updated?: IsoDateString
-}
-
 export type LobbiesRecord = {
 	created?: IsoDateString
 	host?: RecordIdString
@@ -125,7 +118,6 @@ export type PlayerPositionsRecord = {
 	created?: IsoDateString
 	id: string
 	updated?: IsoDateString
-	user: RecordIdString
 	x?: number
 	y?: number
 }
@@ -145,10 +137,11 @@ export type UsersRecord = {
 	email: string
 	emailVisibility?: boolean
 	id: string
+	name?: string
 	password: string
+	score?: number
 	tokenKey: string
 	updated?: IsoDateString
-	username?: string
 	verified?: boolean
 }
 
@@ -160,7 +153,6 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ChatResponse<Texpand = unknown> = Required<ChatRecord> & BaseSystemFields<Texpand>
 export type EventsGamesResponse<Tdata = unknown, Texpand = unknown> = Required<EventsGamesRecord<Tdata>> & BaseSystemFields<Texpand>
-export type GamesResponse<Texpand = unknown> = Required<GamesRecord> & BaseSystemFields<Texpand>
 export type LobbiesResponse<Texpand = unknown> = Required<LobbiesRecord> & BaseSystemFields<Texpand>
 export type PlayerPositionsResponse<Texpand = unknown> = Required<PlayerPositionsRecord> & BaseSystemFields<Texpand>
 export type PositionsResponse<Texpand = unknown> = Required<PositionsRecord> & BaseSystemFields<Texpand>
@@ -176,7 +168,6 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	chat: ChatRecord
 	events_games: EventsGamesRecord
-	games: GamesRecord
 	lobbies: LobbiesRecord
 	player_positions: PlayerPositionsRecord
 	positions: PositionsRecord
@@ -191,7 +182,6 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	chat: ChatResponse
 	events_games: EventsGamesResponse
-	games: GamesResponse
 	lobbies: LobbiesResponse
 	player_positions: PlayerPositionsResponse
 	positions: PositionsResponse
@@ -209,7 +199,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'chat'): RecordService<ChatResponse>
 	collection(idOrName: 'events_games'): RecordService<EventsGamesResponse>
-	collection(idOrName: 'games'): RecordService<GamesResponse>
 	collection(idOrName: 'lobbies'): RecordService<LobbiesResponse>
 	collection(idOrName: 'player_positions'): RecordService<PlayerPositionsResponse>
 	collection(idOrName: 'positions'): RecordService<PositionsResponse>

@@ -73,5 +73,5 @@ export const getLoggedInUserID = () => {
 
 export async function getUsername(id: string): Promise<string> {
   const user =  await getUserById(id);
-  return user.username ?? "Unknown";
+  return user.name ?? "Unknown";
 }

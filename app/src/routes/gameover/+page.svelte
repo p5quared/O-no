@@ -18,7 +18,7 @@
 			});
 
 			
-			return winner.items[0].expand?.user.username ?? 'Unknown';
+			return winner.items[0].expand?.user.name ?? 'Unknown';
 		} catch (error) {
 			console.error("Error getting winning player:", error);
 			return 'Unknown';
