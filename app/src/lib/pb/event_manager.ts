@@ -26,7 +26,6 @@ export class PBEventManager {
 	public async setup() {
 		this.setupOutGoingEventSubscriptions();
 		await this.setupIncomingEventSubscriptions();
-		this.emitExistingPositions()
 
 	}
 
@@ -91,18 +90,18 @@ export class PBEventManager {
 					})
 					break;
 				case "update":
-					Conduit.emit(GameEventTypes.PLAYER_MOVED, {
-						player_id: record.user,
-						position: {
-							'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
-							'y': record.y ?? -1, // i.e. broadcast MUST set these
-						}
-					})
+					// Removed in favor of ws system
+					//Conduit.emit(GameEventTypes.PLAYER_MOVED, {
+					//	player_id: record.user,
+					//	position: {
+					//		'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+					//		'y': record.y ?? -1, // i.e. broadcast MUST set these
+					//	}
+					//})
 					break;
 				case "delete":
-					console.log("Player left", record.user)
 					Conduit.emit(GameEventTypes.PLAYER_QUIT, {
-						id: record.user,
+						id: record.id,
 					})
 					break;
 			}
@@ -112,7 +111,7 @@ export class PBEventManager {
 	// Emit the positions of all players already in the game
 	// This is done at startup to ensure that we load all players
 	// This could cause some double spawns?
-	private async emitExistingPositions() {
+	public async emitExistingPositions() {
 		const existingPositions = await listUserPositions();
 		for (const positionRecord of existingPositions) {
 			Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {

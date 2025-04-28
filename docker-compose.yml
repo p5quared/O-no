@@ -23,6 +23,7 @@ services:
       - app-network
     environment:
       - VITE_PB_URL=http://localhost:8080/api/pb
+      - VITE_WS_URL=ws://localhost:8080/ws
       - NODE_ENV=development
 
   caddy:
@@ -38,6 +39,16 @@ services:
     depends_on:
       - sveltekit
       - pocketbase
+    networks:
+      - app-network
+
+  ws-service:
+    build:
+      context: ./ws
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8080"
     networks:
       - app-network
 

@@ -10,6 +10,7 @@ export class PlayerFactory {
 		positionTableID: string;
 		eventManager: PBEventManager;
 	}> {
+	  console.log("Spawned local player", playerID, x, y);
 		const positionTableID = await createOrRecreateUserPositionRecord(playerID, x, y);
 		const eventManager = new PBEventManager(playerID, positionTableID);
 		await eventManager.setup();

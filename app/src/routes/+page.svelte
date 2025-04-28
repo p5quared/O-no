@@ -5,6 +5,8 @@
 	import { fetchAllLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
 	import { TABLES } from '$lib/pb/constants';
+	import Header from './Header.svelte';
+	import { page } from '$app/state';
 
 	let sounds: { [key: string]: HTMLAudioElement } = {};
 	let frogInterval: number;
@@ -27,6 +29,9 @@
 		const playFrog = () => sounds.frog.play().catch(console.error);
 		playFrog();
 		frogInterval = setInterval(playFrog, 25000);
+
+		alert('Start resets the game!');
+		alert("When you join/start, scroll down and click inside the canvas to play. Sorry about the buggy window. We're working on it");
 
 		return () => {
 			Object.values(sounds).forEach((sound) => sound.pause());
@@ -102,6 +107,11 @@
 <svelte:head>
 	<title>Home</title>
 </svelte:head>
+
+	{#if !['/login', '/registration'].includes(page.url.pathname)}
+	<Header />
+
+	{/if}
 
 <section class="lobby-page" style="background-image: url({homepageBackground});">
 	<div class="form-box mx-auto max-w-md p-4">

@@ -11,11 +11,10 @@ export async function listUserPositions() {
 // and possible deletes the old one.
 export async function createOrRecreateUserPositionRecord(userID: string, x: number, y: number): Promise<string> {
 	try {
-		await deleteUserPositionRecordByUserId(userID);
+		deleteUserPositionRecordByUserId(userID).then().catch(e => { })
 	} catch (error) {
 		console.error('Error creating or recreating user position record:', error);
 	}
-
 
 	const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).create({
 		user: userID,
@@ -27,24 +26,20 @@ export async function createOrRecreateUserPositionRecord(userID: string, x: numb
 }
 
 export async function updateUserPositionRecord(id: string, p: PlayerPosition) {
-   await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e=> {})
+	await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e => { })
 }
 
 export async function deleteUserPositionRecordByUserId(userID: string) {
-  try {
-  		const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
-  		if (id) {
-  			await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
-  		}
-  	} catch (error) {
-  		console.error('Error deleting user position record:', error);
-  	}
-  }
+	const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
+	if (id) {
+		pb.collection(TABLES.PLAYER_POSITIONS).delete(id).catch()
+	}
+}
 
 export async function deleteUserPositionRecord(id: string) {
-  try {
-  await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
-  } catch (error) {
-	console.error('Error deleting user position record:', error);
-  }
+	try {
+		await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
+	} catch (error) {
+		console.error('Error deleting user position record:', error);
+	}
 }

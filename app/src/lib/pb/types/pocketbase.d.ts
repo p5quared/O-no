@@ -118,6 +118,7 @@ export type PlayerPositionsRecord = {
 	created?: IsoDateString
 	id: string
 	updated?: IsoDateString
+	user: RecordIdString
 	x?: number
 	y?: number
 }

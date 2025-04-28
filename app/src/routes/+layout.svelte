@@ -1,17 +1,10 @@
 <script lang="ts">
-	import Header from './Header.svelte';
 	import '../app.css';
-	import {page} from '$app/stores';
 
 	let { children } = $props();
 </script>
 
 <div class="app">
-	{#if !['/login', '/registration'].includes($page.url.pathname)}
-	<Header />
-
-	{/if}
-
 	<main>
 		{@render children()}
 	</main>

@@ -5,6 +5,8 @@ import { Conduit } from "$lib/events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "./constants";
 import { getUsername } from "$lib/pb/users";
+import { wsClient } from "$lib/ws/ws";
+import { browser } from "$app/environment";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -44,7 +46,7 @@ export class PlayerBuilder extends EntityBuilder {
 		let p = k.add([
 			this.sprite,
 			k.pos(this.posX, this.posY),
-			k.area(),
+			 k.area(),
 			k.body(),
 		])
 
@@ -145,9 +147,11 @@ export class PlayerBuilder extends EntityBuilder {
 
 	private setupEventBroadcast(p: KaplayPlayerType): KaplayPlayerType {
 		p.onUpdate(() => {
-			Conduit.emit(GameEventTypes.PLAYER_MOVED,
-				{ player_id: this.playerID, position: p.pos }
-			)
+			//Conduit.emit(GameEventTypes.PLAYER_MOVED,
+			//	{ player_id: this.playerID, position: p.pos }
+			//)
+			if (!browser) return;
+			wsClient.emitMessage(this.playerID, p.pos.x, p.pos.y)
 		});
 		return p
 	}
@@ -157,7 +161,7 @@ export class PlayerBuilder extends EntityBuilder {
 		if (!this.isLocalPlayer) {
 			Conduit.on(GameEventTypes.PLAYER_MOVED, (e) => {
 				if (e.player_id === this.playerID) {
-					p.moveTo(k.vec2(e.position.x, e.position.y), this.PLAYER_SPEED * 3);
+					p.moveTo(k.vec2(e.position.x, e.position.y));
 				}
 			});
 		}
