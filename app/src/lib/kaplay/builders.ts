@@ -51,7 +51,7 @@ export class PlayerBuilder extends EntityBuilder {
 		// TODO: Player username under sprite
 		// This can be attached: https://kaplayjs.com/guides/game_objects/ 
 		// (see section on "Parents, childs, and roots")
-		
+
 		const username = await getUsername(this.playerID);
 		p.add([
 			k.text(username, { size: 12, align: "center", width: 100 }),
@@ -67,7 +67,7 @@ export class PlayerBuilder extends EntityBuilder {
 		p = this.setupEventHooks(p)
 
 		if (this.isLocalPlayer) {
-		p = this.setupCameraTracking(p)
+			p = this.setupCameraTracking(p)
 			p = this.attachMovementBindings(p);
 			p = this.setupEventBroadcast(p);
 			p.tag("localPlayer");
@@ -129,6 +129,13 @@ export class PlayerBuilder extends EntityBuilder {
 
 		p.onCollide("boostpad", () => {
 			p.jump(2.5 * 400);
+		});
+
+		p.onCollide("endPlatform", () => {
+			if (p.isGrounded()) {
+				console.log("Gold collected");
+				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
+			}
 		});
 
 		return p

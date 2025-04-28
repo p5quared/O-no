@@ -5,6 +5,7 @@ import { Conduit } from '$lib/events';
 import { GameEventTypes } from '$lib/events/EventTypes';
 import { WorldFactory } from './factory_world';
 import { PlayerFactory } from './factory_player';
+import { goto } from '$app/navigation';
 
 const init = async (name: string) => {
 	const k = getKaplay();
@@ -14,6 +15,7 @@ const init = async (name: string) => {
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
 	const { eventManager } = await PlayerFactory.createLocalPlayer(getLoggedInUserID(), 0, 0)
+
 	const spawnedPlayers: string[] = [];
 	Conduit.on(GameEventTypes.PLAYER_SPAWNED, async (e) => {
 		if (e.id === getLoggedInUserID() || spawnedPlayers.includes(e.id)) return;
@@ -21,8 +23,11 @@ const init = async (name: string) => {
 		spawnedPlayers.push(e.id);
 	})
 
+	Conduit.on(GameEventTypes.GAME_OVER, (e) => {
+		goto('/gameover');
+	})
 
-  return () => eventManager.shutdown();
+	return () => eventManager.shutdown();
 };
 
 export { init };
