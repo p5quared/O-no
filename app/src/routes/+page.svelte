@@ -32,7 +32,7 @@
 		playFrog();
 		frogInterval = setInterval(playFrog, 25000);
 
-		
+
 		return () => {
 			Object.values(sounds).forEach((sound) => sound.pause());
 			clearInterval(frogInterval);
@@ -188,7 +188,9 @@
 					
 					<div class="form-box mx-auto max-w-md p-4">
 						<div class="text-center" style="margin-bottom: 1rem;">
+							<p class="button-desc">Click "Start" to Reset the Game!</p>
 							<button class="create-btn" on:click={resetGame}>Start</button>
+							<p class="button-desc" style="margin-top: 1rem;">Click "Join" to Go to Existing Game!</p>
 							<button class="create-btn" style="margin-left: 1rem;" on:click={joinGame}>Join</button>
 						</div>
 					</div>
@@ -627,5 +629,13 @@
 		padding: 1rem;
 		margin-top: 1rem;
 		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	
+	.button-desc {
+		color: #f4c03f;
+		font-family: 'FrogFont', sans-serif;
+		font-size: 1.1rem;
+		margin-bottom: 0.5rem;
+		text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 	}
 </style>
