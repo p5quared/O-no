@@ -3,6 +3,8 @@
 	import { getChatMessages, subscribeToChatUpdates, sendChatMessage } from '$lib/pb/chat';
 	import type { ChatMessage } from './types';
 	import { pb } from '$lib/pb/pocketbase';
+	import Header from '../Header.svelte';
+	import { page } from '$app/state';
 	let messages: ChatMessage[] = [];
 	let newMessage = '';
 	let unsubscribe: () => void;
@@ -36,7 +38,9 @@
 <svelte:head>
 	<title>Chat Demo</title>
 </svelte:head>
-
+{#if !['/login', '/registration'].includes(page.url.pathname)}
+	<Header />
+{/if}
 <div class="mx-auto max-w-xl p-4">
 	<h1 class="mb-6 text-center text-2xl font-bold">Chat Demo</h1>
 
