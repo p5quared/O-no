@@ -1,6 +1,6 @@
 import type { PlayerID } from "$lib/constants";
-import { PBEventManager } from "$lib/pb/events";
-import { createOrRecreateUserPositionRecord } from "$lib/pb/users";
+import { PBEventManager } from "$lib/pb/event_manager";
+import { createOrRecreateUserPositionRecord } from "$lib/pb/game/subscriptions/users";
 import { getKaplay } from ".";
 import { PlayerBuilder, type KaplayPlayerType } from "./builders";
 
@@ -10,6 +10,7 @@ export class PlayerFactory {
 		positionTableID: string;
 		eventManager: PBEventManager;
 	}> {
+	  console.log("Spawned local player", playerID, x, y);
 		const positionTableID = await createOrRecreateUserPositionRecord(playerID, x, y);
 		const eventManager = new PBEventManager(playerID, positionTableID);
 		await eventManager.setup();

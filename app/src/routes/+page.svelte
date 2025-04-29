@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { pb } from '$lib/pb/pocketbase';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import homepageBackground from '$lib/images/swamp.png';
-	import { fetchAllLobbies, createLobby, subscribeToLobbies, joinLobby } from '$lib/pb/lobbies';
+	import { fetchAllLobbies, createLobby, subscribeToLobbies } from '$lib/pb/lobbies';
 	import { onMount } from 'svelte';
-	import Leaderboard from './Leaderboard.svelte';
 
+	import Leaderboard from './Leaderboard.svelte';
+	import { TABLES } from '$lib/pb/constants';
+	import Header from './Header.svelte';
+	import { page } from '$app/state';
 
 	let sounds: { [key: string]: HTMLAudioElement } = {};
 	let frogInterval: number;
@@ -29,8 +32,11 @@
 		playFrog();
 		frogInterval = setInterval(playFrog, 25000);
 
+		alert('Start resets the game!');
+		alert("When you join/start, scroll down and click inside the canvas to play. Sorry about the buggy window. We're working on it");
+
 		return () => {
-			Object.values(sounds).forEach(sound => sound.pause());
+			Object.values(sounds).forEach((sound) => sound.pause());
 			clearInterval(frogInterval);
 		};
 	});
@@ -43,9 +49,9 @@
 			try {
 				await createLobby(newLobbyName.trim());
 				lobbies = await fetchAllLobbies();
-				newLobbyName = ''; 
+				newLobbyName = '';
 			} catch (error) {
-				console.error("Error creating lobby:", error);
+				console.error('Error creating lobby:', error);
 			}
 		}
 	}
@@ -95,8 +101,34 @@
 		return { bgColor, circleColor, letter };
 	}
 
+
 	async function handleJoinLobby(lobbyId: string) {
 		goto(`/lobby?id=${lobbyId}`);
+	}
+
+	function joinGame() {
+		goto('/demo-game');
+	}
+
+	async function resetGame() {
+		try {
+			const records = await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
+			if (records.length === 0) {
+				console.log(`No records found in ${TABLES.PLAYER_POSITIONS}`);
+			} else {
+				for (const record of records) {
+					console.log(`Deleting record ${record.id} from ${TABLES.PLAYER_POSITIONS}`);
+					await pb.collection(TABLES.PLAYER_POSITIONS).delete(record.id);
+				}
+			}
+		} catch (error) {
+			console.error(`Error deleting from ${TABLES.PLAYER_POSITIONS}:`, error);
+		}
+		
+		console.log('Game reset!');
+
+		// INFO: Need to force refresh
+		window.location.href = '/demo-game';
 	}
 </script>
 
@@ -153,6 +185,15 @@
 							<button class="join-btn" on:click={() => handleJoinLobby(lobby.id)}>Join</button>
 						</div>
 					{/each}
+					
+					<div class="form-box mx-auto max-w-md p-4">
+						<div class="text-center" style="margin-bottom: 1rem;">
+							<h3 class="button-header">Click "Start" to Reset the Game!</h3>
+							<button class="create-btn" on:click={resetGame}>Start</button>
+							<h3 class="button-header" style="margin-top: 1.5rem;">Click "Join" to Go to Existing Game!</h3>
+							<button class="create-btn" style="margin-left: 1rem;" on:click={joinGame}>Join</button>
+						</div>
+					</div>
 				</div>
 
 				<div class="create-lobby-section">
@@ -173,6 +214,8 @@
 			</div>
 		</div>
 	</div>
+
+
 </section>
 
 <style>
@@ -191,6 +234,11 @@
 		position: relative;
 		z-index: 2;
 		margin: 0 auto;
+	}
+	
+	:global(header) {
+		position: relative;
+		z-index: 10;
 	}
 	
 	/* Enhanced Background Animations */
@@ -578,5 +626,13 @@
 	
 	.leaderboard-section {
 		flex-shrink: 0;
+	}
+	
+	.form-box {
+		background: rgba(33, 46, 29, 0.8);
+		border-radius: 8px;
+		padding: 1rem;
+		margin-top: 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 </style>

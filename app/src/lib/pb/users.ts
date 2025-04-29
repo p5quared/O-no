@@ -1,10 +1,9 @@
-import type { PlayerPosition } from '$lib/events/Events';
 import { TABLES } from './constants';
 import { pb } from './pocketbase';
-import type { PlayerPositionsRecord } from './types/pocketbase';
+import type { UsersRecord } from './types/pocketbase';
 
 export interface UserCreateData {
-	username: string;
+	name: string;
 	email: string;
 	password: string;
 	passwordConfirm: string;
@@ -62,52 +61,19 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 	}
 }
 
-export function getLoggedInUserID(): string {
-	return pb.authStore.record?.id ?? '';
+export async function getUserById(id: string): Promise<UsersRecord> {
+  return await pb.collection(TABLES.USERS).getOne<UsersRecord>(id).then(record => record).catch((error) => {
+	console.error(`Error fetching user ${id}`, error)
+	return { } as UsersRecord
+  });
 }
 
-export async function listUserPositions() {
-	return await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
+export const getLoggedInUserID = () => {
+  return pb.authStore.record?.id || ''; // They better be logged in
 }
 
-// Creates a new user position record,
-// and possible deletes the old one.
-export async function createOrRecreateUserPositionRecord(userID: string, x: number, y: number): Promise<string> {
-	try {
-		await deleteUserPositionRecordByUserId(userID);
-	} catch (error) {
-		console.error('Error creating or recreating user position record:', error);
-	}
 
-
-	const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).create({
-		user: userID,
-		x: x,
-		y: y
-	})
-
-	return id;
-}
-
-export async function updateUserPositionRecord(id: string, p: PlayerPosition) {
-   await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e=> {})
-}
-
-export async function deleteUserPositionRecordByUserId(userID: string) {
-  try {
-  		const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
-  		if (id) {
-  			await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
-  		}
-  	} catch (error) {
-  		console.error('Error deleting user position record:', error);
-  	}
-  }
-
-export async function deleteUserPositionRecord(id: string) {
-  try {
-  await pb.collection(TABLES.PLAYER_POSITIONS).delete(id);
-  } catch (error) {
-	console.error('Error deleting user position record:', error);
-  }
+export async function getUsername(id: string): Promise<string> {
+  const user =  await getUserById(id);
+  return user.name ?? "Unknown";
 }

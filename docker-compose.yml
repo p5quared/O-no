@@ -1,12 +1,8 @@
-version: '3.8'
-
 services:
   pocketbase:
     build:
       context: ./pocketbase
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
     volumes:
       - ./pocketbase/pb_data:/pb_data
       - ./pocketbase/pb_public:/pb_public
@@ -17,20 +13,44 @@ services:
     environment:
       - TZ=UTC
 
-  frontend:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - pocketbase
-    restart: unless-stopped
+  sveltekit:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ./app:/app
     networks:
       - app-network
     environment:
-      - PUBLIC_POCKETBASE_URL=http://pocketbase:8090
-      - NODE_ENV=production
+      - VITE_PB_URL=http://localhost:8080/api/pb
+      - VITE_WS_URL=ws://localhost:8080/ws
+      - NODE_ENV=development
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./:/var/log/caddy
+    depends_on:
+      - sveltekit
+      - pocketbase
+    networks:
+      - app-network
+
+  ws-service:
+    build:
+      context: ./ws
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      - app-network
 
 networks:
   app-network:

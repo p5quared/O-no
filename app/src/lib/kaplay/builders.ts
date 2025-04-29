@@ -4,6 +4,9 @@ import { getKaplay } from ".";
 import { Conduit } from "$lib/events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "./constants";
+import { getUsername } from "$lib/pb/users";
+import { wsClient } from "$lib/ws/ws";
+import { browser } from "$app/environment";
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -43,36 +46,35 @@ export class PlayerBuilder extends EntityBuilder {
 		let p = k.add([
 			this.sprite,
 			k.pos(this.posX, this.posY),
-			k.area(),
+			 k.area(),
 			k.body(),
 		])
 
 		// TODO: Player username under sprite
 		// This can be attached: https://kaplayjs.com/guides/game_objects/ 
 		// (see section on "Parents, childs, and roots")
-		//
-		//const nameLabel = add([
-		//	text(name, { size: 12, align: "center", width: 100 }),
-		//	pos(localPlayer.pos.x + 28, localPlayer.pos.y + 64),
-		//	anchor("center"),
-		//	z(10)
-		//]);
-		//
-		//localPlayer.onUpdate(() => {
-		//	nameLabel.pos = vec2(localPlayer.pos.x + 28, localPlayer.pos.y + 64);
-		//	maxHeights[name] = WORLD_HEIGHT - localPlayer.pos.y;
-		//});
 
+		const username = await getUsername(this.playerID);
+		const usernameLabel = k.add([
+			k.text(username, { size: 12, align: "center", width: 100 }),
+			k.pos(p.pos.x + 28, p.pos.y + 64),
+			k.anchor("center"),
+			k.z(10)
+		]);
+		p.onUpdate(() => {
+			usernameLabel.pos = k.vec2(p.pos.x + 28, p.pos.y + 64);
+		});
 
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
 
 		p = this.setupEventHooks(p)
-		p = this.setupCameraTracking(p)
 
 		if (this.isLocalPlayer) {
-			this.attachMovementBindings(p);
-			this.setupEventBroadcast(p);
+			p = this.setupCameraTracking(p)
+			p = this.attachMovementBindings(p);
+			p = this.setupEventBroadcast(p);
+			p.tag("localPlayer");
 		}
 
 
@@ -133,14 +135,23 @@ export class PlayerBuilder extends EntityBuilder {
 			p.jump(2.5 * 400);
 		});
 
+		p.onCollide("endPlatform", () => {
+			if (p.isGrounded()) {
+				console.log("Gold collected");
+				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
+			}
+		});
+
 		return p
 	}
 
 	private setupEventBroadcast(p: KaplayPlayerType): KaplayPlayerType {
 		p.onUpdate(() => {
-			Conduit.emit(GameEventTypes.PLAYER_MOVED,
-				{ player_id: this.playerID, position: p.pos }
-			)
+			//Conduit.emit(GameEventTypes.PLAYER_MOVED,
+			//	{ player_id: this.playerID, position: p.pos }
+			//)
+			if (!browser) return;
+			wsClient.emitMessage(this.playerID, p.pos.x, p.pos.y)
 		});
 		return p
 	}
@@ -150,7 +161,7 @@ export class PlayerBuilder extends EntityBuilder {
 		if (!this.isLocalPlayer) {
 			Conduit.on(GameEventTypes.PLAYER_MOVED, (e) => {
 				if (e.player_id === this.playerID) {
-					p.moveTo(k.vec2(e.position.x, e.position.y), this.PLAYER_SPEED * 3);
+					p.moveTo(k.vec2(e.position.x, e.position.y));
 				}
 			});
 		}

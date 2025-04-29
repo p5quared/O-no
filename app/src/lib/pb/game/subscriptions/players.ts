@@ -1,6 +1,6 @@
-import { TABLES } from "../constants";
-import { pb } from "../pocketbase";
-import type { PlayerPositionsRecord, PlayerPositionsResponse } from "../types/pocketbase";
+import { TABLES } from "../../constants";
+import { pb } from "../../pocketbase";
+import type { PlayerPositionsRecord, PlayerPositionsResponse } from "../../types/pocketbase";
 
 export type PbTableEvent = "create" | "update" | "delete";
 type PositionHandler = (action: PbTableEvent ,pr: PlayerPositionsRecord) => void;

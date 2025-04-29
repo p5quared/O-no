@@ -4,11 +4,10 @@ import type { GameEvents, PlayerPosition } from "$lib/events/Events";
 import { GameEventTypes } from "$lib/events/EventTypes";
 import { SubscriptionManager } from "$lib/events/Subscriptions";
 import { throttle } from "$lib/utils";
-import { TABLES } from "./constants";
-import { pb } from "./pocketbase";
-import { subscribetoPlayerPositionTable } from "./subscriptions/players";
+import { createGameEvent, subscribeToGameEventsTable } from "./game/subscriptions/events";
+import { subscribetoPlayerPositionTable } from "./game/subscriptions/players";
+import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./game/subscriptions/users";
 import type { PlayerPositionsRecord } from "./types/pocketbase";
-import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./users";
 
 /**
  * This class connects our EventBus to the outside world,
@@ -27,7 +26,6 @@ export class PBEventManager {
 	public async setup() {
 		this.setupOutGoingEventSubscriptions();
 		await this.setupIncomingEventSubscriptions();
-		this.emitExistingPositions()
 
 	}
 
@@ -39,12 +37,20 @@ export class PBEventManager {
 
 	private async setupIncomingEventSubscriptions() {
 		this.subscriptions.add(await this.subToPlayerPositionsTable())
+		this.subscriptions.add(await this.subToGameEventsTable())
 	}
 
 	private setupOutGoingEventSubscriptions() {
 		this.subscriptions.add(
 			Conduit.on(GameEventTypes.PLAYER_MOVED, e => this.broadcastMovement(e))
 		)
+		this.subscriptions.add(
+			Conduit.on(GameEventTypes.GAME_OVER, e => this.broadcastEvent(GameEventTypes.GAME_OVER, e))
+		)
+	}
+
+	private async broadcastEvent<T extends GameEventTypes>(t: T, e: GameEvents[T]) {
+		await createGameEvent(t, e);
 	}
 
 	private async broadcastMovement(e: GameEvents[GameEventTypes.PLAYER_MOVED]) {
@@ -56,6 +62,18 @@ export class PBEventManager {
 	private throttledUpdatePositoin = throttle(async (id: string, p: PlayerPosition) => {
 		await updateUserPositionRecord(id, p)
 	}, 50);
+
+	private async subToGameEventsTable() {
+		console.log("Subscribing to game events");
+		return await subscribeToGameEventsTable((_, eventType, data) => {
+			switch (eventType) {
+				case GameEventTypes.GAME_OVER:
+					let data_typed = data as GameEvents[GameEventTypes.GAME_OVER];
+					if (data_typed.emit_by === this.playerID) return;
+					Conduit.emit(GameEventTypes.GAME_OVER, data_typed);
+			}
+		})
+	}
 
 	private async subToPlayerPositionsTable() {
 		console.log("Subscribing to player locations");
@@ -72,18 +90,18 @@ export class PBEventManager {
 					})
 					break;
 				case "update":
-					Conduit.emit(GameEventTypes.PLAYER_MOVED, {
-						player_id: record.user,
-						position: {
-							'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
-							'y': record.y ?? -1, // i.e. broadcast MUST set these
-						}
-					})
+					// Removed in favor of ws system
+					//Conduit.emit(GameEventTypes.PLAYER_MOVED, {
+					//	player_id: record.user,
+					//	position: {
+					//		'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+					//		'y': record.y ?? -1, // i.e. broadcast MUST set these
+					//	}
+					//})
 					break;
 				case "delete":
-					console.log("Player left", record.user)
 					Conduit.emit(GameEventTypes.PLAYER_QUIT, {
-						id: record.user,
+						id: record.id,
 					})
 					break;
 			}
@@ -93,7 +111,7 @@ export class PBEventManager {
 	// Emit the positions of all players already in the game
 	// This is done at startup to ensure that we load all players
 	// This could cause some double spawns?
-	private async emitExistingPositions() {
+	public async emitExistingPositions() {
 		const existingPositions = await listUserPositions();
 		for (const positionRecord of existingPositions) {
 			Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {

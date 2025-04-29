@@ -71,10 +71,7 @@ export interface GameEvents {
 		timestamp: number;
 	};
 	game_ended: {
-		gameId: string;
-		winner?: { id: string; username: string; score: number };
-		reason: 'timeout' | 'victory' | 'admin_ended';
-		timestamp: number;
+		emit_by: string;
 	};
 
 	chat_message: {
