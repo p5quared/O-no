@@ -135,7 +135,9 @@
 <svelte:head>
 	<title>Home</title>
 </svelte:head>
-
+{#if !['/login', '/registration'].includes(page.url.pathname)}
+	<Header />
+{/if}
 <section class="lobby-page" style="background-image: url({homepageBackground});">
 	<div class="forest-animations">
 		<div class="jumping-frog frog1">🐸</div>
@@ -188,9 +190,7 @@
 					
 					<div class="form-box mx-auto max-w-md p-4">
 						<div class="text-center" style="margin-bottom: 1rem;">
-							<h3 class="button-header">Click "Start" to Reset the Game!</h3>
 							<button class="create-btn" on:click={resetGame}>Start</button>
-							<h3 class="button-header" style="margin-top: 1.5rem;">Click "Join" to Go to Existing Game!</h3>
 							<button class="create-btn" style="margin-left: 1rem;" on:click={joinGame}>Join</button>
 						</div>
 					</div>
@@ -214,7 +214,7 @@
 			</div>
 		</div>
 	</div>
-
+	
 
 </section>
 
@@ -234,11 +234,6 @@
 		position: relative;
 		z-index: 2;
 		margin: 0 auto;
-	}
-	
-	:global(header) {
-		position: relative;
-		z-index: 10;
 	}
 	
 	/* Enhanced Background Animations */
