@@ -191,7 +191,7 @@
 							<p class="button-desc">Click "Start" to Reset the Game!</p>
 							<button class="create-btn" on:click={resetGame}>Start</button>
 							<p class="button-desc" style="margin-top: 1rem;">Click "Join" to Go to Existing Game!</p>
-							<button class="create-btn" style="margin-left: 1rem;" on:click={joinGame}>Join</button>
+							<button class="create-btn"  on:click={joinGame}>Join</button>
 						</div>
 					</div>
 				</div>
