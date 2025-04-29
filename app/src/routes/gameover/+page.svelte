@@ -13,7 +13,7 @@
 				user: UsersResponse;
 			};
 			const winner = await pb.collection(TABLES.PLAYER_POSITIONS).getList<PositionsResponse<Expand>>(1, 1, {
-				sort: '-y',
+				sort: 'y',
 				expand: 'user'
 			});
 
