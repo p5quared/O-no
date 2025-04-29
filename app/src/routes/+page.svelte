@@ -32,9 +32,7 @@
 		playFrog();
 		frogInterval = setInterval(playFrog, 25000);
 
-		alert('Start resets the game!');
-		alert("When you join/start, scroll down and click inside the canvas to play. Sorry about the buggy window. We're working on it");
-
+		
 		return () => {
 			Object.values(sounds).forEach((sound) => sound.pause());
 			clearInterval(frogInterval);
