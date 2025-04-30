@@ -37,15 +37,15 @@
         // Profile exists, get current sprite
         const profile = profiles.items[0];
         profileId = profile.id;
-        currentSprite = profile.sprite || availableSprites[0].name;
+        currentSprite = profile.sprite || KAPLAY_SPRITES[0];
       } else {
         // Create a new profile with default sprite
         const newProfile = await pb.collection('profiles').create({
           user: userId,
-          sprite: availableSprites[0].name
+          sprite: KAPLAY_SPRITES[0]
         });
         profileId = newProfile.id;
-        currentSprite = availableSprites[0].name;
+        currentSprite = KAPLAY_SPRITES[0];
       }
     } catch (err) {
       console.error('Error loading profile:', err);
@@ -74,7 +74,8 @@
   }
 
   function getSpriteUrl(spriteName: string) {
-    return availableSprites.find(s => s.name === spriteName)?.href || availableSprites[0].href;
+    // Construct the URL using the KaplayJS sprite path
+    return `https://play.kaplayjs.com/sprites/${spriteName}.png`;
   }
 </script>
 
@@ -108,10 +109,10 @@
       <div class="sprite-selection">
         <h2 style="font-family: 'FrogFont', sans-serif;">Available Sprites</h2>
         <div class="sprite-grid">
-          {#each availableSprites as sprite}
-            <div 
-              class="sprite-option" 
-              class:selected={currentSprite === sprite.name}
+          {#each KAPLAY_SPRITES as sprite}
+            <div
+              class="sprite-option"
+              class:selected={currentSprite === sprite}
               on:click={() => selectSprite(sprite.name)}
             >
               <img src={sprite.href} alt={sprite.name} />
