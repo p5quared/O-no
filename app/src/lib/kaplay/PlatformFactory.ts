@@ -36,25 +36,35 @@ export class PlatformFactory {
     }
     static createTogglePlatform(x: number, y: number) {
         const k = getKaplay();
-        let p = k.add([
-            k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
-            k.pos(x, y),
-            k.area(),
-            k.body({ isStatic: true, }),
-            k.color(48, 0, 80),
-            k.outline(2)
-        ]);
+        let p: GameObj | null = null;
 
-        setInterval(() => {
-            if (p) {
-                k.destroy(p);
-            } else {
-                p = PlatformFactory.createTogglePlatform(x, y);
-            }
-        }, 2000);
+        const createPlatform = () => {
+            p = k.add([
+                k.rect(PLATFORM_WIDTH, PlatformFactory.PLATFORM_HEIGHT),
+                k.pos(x, y),
+                k.area(),
+                k.body({ isStatic: true }),
+                k.color(48, 0, 80),
+                k.outline(2),
+            ]);
+        };
+
+        createPlatform();
+
+        if (typeof window !== 'undefined') {
+            setInterval(() => {
+                if (p) {
+                    k.destroy(p);
+                    p = null;
+                } else {
+                    createPlatform();
+                }
+            }, 2000);
+        }
 
         return p;
-    };
+    }
+
 
     static createBoostPad(x: number, y: number) {
         const k = getKaplay();
