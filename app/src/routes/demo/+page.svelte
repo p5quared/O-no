@@ -43,7 +43,7 @@
 		try {
 			const lobbies = await fetchAllLobbies();
 			
-			const openLobby = lobbies.find(lobby => !lobby.is_started);
+			const openLobby = lobbies[0];
 			
 			if (openLobby) {
 				currentLobby = await joinLobby(openLobby.id);
