@@ -57,3 +57,13 @@ export async function fetchSingleLobby(lobbyId: string) {
 		throw err;
 	}
 }
+
+export async function updateLobby(lobbyId: string, data: Record<string, any>) {
+	try {
+		const result = await pb.collection('lobbies').update(lobbyId, data);
+		return result;
+	} catch (error) {
+		console.error('Error updating lobby:', error);
+		throw error;
+	}
+}

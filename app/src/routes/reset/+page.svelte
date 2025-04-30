@@ -38,7 +38,7 @@
 			is_started: false
 		});
 
-		goto('/');
+		goto('/demo');
 	}
 
 	onMount(resetGame);

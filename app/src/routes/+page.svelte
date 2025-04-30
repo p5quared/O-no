@@ -19,6 +19,9 @@
 			return;
 		}
 
+	// INFO: Temporily send everyone to demo lobby
+	  goto('/demo')
+
 		// Setup sounds
 		sounds = {
 			forest: Object.assign(new Audio('/forest.wav'), { volume: 0.7, loop: true }),

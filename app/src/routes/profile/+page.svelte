@@ -119,6 +119,12 @@
           {/each}
         </div>
       </div>
+      
+      <div class="return-button-container">
+        <button class="return-button" on:click={() => goto('/demo')}>
+          Return to Demo
+        </button>
+      </div>
     {/if}
   </div>
 </section>
@@ -238,5 +244,30 @@
     border-radius: 4px;
     margin-bottom: 1rem;
     text-align: center;
+  }
+  
+  .return-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .return-button {
+    background-color: #4a6741;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-family: 'FrogFont', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .return-button:hover {
+    background-color: #5c7d52;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 </style>
