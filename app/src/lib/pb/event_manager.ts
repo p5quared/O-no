@@ -71,10 +71,13 @@ export class PBEventManager {
 					let data_typed = data as GameEvents[GameEventTypes.GAME_OVER];
 					if (data_typed.emit_by === this.playerID) return;
 					Conduit.emit(GameEventTypes.GAME_OVER, data_typed);
-		  break;
 				case GameEventTypes.POWERUP_COLLECTED:
 					let data_typed2 = data as GameEvents[GameEventTypes.POWERUP_COLLECTED];
 					Conduit.emit(GameEventTypes.POWERUP_COLLECTED, data_typed2);
+					break;
+				case GameEventTypes.POWERUP_USED:
+					let data_typed3 = data as GameEvents[GameEventTypes.POWERUP_USED];
+					Conduit.emit(GameEventTypes.POWERUP_USED, data_typed3);
 					break;
 			}
 		})

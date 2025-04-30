@@ -8,11 +8,11 @@
 	onMount(() => {
 		events = [];
 	Conduit.on(GameEventTypes.POWERUP_COLLECTED, e => {
-		events = [...events, e];
+		events = [...events, {t: GameEventTypes.POWERUP_COLLECTED, ...e}];
 	});
 
 	Conduit.on(GameEventTypes.POWERUP_USED, e => {
-		events = [...events, e];
+		events = [...events, {t: GameEventTypes.POWERUP_USED, ...e}];
 	});
 
 	});
