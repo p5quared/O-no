@@ -9,7 +9,20 @@
 
 </script>
 
-<div class="min-h-full flex">
-  <canvas id="game-canvas "/>
+<div class="game-container">
+  <canvas id="game-canvas" />
   <GameLog />
 </div>
+
+<style>
+  .game-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  canvas {
+    flex: 1;
+  }
+</style>
