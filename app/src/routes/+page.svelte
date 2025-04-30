@@ -32,7 +32,6 @@
 		playFrog();
 		frogInterval = setInterval(playFrog, 25000);
 
-
 		return () => {
 			Object.values(sounds).forEach((sound) => sound.pause());
 			clearInterval(frogInterval);
@@ -195,7 +194,6 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="create-lobby-section">
 					<button class="create-btn" on:click={handleCreateLobby}>New Lobby</button>
 					<div class="input-wrapper">

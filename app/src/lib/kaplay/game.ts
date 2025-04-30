@@ -1,22 +1,21 @@
-import { getKaplay } from '.';
+import { getKaplay, KAPLAY_SPRITES } from '.';
 import { frogGodHeight, GROUND_HEIGHT, WORLD_HEIGHT } from './constants';
 import { getLoggedInUserID } from '$lib/pb/users';
 import { Conduit } from '$lib/events';
 import { GameEventTypes } from '$lib/events/EventTypes';
 import { WorldFactory } from './factory_world';
 import { PlayerFactory } from './factory_player';
-import { goto } from '$app/navigation';
 import { wsClient } from '$lib/ws/ws';
 
 // TODO: This should probably dynamically generate a random valid spawn
 const spawnPosition = () => { return { x: 80, y: WORLD_HEIGHT - GROUND_HEIGHT - 32 } }
 
-const init = async (name: string) => {
+const init = async () => {
 	const k = getKaplay();
 
-	k.loadSprite('bean', 'https://play.kaplayjs.com/sprites/bean.png');
-
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
+
+	KAPLAY_SPRITES.forEach((sprite) => { k.loadSprite(sprite, `https://play.kaplayjs.com/${sprite}.png`); });
 
 	const localSpawn = spawnPosition();
 	const { eventManager } = await PlayerFactory.createLocalPlayer(getLoggedInUserID(), localSpawn.x, localSpawn.y);
@@ -30,7 +29,7 @@ const init = async (name: string) => {
    await eventManager.emitExistingPositions();
 
 	Conduit.on(GameEventTypes.GAME_OVER, (e) => {
-		goto('/gameover');
+		window.location.href = '/gameover';
 	})
 
 	wsClient.subscribeToMessages(m => {

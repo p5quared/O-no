@@ -1,6 +1,7 @@
 import type { PlayerID } from "$lib/constants";
 import { PBEventManager } from "$lib/pb/event_manager";
 import { createOrRecreateUserPositionRecord } from "$lib/pb/game/subscriptions/users";
+import { getUserProfile } from "$lib/pb/profiles";
 import { getKaplay } from ".";
 import { PlayerBuilder, type KaplayPlayerType } from "./builders";
 
@@ -14,10 +15,12 @@ export class PlayerFactory {
 		const positionTableID = await createOrRecreateUserPositionRecord(playerID, x, y);
 		const eventManager = new PBEventManager(playerID, positionTableID);
 		await eventManager.setup();
+		const profile = await getUserProfile(playerID);
+
 
 		const k = getKaplay();
 		const entity = await new PlayerBuilder()
-			.withSprite(k.sprite('bean'))
+			.withSprite(k.sprite(profile.sprite ?? 'bean'))
 			.atPosition(x, y)
 			.asLocalPlayer(playerID)
 			.build();
@@ -29,8 +32,9 @@ export class PlayerFactory {
 		entity: KaplayPlayerType;
 	}> {
 		const k = getKaplay();
+		const profile = await getUserProfile(playerID);
 		const entity = await new PlayerBuilder()
-			.withSprite(k.sprite('bean'))
+			.withSprite(profile.sprite ?? 'bean')
 			.atPosition(x, y)
 			.withID(playerID)
 			.build();
