@@ -26,6 +26,9 @@
 			</li>
 
 			{#if pb.authStore.model}
+				<li aria-current={$page.url.pathname === '/profile' ? 'page' : undefined}>
+					<a href="/profile" style="font-family: 'FrogFont', sans-serif;">Profile</a>
+				</li>
 				<li>
 					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button" style="font-family: 'FrogFont', sans-serif;">Logout</button></a>
 				</li>
