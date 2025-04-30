@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import logo from '$lib/images/frogdeath.png';
 	import { pb } from '$lib/pb/pocketbase';
 	import ProfilePicture from './ProfilePicture.svelte';
@@ -15,25 +15,25 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
+			<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
 				<a href="/" style="font-family: 'FrogFont', sans-serif;">Home</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
+			<li aria-current={page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href="/about" style="font-family: 'FrogFont', sans-serif;">About</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/chat' ? 'page' : undefined}>
+			<li aria-current={page.url.pathname === '/chat' ? 'page' : undefined}>
 				<a href="/chat" style="font-family: 'FrogFont', sans-serif;">Chat</a>
 			</li>
 
 			{#if pb.authStore.model}
-				<li aria-current={$page.url.pathname === '/profile' ? 'page' : undefined}>
+				<li aria-current={page.url.pathname === '/profile' ? 'page' : undefined}>
 					<a href="/profile" style="font-family: 'FrogFont', sans-serif;">Profile</a>
 				</li>
 				<li>
 					<a><button on:click={() => { pb.authStore.clear(); window.location.href = '/'; }} class="nav-button" style="font-family: 'FrogFont', sans-serif;">Logout</button></a>
 				</li>
 			{:else}
-				<li aria-current={$page.url.pathname === '/login' ? 'page' : undefined}>
+				<li aria-current={page.url.pathname === '/login' ? 'page' : undefined}>
 					<a href="/login" style="font-family: 'FrogFont', sans-serif;">Login</a>
 				</li>
 			{/if}

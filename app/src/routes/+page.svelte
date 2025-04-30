@@ -7,8 +7,8 @@
 
 	import Leaderboard from './Leaderboard.svelte';
 	import { TABLES } from '$lib/pb/constants';
-	import Header from './Header.svelte';
 	import { page } from '$app/state';
+	import Header from './Header.svelte';
 
 	let sounds: { [key: string]: HTMLAudioElement } = {};
 	let frogInterval: number;
