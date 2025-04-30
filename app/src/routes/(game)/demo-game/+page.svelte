@@ -24,8 +24,8 @@
 
 	// Show the game canvas with a fade-in effect
 	function handleGameReady() {
-        // Only n when   the game is loaded
-        if (gameLoadComplete) {
+        // Only n when  the simulated progress is 100% or the game is loaded
+        if (loadingProgress >= 100) {
             setTimeout(() => {
                 isLoading = false;
                 gameInitialized = true;
