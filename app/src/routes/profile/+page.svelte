@@ -4,15 +4,9 @@
   import { goto } from '$app/navigation';
   import Header from '../Header.svelte';
   import profileBackground from '$lib/images/swamp.png';
+  import { KAPLAY_SPRITES } from '$lib/kaplay';
 
-  // List of available sprites
-  const availableSprites = [
-    { name: 'frog_green', href: '/sprites/frog_green.png' },
-    { name: 'frog_blue', href: '/sprites/frog_blue.png' },
-    { name: 'frog_red', href: '/sprites/frog_red.png' },
-    { name: 'frog_yellow', href: '/sprites/frog_yellow.png' },
-    { name: 'frog_purple', href: '/sprites/frog_purple.png' }
-  ];
+  const availableSprits = KAPLAY_SPRITES;
 
   let currentSprite = '';
   let loading = true;
