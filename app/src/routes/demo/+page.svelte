@@ -6,6 +6,7 @@
 	import homepageBackground from '$lib/images/swamp.png';
 	import { getUserById } from '$lib/pb/users';
 	import type { LobbiesRecord } from '$lib/pb/types/pocketbase';
+	import { getUserProfile } from '$lib/pb/profiles';
 
 	let currentLobby: LobbiesRecord | null = null;
 	let players: { id: string; name: string }[] = [];
@@ -31,50 +32,41 @@
 
 	async function findOrJoinLobby() {
 		try {
-			// Get all lobbies
 			const lobbies = await fetchAllLobbies();
 			
-			// Find a lobby that isn't started yet
 			const openLobby = lobbies.find(lobby => !lobby.is_started);
 			
 			if (openLobby) {
-				// Join the lobby
 				currentLobby = await joinLobby(openLobby.id);
 				
-				// Check if current user is the lobby owner
 				isLobbyOwner = currentLobby.host === pb.authStore.model?.id;
 				
-				// If the lobby is already started, redirect to game
 				if (currentLobby.is_started) {
 					goto('/demo-game');
 					return;
 				}
 				
-				// Subscribe to lobby changes
-				subscription = pb.collection('lobbies').subscribe(currentLobby.id, async (e) => {
+				let sub = await pb.collection('lobbies').subscribe(currentLobby.id, async (e) => {
 					if (e.action === 'update') {
 						currentLobby = e.record;
 						
-						// Check if current user is the lobby owner
 						isLobbyOwner = currentLobby.host === pb.authStore.model?.id;
 						
-						// If the lobby is started, redirect to game
 						if (currentLobby.is_started) {
 							goto('/demo-game');
 							return;
 						}
 						
-						// Update player list
 						await loadPlayers();
 					}
 				});
+				subscription = {
+				  unsubscribe: ()  => sub()
+				};
 				
-				// Load initial player list
 				await loadPlayers();
 			} else {
-				// No open lobby found, could handle this differently
 				console.log('No open lobby found');
-				// For now, just redirect to home
 				goto('/');
 			}
 		} catch (error) {
@@ -89,7 +81,6 @@
 		
 		try {
 			await updateLobby(currentLobby.id, { is_started: true });
-			// The subscription will handle the redirect
 		} catch (error) {
 			console.error('Error starting game:', error);
 		}
@@ -99,22 +90,24 @@
 		goto('/profile');
 	}
 
+	let sprite = 'bean'
 	onMount(async () => {
-		// Check if user is logged in
 		if (!pb.authStore.isValid) {
 			goto('/login');
 			return;
 		}
+	  const profile = await getUserProfile(pb.authStore.record?.id ?? '');
+	  sprite = profile.sprite ?? 'bean'
 		
 		await findOrJoinLobby();
 	});
 
 	onDestroy(() => {
-		// Clean up subscription when component is destroyed
 		if (subscription) {
 			subscription.unsubscribe();
 		}
 	});
+
 </script>
 
 <svelte:head>
@@ -163,7 +156,9 @@
 					<div class="player-list">
 						{#each players as player}
 							<div class="player-item">
-								<div class="player-avatar">👤</div>
+								<div class="player-avatar">
+				  <img src={`https://play.kaplayjs.com/${sprite}.png`} />
+				</div>
 								<div class="player-name">{player.name}</div>
 							</div>
 						{/each}
