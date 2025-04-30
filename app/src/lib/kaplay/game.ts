@@ -1,11 +1,12 @@
 import { getKaplay, KAPLAY_SPRITES } from '.';
-import { frogGodHeight, GROUND_HEIGHT, WORLD_HEIGHT } from './constants';
+import { frogGodHeight, GROUND_HEIGHT, WORLD_HEIGHT, WORLD_WIDTH } from './constants';
 import { getLoggedInUserID } from '$lib/pb/users';
 import { Conduit } from '$lib/events';
 import { GameEventTypes } from '$lib/events/EventTypes';
 import { WorldFactory } from './factory_world';
 import { PlayerFactory } from './factory_player';
 import { wsClient } from '$lib/ws/ws';
+import { PowerupManager, spawnPowerup } from './powerups';
 
 // TODO: This should probably dynamically generate a random valid spawn
 const spawnPosition = () => { return { x: 80, y: WORLD_HEIGHT - GROUND_HEIGHT - 32 } }
@@ -41,6 +42,14 @@ const init = async () => {
 			}
 		})
 	})
+
+  setInterval(() => {
+	if (Math.random() < 0.5) {
+			spawnPowerup(eventManager);
+	}
+  }, 1000)
+
+  new PowerupManager(eventManager);
 
 	return () => eventManager.shutdown();
 };

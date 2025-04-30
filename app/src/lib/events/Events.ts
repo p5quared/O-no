@@ -1,4 +1,5 @@
 import type { PlayerID } from "$lib/constants";
+import type { POWERUP_TYPES } from "$lib/kaplay/powerups";
 
 // NOTE: In reality these are all non-null
 export type PlayerPosition = {x: number, y: number};
@@ -40,20 +41,15 @@ export interface GameEvents {
 	};
 
 	// Powerups
-	powerup_spawned: {
-		id: string;
-		type: string;
-		position: { x: number; y: number };
-	};
 	powerup_collected: {
-		id: string;
-		type: string;
-		playerId: string;
+		emit_by: string;
+		type: POWERUP_TYPES;
 	};
-	powerup_expired: {
-		id: string;
-		player_id: string;
-		type: string;
+
+	powerup_used: {
+		emit_by: string
+		type: POWERUP_TYPES;
+		target?: string[]
 	};
 
 	// Game/lobby state?

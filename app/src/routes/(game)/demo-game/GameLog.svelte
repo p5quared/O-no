@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { Conduit } from "$lib/events";
 	import { GameEventTypes } from "$lib/events/EventTypes";
+	import { onMount } from "svelte";
 
 	let events = [];
 	
-	Conduit.on(GameEventTypes.PLAYER_MOVED, e => {
+	onMount(() => {
+		events = [];
+	Conduit.on(GameEventTypes.POWERUP_COLLECTED, e => {
 		events = [...events, e];
-		console.log("Player moved event:", e);
+	});
+
+	Conduit.on(GameEventTypes.POWERUP_USED, e => {
+		events = [...events, e];
+	});
+
 	});
 </script>
 

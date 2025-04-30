@@ -49,7 +49,7 @@ export class PBEventManager {
 		)
 	}
 
-	private async broadcastEvent<T extends GameEventTypes>(t: T, e: GameEvents[T]) {
+	public async broadcastEvent<T extends GameEventTypes>(t: T, e: GameEvents[T]) {
 		await createGameEvent(t, e);
 	}
 
@@ -71,6 +71,11 @@ export class PBEventManager {
 					let data_typed = data as GameEvents[GameEventTypes.GAME_OVER];
 					if (data_typed.emit_by === this.playerID) return;
 					Conduit.emit(GameEventTypes.GAME_OVER, data_typed);
+		  break;
+				case GameEventTypes.POWERUP_COLLECTED:
+					let data_typed2 = data as GameEvents[GameEventTypes.POWERUP_COLLECTED];
+					Conduit.emit(GameEventTypes.POWERUP_COLLECTED, data_typed2);
+					break;
 			}
 		})
 	}

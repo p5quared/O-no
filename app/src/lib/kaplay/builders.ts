@@ -46,8 +46,9 @@ export class PlayerBuilder extends EntityBuilder {
 		let p = k.add([
 			this.sprite,
 			k.pos(this.posX, this.posY),
-			 k.area(),
+			k.area(),
 			k.body(),
+			"player"
 		])
 
 		// TODO: Player username under sprite
@@ -75,6 +76,9 @@ export class PlayerBuilder extends EntityBuilder {
 			p = this.attachMovementBindings(p);
 			p = this.setupEventBroadcast(p);
 			p.tag("localPlayer");
+		} else {
+			p.tag('remotePlayer')
+			p.tag(`id:${this.playerID}`)
 		}
 
 
