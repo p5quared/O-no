@@ -123,3 +123,209 @@
 	></div>
 </div>
 
+<style>
+	:global(body) {
+		margin: 0;
+		overflow: hidden;
+		background-color: #101a10;
+	}
+	
+	.game-wrapper {
+		position: relative;
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: #101a10;
+	}
+	
+	#game-container {
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		transition: opacity 0.5s ease;
+	}
+	
+	#game-container.visible {
+		opacity: 1;
+	}
+	
+	.loading-screen {
+		position: absolute;
+		z-index: 100;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		background: linear-gradient(135deg, #0a1a0c 0%, #203020 100%);
+		color: #fff;
+	}
+	
+	.loading-screen h1 {
+		font-size: 3.5rem;
+		margin-bottom: 1rem;
+		color: #90ee90;
+		text-shadow: 0 2px 8px rgba(0, 128, 0, 0.5);
+		font-family: 'FrogFont', sans-serif;
+		letter-spacing: 2px;
+	}
+	
+	.loading-screen p {
+		font-size: 1.2rem;
+		margin-bottom: 2rem;
+		color: #c0f0c0;
+	}
+	
+	.progress-bar {
+		width: 300px;
+		height: 20px;
+		background-color: rgba(255, 255, 255, 0.2);
+		border-radius: 10px;
+		overflow: hidden;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	}
+	
+	.progress-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #4CAF50, #8BC34A);
+		transition: width 0.3s ease;
+		border-radius: 10px;
+		box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+	}
+	
+	.loading-percentage {
+		margin-top: 0.5rem;
+		font-size: 1rem;
+		color: #90ee90;
+	}
+	
+	/* Bouncing frog animation */
+	.frog-animation {
+		position: relative;
+		height: 100px;
+		margin-bottom: 2rem;
+	}
+	
+	.frog {
+		font-size: 5rem;
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		animation: bounce 1.5s infinite;
+		filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+	}
+	
+	.shadow {
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 15px;
+		background: rgba(0, 0, 0, 0.3);
+		border-radius: 50%;
+		animation: shadow 1.5s infinite;
+	}
+	
+	@keyframes bounce {
+		0%, 100% {
+			bottom: 0;
+		}
+		50% {
+			bottom: 60px;
+			transform: translateX(-50%) rotate(10deg);
+		}
+	}
+	
+	@keyframes shadow {
+		0%, 100% {
+			width: 60px;
+			opacity: 0.3;
+		}
+		50% {
+			width: 40px;
+			opacity: 0.15;
+		}
+	}
+	
+	/* Game UI Overlay */
+	.game-ui-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 50;
+		padding: 1rem;
+	}
+	
+	.help-button {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background-color: rgba(50, 120, 50, 0.8);
+		color: white;
+		border: 2px solid rgba(255, 255, 255, 0.6);
+		cursor: pointer;
+		font-size: 1.2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+		transition: all 0.2s ease;
+	}
+	
+	.help-button:hover {
+		background-color: rgba(70, 150, 70, 0.9);
+		transform: scale(1.05);
+	}
+	
+	.controls-panel {
+		position: absolute;
+		top: 60px;
+		right: 1rem;
+		background-color: rgba(20, 40, 20, 0.85);
+		padding: 1rem;
+		border-radius: 12px;
+		width: 250px;
+		color: white;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+		border: 1px solid rgba(100, 200, 100, 0.3);
+	}
+	
+	.controls-panel h3 {
+		font-size: 1.2rem;
+		margin: 0.5rem 0;
+		color: #90ee90;
+		border-bottom: 1px solid rgba(144, 238, 144, 0.3);
+		padding-bottom: 0.3rem;
+	}
+	
+	.controls-panel ul {
+		padding-left: 1.5rem;
+		margin: 0.5rem 0 1rem;
+	}
+	
+	.controls-panel li {
+		margin-bottom: 0.5rem;
+	}
+	
+	.controls-panel p {
+		margin: 0.5rem 0;
+		font-size: 0.9rem;
+		color: #d0f0d0;
+	}
+	
+	.key {
+		display: inline-block;
+		background-color: rgba(255, 255, 255, 0.2);
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
+		font-family: monospace;
+		font-weight: bold;
+		min-width: 1rem;
+		text-align: center;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+</style>
