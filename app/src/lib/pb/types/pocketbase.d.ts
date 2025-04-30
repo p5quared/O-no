@@ -16,6 +16,7 @@ export enum Collections {
 	Lobbies = "lobbies",
 	PlayerPositions = "player_positions",
 	Positions = "positions",
+	Profiles = "profiles",
 	Users = "users",
 }
 
@@ -24,15 +25,20 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
+type ExpandType<T> = unknown extends T
+	? T extends unknown
+		? { expand?: unknown }
+		: { expand: T }
+	: { expand: T }
+
 // System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
 	collectionId: string
 	collectionName: Collections
-	expand?: T
-}
+} & ExpandType<T>
 
-export type AuthSystemFields<T = never> = {
+export type AuthSystemFields<T = unknown> = {
 	email: string
 	emailVisibility: boolean
 	username: string
@@ -132,6 +138,14 @@ export type PositionsRecord = {
 	updated?: IsoDateString
 }
 
+export type ProfilesRecord = {
+	created?: IsoDateString
+	id: string
+	sprite: string
+	updated?: IsoDateString
+	user: RecordIdString
+}
+
 export type UsersRecord = {
 	avatar?: string
 	created?: IsoDateString
@@ -157,6 +171,7 @@ export type EventsGamesResponse<Tdata = unknown, Texpand = unknown> = Required<E
 export type LobbiesResponse<Texpand = unknown> = Required<LobbiesRecord> & BaseSystemFields<Texpand>
 export type PlayerPositionsResponse<Texpand = unknown> = Required<PlayerPositionsRecord> & BaseSystemFields<Texpand>
 export type PositionsResponse<Texpand = unknown> = Required<PositionsRecord> & BaseSystemFields<Texpand>
+export type ProfilesResponse<Texpand = unknown> = Required<ProfilesRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -172,6 +187,7 @@ export type CollectionRecords = {
 	lobbies: LobbiesRecord
 	player_positions: PlayerPositionsRecord
 	positions: PositionsRecord
+	profiles: ProfilesRecord
 	users: UsersRecord
 }
 
@@ -186,6 +202,7 @@ export type CollectionResponses = {
 	lobbies: LobbiesResponse
 	player_positions: PlayerPositionsResponse
 	positions: PositionsResponse
+	profiles: ProfilesResponse
 	users: UsersResponse
 }
 
@@ -203,5 +220,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'lobbies'): RecordService<LobbiesResponse>
 	collection(idOrName: 'player_positions'): RecordService<PlayerPositionsResponse>
 	collection(idOrName: 'positions'): RecordService<PositionsResponse>
+	collection(idOrName: 'profiles'): RecordService<ProfilesResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

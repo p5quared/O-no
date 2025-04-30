@@ -3,4 +3,5 @@ export const TABLES = {
   GAME_EVENTS: 'events_games',
   USERS: 'users',
   PROFILES: 'profiles',
+  LOBBIES: 'lobbies',
 }

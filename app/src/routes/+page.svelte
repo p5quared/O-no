@@ -83,12 +83,21 @@
 			try {
 				const records = await pb.collection(table).getFullList();
 				if (records.length === 0) {
-									console.log(`No records found in ${table}`);
-									continue;
-								}
-				for (const record of records) {
-					console.log(`Deleting record ${record.id} from ${table}`);
-					await pb.collection(table).delete(record.id);
+					console.log(`No records found in ${table}`);
+					continue;
+				}
+				const batches = Math.ceil(records.length / 1000);
+				for (let i = 0; i < batches; i++) {
+					const batch = records.slice(i * 1000, (i + 1) * 1000);
+					await Promise.all(
+						batch.map(async (record) => await pb.collection(table).delete(record.id))
+					)
+						.then(() => {
+							console.log(`Deleted ${batch.length} records from ${table}`);
+						})
+						.catch((error) => {
+							console.error(`Error deleting records from ${table}:`, error);
+						});
 				}
 			} catch (error) {
 				console.error(`Error deleting from ${table}:`, error);
@@ -105,10 +114,9 @@
 	<title>Home</title>
 </svelte:head>
 
-	{#if !['/login', '/registration'].includes(page.url.pathname)}
+{#if !['/login', '/registration'].includes(page.url.pathname)}
 	<Header />
-
-	{/if}
+{/if}
 
 <section class="lobby-page" style="background-image: url({homepageBackground});">
 	<div class="form-box mx-auto max-w-md p-4">

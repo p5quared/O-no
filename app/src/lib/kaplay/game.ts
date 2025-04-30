@@ -1,4 +1,4 @@
-import { getKaplay } from '.';
+import { getKaplay, KAPLAY_SPRITES } from '.';
 import { frogGodHeight, GROUND_HEIGHT, WORLD_HEIGHT } from './constants';
 import { getLoggedInUserID } from '$lib/pb/users';
 import { Conduit } from '$lib/events';
@@ -13,9 +13,9 @@ const spawnPosition = () => { return { x: 80, y: WORLD_HEIGHT - GROUND_HEIGHT - 
 const init = async () => {
 	const k = getKaplay();
 
-	k.loadSprite('bean', 'https://play.kaplayjs.com/sprites/bean.png');
-
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
+
+	KAPLAY_SPRITES.forEach((sprite) => { k.loadSprite(sprite, `https://play.kaplayjs.com/${sprite}.png`); });
 
 	const localSpawn = spawnPosition();
 	const { eventManager } = await PlayerFactory.createLocalPlayer(getLoggedInUserID(), localSpawn.x, localSpawn.y);
