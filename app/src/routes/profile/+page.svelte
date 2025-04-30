@@ -6,8 +6,6 @@
   import profileBackground from '$lib/images/swamp.png';
   import { KAPLAY_SPRITES } from '$lib/kaplay';
 
-  const availableSprits = KAPLAY_SPRITES;
-
   let currentSprite = '';
   let loading = true;
   let error = '';
@@ -113,10 +111,10 @@
             <div
               class="sprite-option"
               class:selected={currentSprite === sprite}
-              on:click={() => selectSprite(sprite.name)}
+              on:click={() => selectSprite(sprite)}
             >
-              <img src={sprite.href} alt={sprite.name} />
-              <p style="font-family: 'FrogFont', sans-serif;">{sprite.name}</p>
+              <img src={getSpriteUrl(sprite)} alt={sprite} />
+              <p style="font-family: 'FrogFont', sans-serif;">{sprite}</p>
             </div>
           {/each}
         </div>
