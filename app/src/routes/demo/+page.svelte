@@ -2,7 +2,7 @@
 	import { pb } from '$lib/pb/pocketbase';
 	import { goto } from '$app/navigation';
 	import { onMount, onDestroy } from 'svelte';
-	import { fetchAllLobbies, fetchSingleLobby, joinLobby } from '$lib/pb/lobbies';
+	import { fetchAllLobbies, fetchSingleLobby, joinLobby, updateLobby } from '$lib/pb/lobbies';
 	import homepageBackground from '$lib/images/swamp.png';
 	import { getUserById } from '$lib/pb/users';
 	import type { LobbiesRecord } from '$lib/pb/types/pocketbase';
@@ -11,6 +11,7 @@
 	let players: { id: string; name: string }[] = [];
 	let isLoading = true;
 	let subscription: { unsubscribe: () => void } | null = null;
+	let isLobbyOwner = false;
 
 	async function loadPlayers() {
 		if (!currentLobby || !currentLobby.players) return;
@@ -40,6 +41,9 @@
 				// Join the lobby
 				currentLobby = await joinLobby(openLobby.id);
 				
+				// Check if current user is the lobby owner
+				isLobbyOwner = currentLobby.host === pb.authStore.model?.id;
+				
 				// If the lobby is already started, redirect to game
 				if (currentLobby.is_started) {
 					goto('/demo-game');
@@ -50,6 +54,9 @@
 				subscription = pb.collection('lobbies').subscribe(currentLobby.id, async (e) => {
 					if (e.action === 'update') {
 						currentLobby = e.record;
+						
+						// Check if current user is the lobby owner
+						isLobbyOwner = currentLobby.host === pb.authStore.model?.id;
 						
 						// If the lobby is started, redirect to game
 						if (currentLobby.is_started) {
@@ -74,6 +81,17 @@
 			console.error('Error finding or joining lobby:', error);
 		} finally {
 			isLoading = false;
+		}
+	}
+
+	async function startGame() {
+		if (!currentLobby || !isLobbyOwner) return;
+		
+		try {
+			await updateLobby(currentLobby.id, { is_started: true });
+			// The subscription will handle the redirect
+		} catch (error) {
+			console.error('Error starting game:', error);
 		}
 	}
 
@@ -130,7 +148,14 @@
 				<h1 class="page-title">Waiting Room</h1>
 				
 				<div class="status-message">
-					<p>Waiting for host to start the game...</p>
+					{#if isLobbyOwner}
+						<p>You are the host. Start the game when ready!</p>
+						<button class="start-button" on:click={startGame}>
+							Start Game
+						</button>
+					{:else}
+						<p>Waiting for host to start the game...</p>
+					{/if}
 				</div>
 				
 				<div class="player-list-container">
@@ -273,6 +298,35 @@
 	
 	.profile-button:active {
 		transform: translateY(0);
+	}
+	
+	.start-button {
+		background-color: #4CAF50;
+		color: white;
+		padding: 1rem 2rem;
+		font-size: 1.2rem;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-weight: bold;
+		font-family: 'FrogFont', sans-serif;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+		margin-top: 1rem;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	
+	.start-button:hover {
+		background-color: #45a049;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+	}
+	
+	.start-button:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
 	
 	.loading-container, .error-container {
