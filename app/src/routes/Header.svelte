@@ -179,4 +179,8 @@
 		object-fit: cover;
 		border: 2px solid white;
 	}
+	:global(header) {
+		position: relative;
+		z-index: 10;
+	}
 </style>

@@ -1,8 +1,14 @@
+<script lang="ts">
+	import Header from '../Header.svelte';
+	import { page } from '$app/state';
+</script>
 <svelte:head>
 	<title>About HellHopper!</title>
 	<meta name="description" content="Learn more about the HellHopper game" />
 </svelte:head>
-
+{#if !['/login', '/registration'].includes(page.url.pathname)}
+	<Header />
+{/if}
 <div class="about-container">
 	<div class="header">
 		<span class="frog-icon">🐸</span>
