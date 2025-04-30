@@ -1,3 +1,5 @@
+import { PUBLIC_VERCEL_WS_URL } from "$env/static/public";
+
 interface WebSocketMessage {
   id: string;
   x: number;
@@ -11,7 +13,7 @@ interface WebSocketOptions {
   maxReconnectAttempts?: number;
 }
 
-const PROD_WS_URL = 'wss://ws-wispy-wave-3271.fly.dev/ws';
+const PROD_WS_URL = PUBLIC_VERCEL_WS_URL ?? 'wss://ws-wispy-wave-3271.fly.dev/ws';
 const DEFAULT_OPTIONS: WebSocketOptions = {
   url: import.meta.env.VITE_WS_URL ?? PROD_WS_URL,
   autoReconnect: true,
