@@ -9,7 +9,7 @@
 	import { getUserProfile } from '$lib/pb/profiles';
 
 	let currentLobby: LobbiesRecord | null = null;
-	let players: { id: string; name: string }[] = [];
+	let players: { id: string; name: string; sprite: string }[] = [];
 	let isLoading = true;
 	let subscription: { unsubscribe: () => void } | null = null;
 	let isLobbyOwner = false;
@@ -20,10 +20,19 @@
 		const playerPromises = currentLobby.players.map(async (playerId) => {
 			try {
 				const user = await getUserById(playerId);
-				return { id: playerId, name: user.name || 'Unknown Player' };
+				const profile = await getUserProfile(playerId);
+				return { 
+					id: playerId, 
+					name: user.name || 'Unknown Player',
+					sprite: profile.sprite || 'bean'
+				};
 			} catch (error) {
 				console.error('Error fetching player:', error);
-				return { id: playerId, name: 'Unknown Player' };
+				return { 
+					id: playerId, 
+					name: 'Unknown Player',
+					sprite: 'bean'
+				};
 			}
 		});
 		
@@ -157,8 +166,8 @@
 						{#each players as player}
 							<div class="player-item">
 								<div class="player-avatar">
-				  <img src={`https://play.kaplayjs.com/${sprite}.png`} />
-				</div>
+									<img src={`https://play.kaplayjs.com/${player.sprite}.png`} />
+								</div>
 								<div class="player-name">{player.name}</div>
 							</div>
 						{/each}
