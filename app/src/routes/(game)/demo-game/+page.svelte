@@ -24,14 +24,14 @@
 
 	// Show the game canvas with a fade-in effect
 	function handleGameReady() {
-		// Only complete the loading when both the simulated progress is 100% AND the game is loaded
-		if (loadingProgress >= 100 && gameLoadComplete) {
-			setTimeout(() => {
-				isLoading = false;
-				gameInitialized = true;
-			}, 500);
-		}
-	}
+        // Only n when   the game is loaded
+        if (gameLoadComplete) {
+            setTimeout(() => {
+                isLoading = false;
+                gameInitialized = true;
+            }, 500);
+        }
+    }
 
 	// Simulated loading progress
 	function simulateLoading() {
