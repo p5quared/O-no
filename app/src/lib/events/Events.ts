@@ -80,5 +80,7 @@ export interface GameEvents {
 		message: string;
 		timestamp: number;
 	};
+
+	leaderboard_update: Array<{ name: string; y: number }>;
 }
 
