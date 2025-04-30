@@ -125,6 +125,11 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
+func serveHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func main() {
 	addr := flag.String("addr", ":8080", "http service address")
 	flag.Parse()
@@ -135,6 +140,7 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
+	http.HandleFunc("/", serveHealthCheck)
 
 	log.Printf("Server starting on %s", *addr)
 	err := http.ListenAndServe(*addr, nil)
