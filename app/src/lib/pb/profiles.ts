@@ -6,3 +6,12 @@ export const getUserProfile = async (userId: string) => {
   return user
 }
 
+export const getUserSprite = async (userId: string): Promise<string> => {
+  return getUserProfile(userId).then((user) => {
+	return user.sprite ?? 'bean'
+  }).catch((err) => {
+			console.error("Error fetching user sprite", err);
+			return 'bean'
+	})
+}
+
