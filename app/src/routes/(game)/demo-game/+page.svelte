@@ -9,6 +9,7 @@
 	let loadingProgress = 0;
 	let loadingText = "Preparing the Hell...";
 	let showControls = false;
+	let gameLoadComplete = false;
 
 	// Loading messages to cycle through
 	const loadingMessages = [
@@ -23,10 +24,13 @@
 
 	// Show the game canvas with a fade-in effect
 	function handleGameReady() {
-		setTimeout(() => {
-			isLoading = false;
-			gameInitialized = true;
-		}, 500);
+		// Only complete the loading when both the simulated progress is 100% AND the game is loaded
+		if (loadingProgress >= 100 && gameLoadComplete) {
+			setTimeout(() => {
+				isLoading = false;
+				gameInitialized = true;
+			}, 500);
+		}
 	}
 
 	// Simulated loading progress
@@ -42,6 +46,7 @@
 			if (loadingProgress >= 100) {
 				loadingProgress = 100;
 				clearInterval(interval);
+				// Check if game is ready before proceeding
 				handleGameReady();
 			}
 		}, 300);
@@ -56,13 +61,23 @@
 		simulateLoading();
 		
 		// Initialize the game
-		const cleanup = await init();
-		
-		return () => {
-			if (cleanup && typeof cleanup === 'function') {
-				cleanup();
-			}
-		};
+		try {
+			const cleanup = await init();
+			
+			// Mark the game as loaded and check if we can complete the loading
+			gameLoadComplete = true;
+			handleGameReady();
+			
+			return () => {
+				if (cleanup && typeof cleanup === 'function') {
+					cleanup();
+				}
+			};
+		} catch (error) {
+			console.error("Game initialization failed:", error);
+			loadingText = "Failed to load the game. Please refresh.";
+			return () => {};
+		}
 	});
 </script>
 
