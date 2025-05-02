@@ -2,7 +2,7 @@ export const throttle = <T extends (...args: any[]) => any>(callback: T, delay: 
 	let wait = false;
 	let pendingArgs: Parameters<T> | null = null;
 
-	return function(...args: Parameters<T>): void {
+	return function (...args: Parameters<T>): void {
 		if (!wait) {
 			// Execute immediately
 			callback(...args);

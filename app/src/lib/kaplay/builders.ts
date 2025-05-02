@@ -1,12 +1,12 @@
-import type { PlayerID } from "$lib/constants";
-import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from "kaplay";
-import { getKaplay } from ".";
-import { Conduit } from "$lib/events";
-import { GameEventTypes } from "$lib/events/EventTypes";
-import { WORLD_HEIGHT, WORLD_WIDTH } from "./constants";
-import { getUsername } from "$lib/pb/users";
-import { wsClient } from "$lib/ws/ws";
-import { browser } from "$app/environment";
+import type { PlayerID } from '$lib/constants';
+import type { AreaComp, BodyComp, GameObj, PosComp, SpriteComp } from 'kaplay';
+import { getKaplay } from '.';
+import { Conduit } from '$lib/events';
+import { GameEventTypes } from '$lib/events/EventTypes';
+import { WORLD_HEIGHT, WORLD_WIDTH } from './constants';
+import { getUsername } from '$lib/pb/users';
+import { wsClient } from '$lib/ws/ws';
+import { browser } from '$app/environment';
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -15,17 +15,17 @@ class EntityBuilder {
 
 	public withSprite(sprite: SpriteComp): this {
 		this.sprite = sprite;
-		return this
+		return this;
 	}
 
 	public atPosition(x: number, y: number): this {
 		this.posX = x;
 		this.posY = y;
-		return this
+		return this;
 	}
 }
 
-export type KaplayPlayerType = GameObj<SpriteComp | PosComp | AreaComp | BodyComp | null>
+export type KaplayPlayerType = GameObj<SpriteComp | PosComp | AreaComp | BodyComp | null>;
 export class PlayerBuilder extends EntityBuilder {
 	private isLocalPlayer: boolean = false;
 	private PLAYER_SPEED = 200;
@@ -34,31 +34,26 @@ export class PlayerBuilder extends EntityBuilder {
 	public asLocalPlayer(playerID: PlayerID): this {
 		this.isLocalPlayer = true;
 		this.playerID = playerID;
-		return this
+		return this;
 	}
 
 	public async build() {
 		if (!this.playerID) {
-			throw new Error("Player ID is required to build a player");
+			throw new Error('Player ID is required to build a player');
 		}
 
 		const k = getKaplay();
-		let p = k.add([
-			this.sprite,
-			k.pos(this.posX, this.posY),
-			 k.area(),
-			k.body(),
-		])
+		let p = k.add([this.sprite, k.pos(this.posX, this.posY), k.area(), k.body()]);
 
 		// TODO: Player username under sprite
-		// This can be attached: https://kaplayjs.com/guides/game_objects/ 
+		// This can be attached: https://kaplayjs.com/guides/game_objects/
 		// (see section on "Parents, childs, and roots")
 
 		const username = await getUsername(this.playerID);
 		const usernameLabel = k.add([
-			k.text(username, { size: 12, align: "center", width: 100 }),
+			k.text(username, { size: 12, align: 'center', width: 100 }),
 			k.pos(p.pos.x + 28, p.pos.y + 64),
-			k.anchor("center"),
+			k.anchor('center'),
 			k.z(10)
 		]);
 		p.onUpdate(() => {
@@ -68,22 +63,21 @@ export class PlayerBuilder extends EntityBuilder {
 		// TODO: Player camera updates
 		// Update local player and camera based on keyboard inputs
 
-		p = this.setupEventHooks(p)
+		p = this.setupEventHooks(p);
 
 		if (this.isLocalPlayer) {
-			p = this.setupCameraTracking(p)
+			p = this.setupCameraTracking(p);
 			p = this.attachMovementBindings(p);
 			p = this.setupEventBroadcast(p);
-			p.tag("localPlayer");
+			p.tag('localPlayer');
 		}
 
-
-		return p
+		return p;
 	}
 
 	public withID(id: PlayerID): this {
 		this.playerID = id;
-		return this
+		return this;
 	}
 
 	private setupCameraTracking(p: KaplayPlayerType): KaplayPlayerType {
@@ -93,10 +87,9 @@ export class PlayerBuilder extends EntityBuilder {
 		const minCamX = groundCenterX - clampMargin;
 		const maxCamX = groundCenterX + clampMargin;
 
-
 		p.onUpdate(() => {
-			const x = Math.max(minCamX, Math.min(p.pos.x, maxCamX))
-			const y = Math.min(p.pos.y, WORLD_HEIGHT - k.height() / 2)
+			const x = Math.max(minCamX, Math.min(p.pos.x, maxCamX));
+			const y = Math.min(p.pos.y, WORLD_HEIGHT - k.height() / 2);
 			k.setCamPos(k.vec2(x, y));
 		});
 
@@ -115,34 +108,33 @@ export class PlayerBuilder extends EntityBuilder {
 		return p;
 	}
 
-
 	private attachMovementBindings(p: KaplayPlayerType): KaplayPlayerType {
-		p.onKeyDown("left", () => {
+		p.onKeyDown('left', () => {
 			p.move(-this.PLAYER_SPEED, 0);
 		});
 
-		p.onKeyDown("right", () => {
+		p.onKeyDown('right', () => {
 			p.move(this.PLAYER_SPEED, 0);
 		});
 
-		p.onKeyPress("up", () => {
+		p.onKeyPress('up', () => {
 			if (p.isGrounded()) {
-				p.jump()
+				p.jump();
 			}
 		});
 
-		p.onCollide("boostpad", () => {
+		p.onCollide('boostpad', () => {
 			p.jump(2.5 * 400);
 		});
 
-		p.onCollide("endPlatform", () => {
+		p.onCollide('endPlatform', () => {
 			if (p.isGrounded()) {
-				console.log("Gold collected");
+				console.log('Gold collected');
 				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
 			}
 		});
 
-		return p
+		return p;
 	}
 
 	private setupEventBroadcast(p: KaplayPlayerType): KaplayPlayerType {
@@ -151,9 +143,9 @@ export class PlayerBuilder extends EntityBuilder {
 			//	{ player_id: this.playerID, position: p.pos }
 			//)
 			if (!browser) return;
-			wsClient.emitMessage(this.playerID, p.pos.x, p.pos.y)
+			wsClient.emitMessage(this.playerID, p.pos.x, p.pos.y);
 		});
-		return p
+		return p;
 	}
 
 	private setupEventHooks(p: KaplayPlayerType): KaplayPlayerType {
@@ -165,7 +157,6 @@ export class PlayerBuilder extends EntityBuilder {
 				}
 			});
 		}
-		return p
+		return p;
 	}
 }
-

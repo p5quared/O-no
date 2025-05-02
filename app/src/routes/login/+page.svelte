@@ -39,14 +39,15 @@
 	<title>Login</title>
 </svelte:head>
 
-
-
 <div class="register-bg" style="background-image: url({heavenBackground});">
-
-	<div class="mx-auto max-w-md p-4 form-box">
-
+	<div class="form-box mx-auto max-w-md p-4">
 		<div class="mx-auto max-w-md p-4">
-			<h1 class="mb-6 text-2xl font-bold" style="color: #9cc362; font-family: 'FrogFont', sans-serif;">Hop On In!</h1>
+			<h1
+				class="mb-6 text-2xl font-bold"
+				style="color: #9cc362; font-family: 'FrogFont', sans-serif;"
+			>
+				Hop On In!
+			</h1>
 
 			{#if error}
 				<p style="color: #e55e15">{error}</p>
@@ -91,12 +92,16 @@
 
 			<div class="mt-6 text-center text-sm">
 				Don't have an account yet?
-				<a href="/registration" class=" hover:underline" style="color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;">Register here</a>
+				<a
+					href="/registration"
+					class=" hover:underline"
+					style="color: #9cc362; font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;"
+					>Register here</a
+				>
 			</div>
 		</div>
 	</div>
 </div>
-
 
 <style>
 	.register-bg {

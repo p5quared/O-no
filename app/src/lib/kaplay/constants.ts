@@ -9,7 +9,7 @@ export const bgTargetWidth = WORLD_WIDTH * 2.5;
 export const bgScale = bgTargetWidth / bgOriginalWidth;
 export const bgTargetHeight = bgOriginalHeight * bgScale;
 export const frogGodHeight = frogGodOriginalHeight * bgScale;
-export const bgX = (WORLD_WIDTH / 2) - (bgTargetWidth / 2);
+export const bgX = WORLD_WIDTH / 2 - bgTargetWidth / 2;
 
 export const WORLD_HEIGHT = bgTargetHeight * 3 + frogGodHeight;
 export const FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;

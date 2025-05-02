@@ -1,13 +1,17 @@
-import type { PlayerID } from "$lib/constants";
-import { Conduit } from "$lib/events";
-import type { GameEvents, PlayerPosition } from "$lib/events/Events";
-import { GameEventTypes } from "$lib/events/EventTypes";
-import { SubscriptionManager } from "$lib/events/Subscriptions";
-import { throttle } from "$lib/utils";
-import { createGameEvent, subscribeToGameEventsTable } from "./game/subscriptions/events";
-import { subscribetoPlayerPositionTable } from "./game/subscriptions/players";
-import { deleteUserPositionRecordByUserId, listUserPositions, updateUserPositionRecord } from "./game/subscriptions/users";
-import type { PlayerPositionsRecord } from "./types/pocketbase";
+import type { PlayerID } from '$lib/constants';
+import { Conduit } from '$lib/events';
+import type { GameEvents, PlayerPosition } from '$lib/events/Events';
+import { GameEventTypes } from '$lib/events/EventTypes';
+import { SubscriptionManager } from '$lib/events/Subscriptions';
+import { throttle } from '$lib/utils';
+import { createGameEvent, subscribeToGameEventsTable } from './game/subscriptions/events';
+import { subscribetoPlayerPositionTable } from './game/subscriptions/players';
+import {
+	deleteUserPositionRecordByUserId,
+	listUserPositions,
+	updateUserPositionRecord
+} from './game/subscriptions/users';
+import type { PlayerPositionsRecord } from './types/pocketbase';
 
 /**
  * This class connects our EventBus to the outside world,
@@ -26,27 +30,26 @@ export class PBEventManager {
 	public async setup() {
 		this.setupOutGoingEventSubscriptions();
 		await this.setupIncomingEventSubscriptions();
-
 	}
 
 	public async shutdown() {
 		this.subscriptions.cancelAll();
 		await deleteUserPositionRecordByUserId(this.positionTableID);
-		console.log("Cleaned up PB EventManager");
+		console.log('Cleaned up PB EventManager');
 	}
 
 	private async setupIncomingEventSubscriptions() {
-		this.subscriptions.add(await this.subToPlayerPositionsTable())
-		this.subscriptions.add(await this.subToGameEventsTable())
+		this.subscriptions.add(await this.subToPlayerPositionsTable());
+		this.subscriptions.add(await this.subToGameEventsTable());
 	}
 
 	private setupOutGoingEventSubscriptions() {
 		this.subscriptions.add(
-			Conduit.on(GameEventTypes.PLAYER_MOVED, e => this.broadcastMovement(e))
-		)
+			Conduit.on(GameEventTypes.PLAYER_MOVED, (e) => this.broadcastMovement(e))
+		);
 		this.subscriptions.add(
-			Conduit.on(GameEventTypes.GAME_OVER, e => this.broadcastEvent(GameEventTypes.GAME_OVER, e))
-		)
+			Conduit.on(GameEventTypes.GAME_OVER, (e) => this.broadcastEvent(GameEventTypes.GAME_OVER, e))
+		);
 	}
 
 	private async broadcastEvent<T extends GameEventTypes>(t: T, e: GameEvents[T]) {
@@ -60,11 +63,11 @@ export class PBEventManager {
 	}
 
 	private throttledUpdatePositoin = throttle(async (id: string, p: PlayerPosition) => {
-		await updateUserPositionRecord(id, p)
+		await updateUserPositionRecord(id, p);
 	}, 50);
 
 	private async subToGameEventsTable() {
-		console.log("Subscribing to game events");
+		console.log('Subscribing to game events');
 		return await subscribeToGameEventsTable((_, eventType, data) => {
 			switch (eventType) {
 				case GameEventTypes.GAME_OVER:
@@ -72,24 +75,23 @@ export class PBEventManager {
 					if (data_typed.emit_by === this.playerID) return;
 					Conduit.emit(GameEventTypes.GAME_OVER, data_typed);
 			}
-		})
+		});
 	}
 
 	private async subToPlayerPositionsTable() {
-		console.log("Subscribing to player locations");
+		console.log('Subscribing to player locations');
 		return await subscribetoPlayerPositionTable((action, record) => {
 			switch (action) {
 				case 'create':
 					Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {
 						id: record.user,
 						position: {
-							'x': record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
-							'y': record.y ?? -1, // i.e. broadcast MUST set these
+							x: record.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+							y: record.y ?? -1 // i.e. broadcast MUST set these
 						}
-
-					})
+					});
 					break;
-				case "update":
+				case 'update':
 					// Removed in favor of ws system
 					//Conduit.emit(GameEventTypes.PLAYER_MOVED, {
 					//	player_id: record.user,
@@ -99,13 +101,13 @@ export class PBEventManager {
 					//	}
 					//})
 					break;
-				case "delete":
+				case 'delete':
 					Conduit.emit(GameEventTypes.PLAYER_QUIT, {
-						id: record.id,
-					})
+						id: record.id
+					});
 					break;
 			}
-		})
+		});
 	}
 
 	// Emit the positions of all players already in the game
@@ -117,11 +119,10 @@ export class PBEventManager {
 			Conduit.emit(GameEventTypes.PLAYER_SPAWNED, {
 				id: positionRecord.user,
 				position: {
-					'x': positionRecord.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
-					'y': positionRecord.y ?? -1, // i.e. broadcast MUST set these
+					x: positionRecord.x ?? -1, // WARN: Casting away undefined as these MUST exist, however pocketbase defaults to nullable number values
+					y: positionRecord.y ?? -1 // i.e. broadcast MUST set these
 				}
-
-			})
+			});
 		}
 	}
 }

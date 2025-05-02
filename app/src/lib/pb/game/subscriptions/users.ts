@@ -1,7 +1,7 @@
-import type { PlayerPosition } from "$lib/events/Events";
-import { TABLES } from "$lib/pb/constants";
-import { pb } from "$lib/pb/pocketbase";
-import type { PlayerPositionsRecord } from "$lib/pb/types/pocketbase";
+import type { PlayerPosition } from '$lib/events/Events';
+import { TABLES } from '$lib/pb/constants';
+import { pb } from '$lib/pb/pocketbase';
+import type { PlayerPositionsRecord } from '$lib/pb/types/pocketbase';
 
 export async function listUserPositions() {
 	return await pb.collection(TABLES.PLAYER_POSITIONS).getFullList();
@@ -9,9 +9,15 @@ export async function listUserPositions() {
 
 // Creates a new user position record,
 // and possible deletes the old one.
-export async function createOrRecreateUserPositionRecord(userID: string, x: number, y: number): Promise<string> {
+export async function createOrRecreateUserPositionRecord(
+	userID: string,
+	x: number,
+	y: number
+): Promise<string> {
 	try {
-		deleteUserPositionRecordByUserId(userID).then().catch(e => { })
+		deleteUserPositionRecordByUserId(userID)
+			.then()
+			.catch((e) => {});
 	} catch (error) {
 		console.error('Error creating or recreating user position record:', error);
 	}
@@ -20,19 +26,24 @@ export async function createOrRecreateUserPositionRecord(userID: string, x: numb
 		user: userID,
 		x: x,
 		y: y
-	})
+	});
 
 	return id;
 }
 
 export async function updateUserPositionRecord(id: string, p: PlayerPosition) {
-	await pb.collection(TABLES.PLAYER_POSITIONS).update(id, p).catch(e => { })
+	await pb
+		.collection(TABLES.PLAYER_POSITIONS)
+		.update(id, p)
+		.catch((e) => {});
 }
 
 export async function deleteUserPositionRecordByUserId(userID: string) {
-	const { id } = await pb.collection(TABLES.PLAYER_POSITIONS).getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
+	const { id } = await pb
+		.collection(TABLES.PLAYER_POSITIONS)
+		.getFirstListItem<PlayerPositionsRecord>(`user="${userID}"`);
 	if (id) {
-		pb.collection(TABLES.PLAYER_POSITIONS).delete(id).catch()
+		pb.collection(TABLES.PLAYER_POSITIONS).delete(id).catch();
 	}
 }
 

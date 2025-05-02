@@ -1,4 +1,3 @@
-
 // TODO: Connect with events from Coduit (player_moved)
 // Updates the leaderboard based on player height, every 5 seconds
 //const updateLeaderboard = () => {

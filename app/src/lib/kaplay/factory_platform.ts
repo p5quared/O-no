@@ -1,6 +1,6 @@
-import type { GameObj, PosComp, SpriteComp } from "kaplay";
-import { frogGodHeight, PLATFORM_WIDTH, WORLD_WIDTH } from "./constants";
-import { getKaplay } from ".";
+import type { GameObj, PosComp, SpriteComp } from 'kaplay';
+import { frogGodHeight, PLATFORM_WIDTH, WORLD_WIDTH } from './constants';
+import { getKaplay } from '.';
 
 export class PlatformFactory {
 	static FINAL_PLATFORM_Y = frogGodHeight / 3 + 184;
@@ -19,12 +19,15 @@ export class PlatformFactory {
 			k.body({ isStatic: true }),
 			k.color(255, 215, 0),
 			k.z(5),
-			"endPlatform"
+			'endPlatform'
 		]);
 
 		k.add([
 			k.rect(PlatformFactory.GLOW_WIDTH, PlatformFactory.GLOW_HEIGHT),
-			k.pos(x - PlatformFactory.GOLD_WIDTH / 2 - 15, PlatformFactory.FINAL_PLATFORM_Y - PlatformFactory.GLOW_Y_OFFSET),
+			k.pos(
+				x - PlatformFactory.GOLD_WIDTH / 2 - 15,
+				PlatformFactory.FINAL_PLATFORM_Y - PlatformFactory.GLOW_Y_OFFSET
+			),
 			k.color(255, 215, 0),
 			k.opacity(0.3),
 			k.z(4)
@@ -44,7 +47,7 @@ export class PlatformFactory {
 				k.area(),
 				k.body({ isStatic: true }),
 				k.color(48, 0, 80),
-				k.outline(2),
+				k.outline(2)
 			]);
 		};
 
@@ -74,22 +77,21 @@ export class PlatformFactory {
 			k.color(255, 140, 0),
 			k.outline(2),
 			k.offscreen({ distance: 600 }),
-			"boostpad"
+			'boostpad'
 		]);
-		return p
+		return p;
 	}
 
 	static createEndingPlatforms() {
 		// In a perfect world this would live in the world factory
 		const nFinalPlatforms = 5;
 		const spacing = 440;
-		const totalGoldWidth = spacing * (nFinalPlatforms - 1)
+		const totalGoldWidth = spacing * (nFinalPlatforms - 1);
 		const goldStartX = (WORLD_WIDTH - totalGoldWidth) / 2;
 		for (let i = 0; i < nFinalPlatforms; i++) {
-			const x = goldStartX + spacing * i
+			const x = goldStartX + spacing * i;
 			PlatformFactory.createGoldPlatform(x);
 		}
-
 	}
 
 	static createSidewaysMover(x: number, y: number) {
@@ -109,7 +111,6 @@ export class PlatformFactory {
 			mover.pos.x = baseX + Math.sin(t * 2) * 100;
 		});
 		return mover;
-
 	}
 
 	static createUpDownMover(x: number, y: number) {
@@ -143,5 +144,4 @@ export class PlatformFactory {
 			k.offscreen({ distance: 600 })
 		]);
 	}
-
 }

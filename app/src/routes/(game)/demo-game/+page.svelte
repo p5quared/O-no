@@ -6,33 +6,33 @@
 	// Just track if loading is shown or not
 	let isLoading = true;
 	let loadingProgress = 0;
-	let loadingText = "Preparing the Hell...";
+	let loadingText = 'Preparing the Hell...';
 
 	// Loading messages to cycle through
 	const loadingMessages = [
-		"Preparing the Hell...",
-		"Setting up obstacles...",
-		"Counting demons...",
-		"Polishing the flames...",
-		"Setting up torture devices...",
-		"Tying up Angels...",
-		"Warming up the lava..."
+		'Preparing the Hell...',
+		'Setting up obstacles...',
+		'Counting demons...',
+		'Polishing the flames...',
+		'Setting up torture devices...',
+		'Tying up Angels...',
+		'Warming up the lava...'
 	];
 
 	// Just for visual effect, doesn't block game loading
 	function simulateLoading() {
 		const interval = setInterval(() => {
 			loadingProgress += Math.random() * 10;
-			
+
 			// Change loading message occasionally
 			if (Math.random() > 0.7) {
 				loadingText = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
 			}
-			
+
 			if (loadingProgress >= 100) {
 				loadingProgress = 100;
 				clearInterval(interval);
-				
+
 				// Allow a moment at 100% before hiding
 				setTimeout(() => {
 					isLoading = false;
@@ -43,18 +43,21 @@
 
 	onMount(() => {
 		// Start the game initialization immediately
-		init().catch(error => {
-			console.error("Game initialization failed:", error);
+		init().catch((error) => {
+			console.error('Game initialization failed:', error);
 		});
-		
-		// Start the loading simulation 
+
+		// Start the loading simulation
 		simulateLoading();
 	});
 </script>
 
 <svelte:head>
 	<title>Hell Hopper | Play Game</title>
-	<meta name="description" content="Jump through the flames of hell in this infernal multiplayer game!">
+	<meta
+		name="description"
+		content="Jump through the flames of hell in this infernal multiplayer game!"
+	/>
 </svelte:head>
 
 <!-- Main game container with overlay -->
@@ -71,19 +74,19 @@
 			<div class="ember ember6"></div>
 			<div class="ember ember7"></div>
 			<div class="ember ember8"></div>
-			
+
 			<div class="frog-animation">
 				<div class="frog">🔥</div>
 				<div class="shadow"></div>
 			</div>
-			
+
 			<h1>Hell Hopper</h1>
 			<p>{loadingText}</p>
-			
+
 			<div class="progress-bar">
 				<div class="progress-fill" style="width: {loadingProgress}%"></div>
 			</div>
-			
+
 			<p class="loading-percentage">{Math.floor(loadingProgress)}%</p>
 		</div>
 	{/if}
@@ -95,7 +98,7 @@
 		padding: 0;
 		overflow: hidden;
 	}
-	
+
 	.root-container {
 		position: fixed;
 		top: 0;
@@ -104,7 +107,7 @@
 		height: 100vh;
 		/* No background so game can render */
 	}
-	
+
 	.loading-screen {
 		position: fixed;
 		top: 0;
@@ -123,7 +126,7 @@
 		position: relative;
 		overflow: hidden;
 	}
-	
+
 	/* Lava/fire effect background */
 	.loading-screen::before {
 		content: '';
@@ -132,14 +135,14 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: 
+		background:
 			radial-gradient(circle at 20% 50%, rgba(255, 0, 0, 0.5) 0%, rgba(255, 0, 0, 0) 25%),
 			radial-gradient(circle at 50% 30%, rgba(255, 50, 0, 0.5) 0%, rgba(255, 50, 0, 0) 35%),
 			radial-gradient(circle at 80% 70%, rgba(255, 100, 0, 0.5) 0%, rgba(255, 100, 0, 0) 30%);
 		z-index: -1;
 		animation: lavaMove 8s infinite alternate;
 	}
-	
+
 	/* Fire particles */
 	.loading-screen::after {
 		content: '';
@@ -148,7 +151,7 @@
 		left: 0;
 		width: 100%;
 		height: 40%;
-		background: 
+		background:
 			radial-gradient(circle at 10% 100%, rgba(255, 100, 0, 0.8) 0%, rgba(255, 100, 0, 0) 20%),
 			radial-gradient(circle at 30% 100%, rgba(255, 50, 0, 0.7) 0%, rgba(255, 50, 0, 0) 25%),
 			radial-gradient(circle at 50% 100%, rgba(255, 150, 0, 0.8) 0%, rgba(255, 150, 0, 0) 30%),
@@ -157,19 +160,37 @@
 		z-index: -1;
 		animation: fireFlicker 3s infinite alternate;
 	}
-	
+
 	@keyframes lavaMove {
-		0% { opacity: 0.8; transform: scale(1.0); }
-		50% { opacity: 1.0; transform: scale(1.05); }
-		100% { opacity: 0.9; transform: scale(1.02); }
+		0% {
+			opacity: 0.8;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 1;
+			transform: scale(1.05);
+		}
+		100% {
+			opacity: 0.9;
+			transform: scale(1.02);
+		}
 	}
-	
+
 	@keyframes fireFlicker {
-		0% { opacity: 0.7; height: 40%; }
-		50% { opacity: 0.9; height: 43%; }
-		100% { opacity: 0.8; height: 41%; }
+		0% {
+			opacity: 0.7;
+			height: 40%;
+		}
+		50% {
+			opacity: 0.9;
+			height: 43%;
+		}
+		100% {
+			opacity: 0.8;
+			height: 41%;
+		}
 	}
-	
+
 	.loading-screen h1 {
 		font-size: 3.5rem;
 		margin-bottom: 1rem;
@@ -180,7 +201,7 @@
 		position: relative;
 		z-index: 2;
 	}
-	
+
 	.loading-screen p {
 		font-size: 1.2rem;
 		margin-bottom: 2rem;
@@ -189,7 +210,7 @@
 		position: relative;
 		z-index: 2;
 	}
-	
+
 	.progress-bar {
 		width: 300px;
 		height: 20px;
@@ -201,7 +222,7 @@
 		z-index: 2;
 		border: 1px solid rgba(255, 100, 0, 0.3);
 	}
-	
+
 	.progress-fill {
 		height: 100%;
 		background: linear-gradient(90deg, #ff3300, #ff7700);
@@ -209,7 +230,7 @@
 		border-radius: 10px;
 		box-shadow: 0 0 8px rgba(255, 100, 0, 0.8);
 	}
-	
+
 	.loading-percentage {
 		margin-top: 0.5rem;
 		font-size: 1rem;
@@ -218,7 +239,7 @@
 		position: relative;
 		z-index: 2;
 	}
-	
+
 	/* Bouncing frog animation */
 	.frog-animation {
 		position: relative;
@@ -226,7 +247,7 @@
 		margin-bottom: 2rem;
 		z-index: 2;
 	}
-	
+
 	.frog {
 		font-size: 5rem;
 		position: absolute;
@@ -235,7 +256,7 @@
 		animation: bounce 1.5s infinite;
 		filter: drop-shadow(0 0 10px rgba(255, 100, 0, 0.8));
 	}
-	
+
 	.shadow {
 		position: absolute;
 		bottom: 0;
@@ -247,9 +268,10 @@
 		border-radius: 50%;
 		animation: shadow 1.5s infinite;
 	}
-	
+
 	@keyframes bounce {
-		0%, 100% {
+		0%,
+		100% {
 			bottom: 0;
 		}
 		50% {
@@ -257,9 +279,10 @@
 			transform: translateX(-50%) rotate(10deg);
 		}
 	}
-	
+
 	@keyframes shadow {
-		0%, 100% {
+		0%,
+		100% {
 			width: 60px;
 			opacity: 0.3;
 		}
@@ -268,7 +291,7 @@
 			opacity: 0.15;
 		}
 	}
-	
+
 	/* Floating ember/spark particles */
 	.ember {
 		position: absolute;
@@ -282,16 +305,48 @@
 		z-index: 5;
 		animation: floatUp 5s infinite;
 	}
-	
-	.ember1 { left: 20%; bottom: 0; animation-delay: 0.5s; }
-	.ember2 { left: 30%; bottom: 10%; animation-delay: 1.5s; }
-	.ember3 { left: 45%; bottom: 5%; animation-delay: 0.7s; }
-	.ember4 { left: 60%; bottom: 15%; animation-delay: 2.2s; }
-	.ember5 { left: 75%; bottom: 0; animation-delay: 1.1s; }
-	.ember6 { left: 85%; bottom: 10%; animation-delay: 0.3s; }
-	.ember7 { left: 15%; bottom: 20%; animation-delay: 1.8s; }
-	.ember8 { left: 65%; bottom: 5%; animation-delay: 2.5s; }
-	
+
+	.ember1 {
+		left: 20%;
+		bottom: 0;
+		animation-delay: 0.5s;
+	}
+	.ember2 {
+		left: 30%;
+		bottom: 10%;
+		animation-delay: 1.5s;
+	}
+	.ember3 {
+		left: 45%;
+		bottom: 5%;
+		animation-delay: 0.7s;
+	}
+	.ember4 {
+		left: 60%;
+		bottom: 15%;
+		animation-delay: 2.2s;
+	}
+	.ember5 {
+		left: 75%;
+		bottom: 0;
+		animation-delay: 1.1s;
+	}
+	.ember6 {
+		left: 85%;
+		bottom: 10%;
+		animation-delay: 0.3s;
+	}
+	.ember7 {
+		left: 15%;
+		bottom: 20%;
+		animation-delay: 1.8s;
+	}
+	.ember8 {
+		left: 65%;
+		bottom: 5%;
+		animation-delay: 2.5s;
+	}
+
 	@keyframes floatUp {
 		0% {
 			transform: translateY(0) scale(1);
