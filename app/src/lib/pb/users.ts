@@ -37,8 +37,6 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 		if (error?.response?.data) {
 			const errors = error.response.data;
 
-			
-
 			if (errors?.password) {
 				errorMessage += 'Password: ' + errors.password.message + ' ';
 			}
@@ -62,18 +60,21 @@ export async function createUser(userData: UserCreateData): Promise<UserCreateRe
 }
 
 export async function getUserById(id: string): Promise<UsersRecord> {
-  return await pb.collection(TABLES.USERS).getOne<UsersRecord>(id).then(record => record).catch((error) => {
-	console.error(`Error fetching user ${id}`, error)
-	return { } as UsersRecord
-  });
+	return await pb
+		.collection(TABLES.USERS)
+		.getOne<UsersRecord>(id)
+		.then((record) => record)
+		.catch((error) => {
+			console.error(`Error fetching user ${id}`, error);
+			return {} as UsersRecord;
+		});
 }
 
 export const getLoggedInUserID = () => {
-  return pb.authStore.record?.id || ''; // They better be logged in
-}
-
+	return pb.authStore.record?.id || ''; // They better be logged in
+};
 
 export async function getUsername(id: string): Promise<string> {
-  const user =  await getUserById(id);
-  return user.name ?? "Unknown";
+	const user = await getUserById(id);
+	return user.name ?? 'Unknown';
 }

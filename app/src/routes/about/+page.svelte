@@ -2,6 +2,7 @@
 	import Header from '../Header.svelte';
 	import { page } from '$app/state';
 </script>
+
 <svelte:head>
 	<title>About HellHopper!</title>
 	<meta name="description" content="Learn more about the HellHopper game" />
@@ -19,26 +20,23 @@
 	<div class="content-card">
 		<h2>🐸 Hop or Hell: Race to Salvation</h2>
 		<p>
-			It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. 
-			As a virtuous frog, you expected a peaceful ascent to frog-heaven, but there's a problem...
+			It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. As a virtuous
+			frog, you expected a peaceful ascent to frog-heaven, but there's a problem...
 		</p>
-		<p>
-			Due to budget cuts:
-		</p>
+		<p>Due to budget cuts:</p>
 		<ul>
 			<li>Frog-heaven has limited capacity</li>
 			<li>The stairway to heaven is broken</li>
 			<li>Only the fastest hoppers will make it in</li>
 		</ul>
-		<p>
-			Hop your way up before space runs out, or face eternal damnation in frog-hell!
-		</p>
+		<p>Hop your way up before space runs out, or face eternal damnation in frog-hell!</p>
 	</div>
 
 	<div class="content-card">
 		<h2>How to Play</h2>
 		<p>
-			Compete against other frogs in a real-time race to the top! The goal is simple: be one of the fastest hoppers to secure your spot in the limited-capacity frog-heaven.
+			Compete against other frogs in a real-time race to the top! The goal is simple: be one of the
+			fastest hoppers to secure your spot in the limited-capacity frog-heaven.
 		</p>
 		<ul>
 			<li>Engage in real-time multiplayer hopping.</li>
@@ -51,12 +49,8 @@
 
 	<div class="content-card">
 		<h2>The Team & Tech</h2>
-		<p>
-			HellHopper was built with ❤️ using SvelteKit, PocketBase, and WebSockets.
-		</p>
-		<p>
-			The project utilizes the following technologies:
-		</p>
+		<p>HellHopper was built with ❤️ using SvelteKit, PocketBase, and WebSockets.</p>
+		<p>The project utilizes the following technologies:</p>
 		<ul>
 			<li>Frontend: SvelteKit</li>
 			<li>Realtime: Custom WebSockets</li>
@@ -121,13 +115,13 @@
 		margin-bottom: 0.8rem;
 		color: #c8e6c9;
 	}
-	
+
 	ul {
 		list-style: disc;
 		padding-left: 25px;
 		margin-bottom: 0.8rem;
 	}
-	
+
 	li {
 		margin-bottom: 0.4rem;
 	}
@@ -147,5 +141,4 @@
 		overflow-x: auto;
 		color: #eee;
 	}
-
 </style>

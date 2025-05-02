@@ -108,6 +108,6 @@ button:focus:not(:focus-visible) {
 }
 
 @font-face {
-	font-family: "FrogFont";
-	src: url("frogFont.ttf");
+	font-family: 'FrogFont';
+	src: url('frogFont.ttf');
 }

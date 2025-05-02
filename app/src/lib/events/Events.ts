@@ -1,7 +1,7 @@
-import type { PlayerID } from "$lib/constants";
+import type { PlayerID } from '$lib/constants';
 
 // NOTE: In reality these are all non-null
-export type PlayerPosition = {x: number, y: number};
+export type PlayerPosition = { x: number; y: number };
 
 interface HealthState {
 	current: number;
@@ -83,4 +83,3 @@ export interface GameEvents {
 
 	leaderboard_update: Array<{ name: string; y: number }>;
 }
-
