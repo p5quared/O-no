@@ -3,10 +3,9 @@
 	import { init } from '$lib/kaplay/game';
 	import { onMount } from 'svelte';
 
-	const urlParams = page.url.searchParams;
-	const name = urlParams.get('name') ?? 'xxx';
+	const lobbyId = page.params.id
 
 	onMount(async () => {
-		init(name);
+		init(lobbyId);
 	});
 </script>

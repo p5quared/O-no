@@ -58,9 +58,6 @@
 		goto('/profile');
 	}
 
-	function goBack() {
-		window.history.back();
-	}
 
 	onMount(async () => {
 		await new Promise((resolve) => setTimeout(resolve, 50));
@@ -80,7 +77,7 @@
 				isLobbyOwner = lobby.host === pb.authStore.model?.id;
 				
 				if (lobby.is_started) {
-					goto('/game');
+					goto('/game/' + lobbyId);
 					return;
 				}
 
@@ -91,7 +88,7 @@
 						isLobbyOwner = lobby.host === pb.authStore.model?.id;
 						
 						if (lobby.is_started) {
-							goto('/game');
+							goto('/game/' + lobbyId);
 							return;
 						}
 						
