@@ -58,6 +58,10 @@
 		goto('/profile');
 	}
 
+	function goBack() {
+		window.history.back();
+	}
+
 	onMount(async () => {
 		await new Promise((resolve) => setTimeout(resolve, 50));
 		if (!pb.authStore.isValid) {
