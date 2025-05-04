@@ -66,3 +66,8 @@ export async function updateLobby(lobbyId: string, data: Record<string, any>) {
 		throw error;
 	}
 }
+
+export async function playerIsInLobby(lobbyID: string, playerID: string): Promise<boolean> {
+  const lobby = await fetchSingleLobby(lobbyID);
+  return lobby.players.includes(playerID)
+}
