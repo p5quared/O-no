@@ -32,12 +32,30 @@ export function subscribeToLobbies(callback: Function) {
 
 export async function joinLobby(lobbyId: string) {
 	try {
+		const currentUserId = pb.authStore.record!.id;
+		
+		const existingLobbies = await pb.collection('lobbies').getList(1, 50, {
+			filter: `players ~ "${currentUserId}"`
+		});
+		
+		for (const existingLobby of existingLobbies.items) {
+			if (existingLobby.id !== lobbyId) {
+				const updatedPlayers = existingLobby.players.filter(
+					(playerId: string) => playerId !== currentUserId
+				);
+				await pb.collection('lobbies').update(existingLobby.id, { 
+					players: updatedPlayers 
+				});
+			}
+		}
+		
 		const lobby = await pb.collection('lobbies').getOne(lobbyId);
 		const players = lobby.players || [];
-		if (!players.includes(pb.authStore.record!.id)) {
-			players.push(pb.authStore.record!.id);
+		if (!players.includes(currentUserId)) {
+			players.push(currentUserId);
 			await pb.collection('lobbies').update(lobbyId, { players });
 		}
+		
 		return await pb.collection('lobbies').getOne(lobbyId, { expand: 'players' });
 	} catch (error) {
 		console.error('Error Joining the Lobby:', error);
