@@ -29,14 +29,31 @@ async function loadUserName(id: string) {
 	}
 }
 
+//import PocketBase from 'pocketbase'; (whoops I, Arianna, added this but it may be uncessesary!!!)
+
+//const pb = new PocketBase('http://127.0.0.1:8090'); (NOPE)
+
 const init = async () => {
 	const k = getKaplay();
 
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
+	//iterates over list of names of the sprites
 	KAPLAY_SPRITES.forEach((sprite) => {
 		k.loadSprite(sprite, `https://play.kaplayjs.com/${sprite}.png`);
 	});
+	//maybe load custom sprites here???? (NOPE)
+	const custom_sprites = await pb.collection('custom_sprites').getFullList(); //get list of all custom sprites 
+
+	custom_sprites.forEach((customSprite) => {
+		let nameSprite= customSprite.sprite_name
+		let myImage= customSprite.sprite_image
+		let myUrl= pb.files.getURL(customSprite, myImage, {thumb: '50x50'})
+		k.loadSprite(nameSprite, myUrl);
+	});
+
+
+
 
 	const localSpawn = spawnPosition();
 	const { eventManager } = await PlayerFactory.createLocalPlayer(
