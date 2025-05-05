@@ -10,12 +10,32 @@
 	let email = '';
 	let password = '';
 
+	// Helper function to log auth attempts via server endpoint
+	async function logAuthAttempt(email: string, action: string, success: boolean, reason?: string) {
+		try {
+			await fetch('/api/log', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email, action, success, reason, status: 401 })
+			});
+		} catch (e) {
+			console.error('Failed to log auth attempt:', e);
+		}
+	}
+
 	async function handleLogin() {
 		loading = true;
 		try {
+			// Attempt to log in with PocketBase
 			await pb.collection('users').authWithPassword(email, password);
 			goto('/');
 		} catch (err: any) {
+			// Log the failed login attempt via server endpoint in background
+			logAuthAttempt(email, 'login', false, err.message || 'Login failed');
+			
+			// Show error to user
 			error = err.message || 'Login failed';
 		}
 		loading = false;
@@ -29,6 +49,8 @@
 			});
 			goto('/');
 		} catch (err: any) {
+			// Log failed Google auth via server endpoint in background
+			logAuthAttempt(email || 'google-auth', 'login', false, err.message || 'Google authentication failed');
 			error = err.message || 'Google authentication failed';
 			loading = false;
 		}

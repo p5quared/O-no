@@ -5,6 +5,11 @@ import { pb } from '$lib/pb/pocketbase';
 export const handle: Handle = async ({ event, resolve }) => {
   const { request, cookies, url } = event;
 
+  // Skip logging for the logging endpoint itself to avoid duplicate logs
+  if (url.pathname === '/api/log' && request.method === 'POST') {
+    return await resolve(event);
+  }
+
   // 1. ENHANCED: More comprehensive detection of authentication attempts
   // Form-based auth via UI
   const isLogin = url.pathname.includes('/login') && request.method === 'POST';
