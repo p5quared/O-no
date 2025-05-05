@@ -2,8 +2,8 @@
 
 A multiplayer hopping game where frogs race to reach heaven before it's too late.
 
-**Play now: [hellhopper.myintro.link](https://hellhoppers.myintro.link)**
-
+**Play now: [ono312.myintro.link](https://ono312.myintro.link)**
+# Access The logs at - ```O-no/app/logs```
 ## 🐸 Hop or Hell: Race to Salvation
 
 It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. As a virtuous frog, you expected a peaceful ascent to frog-heaven, but there's a problem:
@@ -17,7 +17,8 @@ Hop your way up before space runs out, or face eternal damnation in frog-hell!
 
 ## Live Demo
 
-Visit [hellhopper.myintro.link](https://hellhoppers.myintro.link) to play the game online!
+Visit [ono312.myintro.link](https://ono312.myintro.link) to play the game online!
+
 
 ## Quick Start
 
