@@ -12,6 +12,10 @@
 	let profileId = '';
 	let saveSuccess = false;
 
+	function goBack() {
+		window.history.back();
+	}
+
 	onMount(async () => {
 		if (!pb.authStore.isValid) {
 			goto('/login');
@@ -182,7 +186,7 @@
 			</div>
 
 			<div class="return-button-container">
-				<button class="return-button" on:click={() => goto('/demo')}> Return to Demo </button>
+				<button class="return-button" on:click={goBack}> Return </button>
 			</div>
 		{/if}
 	</div>

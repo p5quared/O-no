@@ -26,6 +26,9 @@
 			</li>
 
 			{#if pb.authStore.model}
+				<li aria-current={page.url.pathname === '/achievements' ? 'page' : undefined}>
+					<a href="/achievements" style="font-family: 'FrogFont', sans-serif;">Achievements</a>
+				</li>
 				<li aria-current={page.url.pathname === '/profile' ? 'page' : undefined}>
 					<a href="/profile" style="font-family: 'FrogFont', sans-serif;">Profile</a>
 				</li>

@@ -8,6 +8,8 @@ import { PlayerFactory } from './factory_player';
 import { LeaderboardFactory } from './LeaderboardFactory';
 import { wsClient } from '$lib/ws/ws';
 import { pb } from '$lib/pb/pocketbase';
+import { playerIsInLobby } from '$lib/pb/lobbies';
+import { createPlaytimeEntry, updatePlaytimeEntry } from '$lib/pb/playtime';
 
 // TODO: This should probably dynamically generate a random valid spawn
 const spawnPosition = () => {
@@ -29,12 +31,13 @@ async function loadUserName(id: string) {
 	}
 }
 
-//import PocketBase from 'pocketbase'; (whoops I, Arianna, added this but it may be uncessesary!!!)
 
-//const pb = new PocketBase('http://127.0.0.1:8090'); (NOPE)
-
-const init = async () => {
+const init = async (lobbyId: string) => {
 	const k = getKaplay();
+	const currentUserId = getLoggedInUserID();
+	
+	// Create playtime entry when joining the game
+	await createPlaytimeEntry(currentUserId, lobbyId);
 
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
@@ -66,14 +69,20 @@ const init = async () => {
 	Conduit.on(GameEventTypes.PLAYER_SPAWNED, async (e) => {
 		if (e.id === getLoggedInUserID() || spawnedPlayers.includes(e.id)) return;
 		console.log('Spawning player', e.id, e.position.x, e.position.y);
+		if (! await playerIsInLobby(lobbyId, e.id)) return;
 		await loadUserName(e.id);
 		await PlayerFactory.createRemotePlayer(e.id, e.position.x, e.position.y);
 		spawnedPlayers.push(e.id);
 	});
 	await eventManager.emitExistingPositions();
 
-	Conduit.on(GameEventTypes.GAME_OVER, (e) => {
-		window.location.href = '/gameover';
+	Conduit.on(GameEventTypes.GAME_OVER, async (e) => {
+		if (! await playerIsInLobby(lobbyId, e.emit_by)) return;
+		
+		// Update playtime entry when game is over
+		await updatePlaytimeEntry(currentUserId, lobbyId);
+		
+		window.location.href = '/gameover/' + lobbyId;
 	});
 
 	wsClient.subscribeToMessages((m) => {
