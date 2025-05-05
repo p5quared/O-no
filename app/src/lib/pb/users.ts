@@ -78,3 +78,18 @@ export async function getUsername(id: string): Promise<string> {
 	const user = await getUserById(id);
 	return user.name ?? 'Unknown';
 }
+
+/**
+ * Get the user's score (wins)
+ * @param userId The user ID
+ * @returns The user's score or 0 if not found
+ */
+export async function getUserScore(userId: string): Promise<number> {
+	try {
+		const user = await getUserById(userId);
+		return user.score || 0;
+	} catch (error) {
+		console.error('Error fetching user score:', error);
+		return 0;
+	}
+}

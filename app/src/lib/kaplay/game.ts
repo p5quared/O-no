@@ -9,6 +9,7 @@ import { LeaderboardFactory } from './LeaderboardFactory';
 import { wsClient } from '$lib/ws/ws';
 import { pb } from '$lib/pb/pocketbase';
 import { playerIsInLobby } from '$lib/pb/lobbies';
+import { createPlaytimeEntry, updatePlaytimeEntry } from '$lib/pb/playtime';
 
 // TODO: This should probably dynamically generate a random valid spawn
 const spawnPosition = () => {
@@ -30,8 +31,13 @@ async function loadUserName(id: string) {
 	}
 }
 
+
 const init = async (lobbyId: string) => {
 	const k = getKaplay();
+	const currentUserId = getLoggedInUserID();
+	
+	// Create playtime entry when joining the game
+	await createPlaytimeEntry(currentUserId, lobbyId);
 
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
@@ -59,6 +65,10 @@ const init = async (lobbyId: string) => {
 
 	Conduit.on(GameEventTypes.GAME_OVER, async (e) => {
 		if (! await playerIsInLobby(lobbyId, e.emit_by)) return;
+		
+		// Update playtime entry when game is over
+		await updatePlaytimeEntry(currentUserId, lobbyId);
+		
 		window.location.href = '/gameover/' + lobbyId;
 	});
 
