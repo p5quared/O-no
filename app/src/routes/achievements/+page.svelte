@@ -250,7 +250,10 @@
 
 <div class="achievements-page">
 	<div class="container">
-		<h1 class="page-title">Your Achievements</h1>
+		<div class="header-container">
+			<button class="back-button" on:click={() => history.back()}>← Back</button>
+			<h1 class="page-title">Your Achievements</h1>
+		</div>
 		
 		{#if loading}
 			<div class="loading">
@@ -340,11 +343,36 @@
 		padding: 0 1rem;
 	}
 	
+	.header-container {
+		display: flex;
+		align-items: center;
+		position: relative;
+		margin-bottom: 2rem;
+	}
+	
+	.back-button {
+		position: absolute;
+		left: 0;
+		background-color: #34623f;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		padding: 0.5rem 1rem;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+	
+	.back-button:hover {
+		background-color: #4a8759;
+	}
+	
 	.page-title {
 		font-family: 'FrogFont', sans-serif;
 		font-size: 3rem;
 		text-align: center;
-		margin-bottom: 2rem;
+		width: 100%;
 		color: #f4c03f;
 		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
