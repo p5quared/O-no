@@ -30,8 +30,54 @@ async function loadUserName(id: string) {
 	}
 }
 
+// Create or find a playtime entry for the current user and game
+async function createPlaytimeEntry(userId: string, lobbyId: string) {
+	try {
+		// Check if an entry already exists
+		const existingEntries = await pb.collection('playtime').getList(1, 1, {
+			filter: `user="${userId}" && game="${lobbyId}"`
+		});
+		
+		if (existingEntries.items.length === 0) {
+			// Create a new entry if none exists
+			await pb.collection('playtime').create({
+				user: userId,
+				game: lobbyId
+				// start field will be auto-populated by the autodate field
+			});
+			console.log('Created new playtime entry for user', userId, 'in game', lobbyId);
+		} else {
+			console.log('Playtime entry already exists for user', userId, 'in game', lobbyId);
+		}
+	} catch (error) {
+		console.error('Error creating playtime entry:', error);
+	}
+}
+
+// Update the playtime entry when the game ends
+async function updatePlaytimeEntry(userId: string, lobbyId: string) {
+	try {
+		const existingEntries = await pb.collection('playtime').getList(1, 1, {
+			filter: `user="${userId}" && game="${lobbyId}"`
+		});
+		
+		if (existingEntries.items.length > 0) {
+			const entryId = existingEntries.items[0].id;
+			// Just update the record - the end field will be auto-populated by the autodate field
+			await pb.collection('playtime').update(entryId, {});
+			console.log('Updated playtime entry for user', userId, 'in game', lobbyId);
+		}
+	} catch (error) {
+		console.error('Error updating playtime entry:', error);
+	}
+}
+
 const init = async (lobbyId: string) => {
 	const k = getKaplay();
+	const currentUserId = getLoggedInUserID();
+	
+	// Create playtime entry when joining the game
+	await createPlaytimeEntry(currentUserId, lobbyId);
 
 	WorldFactory.generateWorld(WORLD_HEIGHT, frogGodHeight);
 
@@ -59,6 +105,10 @@ const init = async (lobbyId: string) => {
 
 	Conduit.on(GameEventTypes.GAME_OVER, async (e) => {
 		if (! await playerIsInLobby(lobbyId, e.emit_by)) return;
+		
+		// Update playtime entry when game is over
+		await updatePlaytimeEntry(currentUserId, lobbyId);
+		
 		window.location.href = '/gameover/' + lobbyId;
 	});
 
