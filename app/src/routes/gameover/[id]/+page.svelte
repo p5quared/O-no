@@ -4,22 +4,32 @@
 	import homepageBackground from '$lib/images/swamp.png';
 	import { onMount } from 'svelte';
 	import { TABLES } from '$lib/pb/constants';
-	import type { PositionsResponse, UsersResponse } from '$lib/pb/types/pocketbase';
+	import type { PlayerPositionsResponse, PositionsResponse, UsersResponse } from '$lib/pb/types/pocketbase';
+	import { page } from '$app/state';
+	import { playerIsInLobby } from '$lib/pb/lobbies';
 
-	// INFO: Temporary win implementation
 	async function getWinningPlayer(): Promise<string> {
 		try {
+			const lobbyId = page.params.id;
 			type Expand = {
 				user: UsersResponse;
 			};
-			const winner = await pb
+			let positions = await pb
 				.collection(TABLES.PLAYER_POSITIONS)
-				.getList<PositionsResponse<Expand>>(1, 1, {
+				.getFullList<PlayerPositionsResponse<Expand>>({
 					sort: 'y',
 					expand: 'user'
 				});
+		console.log(positions)
 
-			return winner.items[0].expand?.user.name ?? 'Unknown';
+			if (lobbyId) {
+				console.log('Lobby ID:', lobbyId);
+				console.log('Before filter:', positions);
+				positions = positions.filter(async (item) => await playerIsInLobby(lobbyId, item.expand.user.id))
+				console.log('After filter:', positions);
+			}
+
+			return positions[0].expand?.user.name ?? 'Unknown';
 		} catch (error) {
 			console.error('Error getting winning player:', error);
 			return 'Unknown';

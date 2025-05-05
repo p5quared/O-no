@@ -1,3 +1,4 @@
+import { TABLES } from './constants';
 import { pb } from './pocketbase';
 
 export async function createLobby(name: string) {
@@ -16,7 +17,7 @@ export async function createLobby(name: string) {
 
 export async function fetchAllLobbies() {
 	try {
-		const lobbies = await pb.collection('lobbies').getFullList();
+		const lobbies = await pb.collection('lobbies').getFullList({filter: 'is_ended != true'});
 		return lobbies;
 	} catch (error) {
 		console.error('Error Getting all the Lobbies:', error);
@@ -32,12 +33,30 @@ export function subscribeToLobbies(callback: Function) {
 
 export async function joinLobby(lobbyId: string) {
 	try {
+		const currentUserId = pb.authStore.record!.id;
+		
+		const existingLobbies = await pb.collection('lobbies').getList(1, 50, {
+			filter: `players ~ "${currentUserId}"`
+		});
+		
+		for (const existingLobby of existingLobbies.items) {
+			if (existingLobby.id !== lobbyId) {
+				const updatedPlayers = existingLobby.players.filter(
+					(playerId: string) => playerId !== currentUserId
+				);
+				await pb.collection('lobbies').update(existingLobby.id, { 
+					players: updatedPlayers 
+				});
+			}
+		}
+		
 		const lobby = await pb.collection('lobbies').getOne(lobbyId);
 		const players = lobby.players || [];
-		if (!players.includes(pb.authStore.record!.id)) {
-			players.push(pb.authStore.record!.id);
+		if (!players.includes(currentUserId)) {
+			players.push(currentUserId);
 			await pb.collection('lobbies').update(lobbyId, { players });
 		}
+		
 		return await pb.collection('lobbies').getOne(lobbyId, { expand: 'players' });
 	} catch (error) {
 		console.error('Error Joining the Lobby:', error);
@@ -65,4 +84,17 @@ export async function updateLobby(lobbyId: string, data: Record<string, any>) {
 		console.error('Error updating lobby:', error);
 		throw error;
 	}
+}
+
+export async function closeLobby(lobbyId: string) {
+  try {
+	await pb.collection(TABLES.LOBBIES).update(lobbyId, {is_ended: true})
+  } catch (error) {
+	console.error('Error closing lobby', lobbyId, error)
+  }
+}
+
+export async function playerIsInLobby(lobbyID: string, playerID: string): Promise<boolean> {
+  const lobby = await fetchSingleLobby(lobbyID);
+  return lobby.players.includes(playerID)
 }
