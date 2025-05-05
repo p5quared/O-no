@@ -49,3 +49,35 @@ export async function updatePlaytimeEntry(userId: string, lobbyId: string) {
 		console.error('Error updating playtime entry:', error);
 	}
 }
+
+/**
+ * Get the total time played by a user across all games
+ * @param userId The user ID
+ * @returns Total playtime in milliseconds
+ */
+export async function getTotalPlaytime(userId: string): Promise<number> {
+	try {
+		// Get all completed playtime entries for this user (where both start and end exist)
+		const playtimeEntries = await pb.collection('playtime').getFullList({
+			filter: `user="${userId}" && end != null`
+		});
+		
+		// Calculate total playtime in milliseconds
+		let totalPlaytimeMs = 0;
+		
+		for (const entry of playtimeEntries) {
+			const startTime = new Date(entry.start).getTime();
+			const endTime = new Date(entry.end).getTime();
+			
+			// Only count valid time ranges
+			if (endTime > startTime) {
+				totalPlaytimeMs += (endTime - startTime);
+			}
+		}
+		
+		return totalPlaytimeMs;
+	} catch (error) {
+		console.error('Error calculating total playtime:', error);
+		return 0;
+	}
+}
