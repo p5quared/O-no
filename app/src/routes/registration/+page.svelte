@@ -11,12 +11,29 @@
 	let loading = false;
 	let successMessage = '';
 
+	// Helper function to log auth attempts via server endpoint
+	async function logAuthAttempt(email: string, action: string, success: boolean, reason?: string) {
+		try {
+			await fetch('/api/log', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email, action, success, reason })
+			});
+		} catch (e) {
+			console.error('Failed to log auth attempt:', e);
+		}
+	}
+
 	async function handleSubmit() {
 		loading = true;
 		error = '';
 
 		if (password !== passwordConfirm) {
 			error = 'Passwords do not match!';
+			// Log validation failure
+			await logAuthAttempt(email, 'register', false, 'Passwords do not match');
 			loading = false;
 			return false;
 		}
@@ -29,10 +46,15 @@
 		});
 
 		if (result.success) {
+			// Log successful registration
+			await logAuthAttempt(email, 'register', true);
 			successMessage = 'Account created!';
 			setTimeout(() => goto('/login'), 1500);
 		} else {
+			// Log failed registration
+			
 			error = result.error || 'Registration failed';
+			await logAuthAttempt(email, 'register', false, result.error || 'Registration failed');
 		}
 
 		loading = false;
