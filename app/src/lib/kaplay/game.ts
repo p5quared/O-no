@@ -59,7 +59,7 @@ const init = async (lobbyId: string) => {
 
 	Conduit.on(GameEventTypes.GAME_OVER, async (e) => {
 		if (! await playerIsInLobby(lobbyId, e.emit_by)) return;
-		window.location.href = '/gameover' + '?lobbyId=' + lobbyId;
+		window.location.href = '/gameover/' + lobbyId;
 	});
 
 	wsClient.subscribeToMessages((m) => {

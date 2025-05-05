@@ -10,22 +10,26 @@
 
 	async function getWinningPlayer(): Promise<string> {
 		try {
-			const lobbyId = page.params.lobbyId;
+			const lobbyId = page.params.id;
 			type Expand = {
 				user: UsersResponse;
 			};
-			const winner = await pb
+			let positions = await pb
 				.collection(TABLES.PLAYER_POSITIONS)
-				.getList<PlayerPositionsResponse<Expand>>(1, 1, {
+				.getFullList<PlayerPositionsResponse<Expand>>({
 					sort: 'y',
 					expand: 'user'
 				});
+		console.log(positions)
 
 			if (lobbyId) {
-				winner.items = winner.items.filter((item) => playerIsInLobby(lobbyId, item.user))
+				console.log('Lobby ID:', lobbyId);
+				console.log('Before filter:', positions);
+				positions = positions.filter(async (item) => await playerIsInLobby(lobbyId, item.expand.user.id))
+				console.log('After filter:', positions);
 			}
 
-			return winner.items[0].expand?.user.name ?? 'Unknown';
+			return positions[0].expand?.user.name ?? 'Unknown';
 		} catch (error) {
 			console.error('Error getting winning player:', error);
 			return 'Unknown';

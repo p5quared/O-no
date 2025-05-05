@@ -133,7 +133,7 @@ export class PlayerBuilder extends EntityBuilder {
 			if (p.isGrounded()) {
 				console.log('Gold collected');
 				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
-				await closeLobby(page.route.id ?? ''); // INFO: Always exists
+				await closeLobby(page.params.id ?? ''); // INFO: Always exists
 			}
 		});
 

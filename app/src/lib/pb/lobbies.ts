@@ -17,7 +17,7 @@ export async function createLobby(name: string) {
 
 export async function fetchAllLobbies() {
 	try {
-		const lobbies = await pb.collection('lobbies').getFullList();
+		const lobbies = await pb.collection('lobbies').getFullList({filter: 'is_ended != true'});
 		return lobbies;
 	} catch (error) {
 		console.error('Error Getting all the Lobbies:', error);
@@ -88,9 +88,9 @@ export async function updateLobby(lobbyId: string, data: Record<string, any>) {
 
 export async function closeLobby(lobbyId: string) {
   try {
-	await pb.collection(TABLES.LOBBIES).update(lobbyId, {is_closed: true})
+	await pb.collection(TABLES.LOBBIES).update(lobbyId, {is_ended: true})
   } catch (error) {
-	console.error('Error closing lobby: ', error)
+	console.error('Error closing lobby', lobbyId, error)
   }
 }
 
