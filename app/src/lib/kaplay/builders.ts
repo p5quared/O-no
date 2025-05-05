@@ -7,6 +7,8 @@ import { WORLD_HEIGHT, WORLD_WIDTH } from './constants';
 import { getUsername } from '$lib/pb/users';
 import { wsClient } from '$lib/ws/ws';
 import { browser } from '$app/environment';
+import { closeLobby } from '$lib/pb/lobbies';
+import { page } from '$app/state';
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -127,10 +129,11 @@ export class PlayerBuilder extends EntityBuilder {
 			p.jump(2.5 * 400);
 		});
 
-		p.onCollide('endPlatform', () => {
+		p.onCollide('endPlatform', async () => {
 			if (p.isGrounded()) {
 				console.log('Gold collected');
 				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
+				await closeLobby(page.route.id ?? ''); // INFO: Always exists
 			}
 		});
 

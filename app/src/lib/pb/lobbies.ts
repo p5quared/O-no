@@ -1,3 +1,4 @@
+import { TABLES } from './constants';
 import { pb } from './pocketbase';
 
 export async function createLobby(name: string) {
@@ -83,6 +84,14 @@ export async function updateLobby(lobbyId: string, data: Record<string, any>) {
 		console.error('Error updating lobby:', error);
 		throw error;
 	}
+}
+
+export async function closeLobby(lobbyId: string) {
+  try {
+	await pb.collection(TABLES.LOBBIES).update(lobbyId, {is_closed: true})
+  } catch (error) {
+	console.error('Error closing lobby: ', error)
+  }
 }
 
 export async function playerIsInLobby(lobbyID: string, playerID: string): Promise<boolean> {
