@@ -49,16 +49,16 @@ const init = async (lobbyId: string) => {
 	const spawnedPlayers: string[] = [];
 	Conduit.on(GameEventTypes.PLAYER_SPAWNED, async (e) => {
 		if (e.id === getLoggedInUserID() || spawnedPlayers.includes(e.id)) return;
-		if (!playerIsInLobby(lobbyId, e.id)) return;
 		console.log('Spawning player', e.id, e.position.x, e.position.y);
+		if (! await playerIsInLobby(lobbyId, e.id)) return;
 		await loadUserName(e.id);
 		await PlayerFactory.createRemotePlayer(e.id, e.position.x, e.position.y);
 		spawnedPlayers.push(e.id);
 	});
 	await eventManager.emitExistingPositions();
 
-	Conduit.on(GameEventTypes.GAME_OVER, (e) => {
-		if (!playerIsInLobby(lobbyId, e.emit_by)) return;
+	Conduit.on(GameEventTypes.GAME_OVER, async (e) => {
+		if (! await playerIsInLobby(lobbyId, e.emit_by)) return;
 		window.location.href = '/gameover' + '?lobbyId=' + lobbyId;
 	});
 
