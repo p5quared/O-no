@@ -3,7 +3,7 @@
 A multiplayer hopping game where frogs race to reach heaven before it's too late.
 
 **Play now: [ono.cse312.myintro.link](https://ono.cse312.myintro.link)**
-
+# Access The logs at - ```O-no/app/logs```
 ## 🐸 Hop or Hell: Race to Salvation
 
 It's 1945 in frog years. The frog-atomic bombs have devastated your frog-city. As a virtuous frog, you expected a peaceful ascent to frog-heaven, but there's a problem:
@@ -18,7 +18,8 @@ Hop your way up before space runs out, or face eternal damnation in frog-hell!
 ## Live Demo
 
 Visit [ono.cse312.myintro.link](https://ono.cse312.myintro.link) to play the game online!
-##TA - Access The log at - O-no/app/logs
+
+
 ## Quick Start
 
 1. Start the application:
