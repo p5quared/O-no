@@ -9,6 +9,18 @@ import { wsClient } from '$lib/ws/ws';
 import { browser } from '$app/environment';
 import { closeLobby } from '$lib/pb/lobbies';
 import { page } from '$app/state';
+import { pb } from '$lib/pb/pocketbase';
+
+async function incrementWinCount(playerID: string) {
+	try {
+		const user = await pb.collection('users').getOne(playerID);
+		await pb.collection('users').update(playerID, {
+			score: (user.score || 0) + 1
+		});
+	} catch (err) {
+		console.error('Failed to increment win count for', playerID, err);
+	}
+}
 
 class EntityBuilder {
 	protected sprite: SpriteComp | null = null;
@@ -132,10 +144,18 @@ export class PlayerBuilder extends EntityBuilder {
 		p.onCollide('endPlatform', async () => {
 			if (p.isGrounded()) {
 				console.log('Gold collected');
+
+				// Increment leaderboard win count
+				await incrementWinCount(this.playerID);
+
+				// Emit game over to others
 				Conduit.emit(GameEventTypes.GAME_OVER, { emit_by: this.playerID });
-				await closeLobby(page.params.id ?? ''); // INFO: Always exists
+
+				// Close the lobby (as added by your teammate)
+				await closeLobby(page.params.id ?? '');
 			}
 		});
+
 
 		return p;
 	}
