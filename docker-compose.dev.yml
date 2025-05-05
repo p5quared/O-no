@@ -22,11 +22,9 @@ services:
     networks:
       - app-network
     environment:
+      - VITE_PB_URL=http://localhost:8080/api/pb
+      - VITE_WS_URL=ws://localhost:8080/ws
       - NODE_ENV=development
-      - VITE_PB_URL=http://c.myintro.link/api/pb
-      - VITE_WS_URL=ws://c.myintro.link/ws
-      - PUBLIC_VERCEL_PB_URL=anything
-      - PUBLIC_VERCEL_WS_URL=anything
 
   caddy:
     image: caddy:2-alpine

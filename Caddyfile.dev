@@ -2,7 +2,7 @@
     admin off
 }
 
-c.myintro.link {
+:80 {
     encode gzip
 
     handle /api/pb/* {
