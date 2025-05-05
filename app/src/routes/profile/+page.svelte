@@ -24,6 +24,9 @@
 
 		try {
 			loading = true;
+
+			await loadCustomSprites();
+
 			// Try to get the user's profile
 			const userId = pb.authStore.model?.id;
 			if (!userId) {
@@ -75,10 +78,51 @@
 		}
 	}
 
-	function getSpriteUrl(spriteName: string) {
+
+	function getSpriteUrl(spriteName: string): string {
+		const custom = customSprites.find(s => s.name === spriteName);
+		if (custom) return custom.url;
+
 		// Construct the URL using the KaplayJS sprite path
 		return `https://play.kaplayjs.com/sprites/${spriteName}.png`;
 	}
+	
+	async function handleFileUpload(event: Event) {
+		const input = event.target as HTMLInputElement;
+		if (!input?.files?.length) return;
+
+		const file = input.files[0];
+		const userId = pb.authStore.record?.id;
+		if (!userId) return;
+
+		try {
+			const formData = new FormData();
+			formData.append('sprite_image', file);
+			formData.append('sprite_name', file.name.split('.')[0]);
+
+			await pb.collection('custom_sprites').create(formData);
+			alert('Sprite uploaded successfully!');
+			window.location.reload(); 
+		} catch (e) {
+			console.error('Upload failed', e);
+			alert('Failed to upload sprite');
+		}
+	}
+
+	let customSprites: { name: string; url: string }[] = [];
+
+	async function loadCustomSprites() {
+		try {
+			const records = await pb.collection('custom_sprites').getFullList({ sort: '-created' });
+			customSprites = records.map((rec) => ({
+				name: rec.sprite_name,
+				url: pb.files.getURL(rec, rec.sprite_image)
+			}));
+		} catch (err) {
+			console.error('Error fetching custom sprites:', err);
+		}
+	}
+
 </script>
 
 <svelte:head>
@@ -109,8 +153,25 @@
 			</div>
 
 			<div class="sprite-selection">
-				<h2 style="font-family: 'FrogFont', sans-serif;">Available Sprites</h2>
+				<h2 style="font-family: 'FrogFont', sans-serif;">Available Sprites</h2>				
+				<input
+					type="file"
+					accept=".png,.jpg,.jpeg"
+					on:change={handleFileUpload}
+					style="padding: 0.5rem; border-radius: 12px; border: 1px solid #ccc; background: rgba(255, 255, 255, 0.2); font-family: 'FrogFont', sans-serif;"
+				/>
+
 				<div class="sprite-grid">
+					{#each customSprites as sprite}
+						<div
+							class="sprite-option"
+							class:selected={currentSprite === sprite.name}
+							on:click={() => selectSprite(sprite.name)}
+						>
+							<img src={sprite.url} alt="Custom Avatar" />
+							<p style="font-family: 'FrogFont', sans-serif;">Custom Avatar</p>
+						</div>
+					{/each}
 					{#each KAPLAY_SPRITES as sprite}
 						<div
 							class="sprite-option"
@@ -120,7 +181,7 @@
 							<img src={getSpriteUrl(sprite)} alt={sprite} />
 							<p style="font-family: 'FrogFont', sans-serif;">{sprite}</p>
 						</div>
-					{/each}
+					{/each}			
 				</div>
 			</div>
 
