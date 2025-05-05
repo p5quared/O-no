@@ -186,16 +186,6 @@
 						</div>
 					{/each}
 
-					<div class="form-box mx-auto max-w-md p-4">
-						<div class="text-center" style="margin-bottom: 1rem;">
-							<p class="button-desc">Click "Start" to Reset the Game!</p>
-							<button class="create-btn" on:click={resetGame}>Start</button>
-							<p class="button-desc" style="margin-top: 1rem;">
-								Click "Join" to Go to Existing Game!
-							</p>
-							<button class="create-btn" on:click={joinGame}>Join</button>
-						</div>
-					</div>
 				</div>
 				<div class="create-lobby-section">
 					<button class="create-btn" on:click={handleCreateLobby}>New Lobby</button>
