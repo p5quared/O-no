@@ -102,7 +102,7 @@
 
 			await pb.collection('custom_sprites').create(formData);
 			alert('Sprite uploaded successfully!');
-			// You might want to trigger a refresh to reload the updated list
+			window.location.reload(); 
 		} catch (e) {
 			console.error('Upload failed', e);
 			alert('Failed to upload sprite');
@@ -162,6 +162,16 @@
 				/>
 
 				<div class="sprite-grid">
+					{#each customSprites as sprite}
+						<div
+							class="sprite-option"
+							class:selected={currentSprite === sprite.name}
+							on:click={() => selectSprite(sprite.name)}
+						>
+							<img src={sprite.url} alt="Custom Avatar" />
+							<p style="font-family: 'FrogFont', sans-serif;">Custom Avatar</p>
+						</div>
+					{/each}
 					{#each KAPLAY_SPRITES as sprite}
 						<div
 							class="sprite-option"
@@ -172,16 +182,6 @@
 							<p style="font-family: 'FrogFont', sans-serif;">{sprite}</p>
 						</div>
 					{/each}			
-					{#each customSprites as sprite}
-						<div
-							class="sprite-option"
-							class:selected={currentSprite === sprite.name}
-							on:click={() => selectSprite(sprite.name)}
-						>
-							<img src={sprite.url} alt={sprite.name} />
-							<p style="font-family: 'FrogFont', sans-serif;">{sprite.name}</p>
-						</div>
-					{/each}
 				</div>
 			</div>
 
