@@ -2,7 +2,7 @@
 
 A multiplayer hopping game where frogs race to reach heaven before it's too late.
 
-**Play now: [hellhopper.myintro.link](https://hellhoppers.myintro.link)**
+**Play now: [ono.cse312.myintro.link](https://ono.cse312.myintro.link)**
 
 ## 🐸 Hop or Hell: Race to Salvation
 
@@ -17,8 +17,8 @@ Hop your way up before space runs out, or face eternal damnation in frog-hell!
 
 ## Live Demo
 
-Visit [hellhopper.myintro.link](https://hellhoppers.myintro.link) to play the game online!
-
+Visit [ono.cse312.myintro.link](https://ono.cse312.myintro.link) to play the game online!
+##TA - Access The log at - O-no/app/logs
 ## Quick Start
 
 1. Start the application:
