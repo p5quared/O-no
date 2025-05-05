@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 // Set up log paths
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const LOG_DIR = path.join(__dirname, '../../../../logs');
+const LOG_DIR = path.join(__dirname, '../../../logs');
 const APP_LOG_FILE = path.join(LOG_DIR, 'app.log');
 const RAW_HTTP_LOG_FILE = path.join(LOG_DIR, 'http_raw.log');
 

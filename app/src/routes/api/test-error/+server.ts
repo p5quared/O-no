@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { errorWrapper } from '$lib/server/logging/logger';
+import { errorWrapper } from '../../../server/logging/logger';
 
 /**
  * This endpoint intentionally throws an error to test error logging with stack traces

@@ -1,4 +1,4 @@
-import { logRequest, logError, logRawHttpRequest, logRawHttpResponse, logAuth } from '$lib/server/logging/logger';
+import { logRequest, logError, logRawHttpRequest, logRawHttpResponse, logAuth } from './server/logging/logger';
 import type { Handle } from '@sveltejs/kit';
 import { pb } from '$lib/pb/pocketbase';
 

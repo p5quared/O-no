@@ -1,4 +1,4 @@
-import { logAuth } from '$lib/server/logging/logger';
+import { logAuth } from '../../../server/logging/logger';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

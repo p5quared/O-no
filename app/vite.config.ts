@@ -7,10 +7,8 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	server: {
 		watch: {
-			ignored: [
-				// Ignore log files to prevent HMR triggers
-				'** / logs/**'
-			]
+			// Prevent HMR loops when log files are updated
+			ignored: ['**/logs/**'] 
 		}
 	},
 	test: {
