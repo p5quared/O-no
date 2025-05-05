@@ -5,6 +5,14 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	server: {
+		watch: {
+			ignored: [
+				// Ignore log files to prevent HMR triggers
+				'** / logs/**'
+			]
+		}
+	},
 	test: {
 		workspace: [
 			{
